@@ -3,6 +3,9 @@ import Image from 'next/image';
 import React, { useState } from 'react'
 import {Button, ButtonGroup} from "@nextui-org/button";
 import Link from 'next/link';
+import { menu } from '@nextui-org/theme';
+import { UserButton, useUser } from '@clerk/nextjs';
+import { UserProfile } from '@clerk/nextjs';
 import {  
     Navbar,   
     NavbarBrand,   
@@ -12,9 +15,10 @@ import {
     NavbarMenu,  
     NavbarMenuItem
 }   from "@nextui-org/navbar";
-import { menu } from '@nextui-org/theme';
 
 const Header = () => {
+
+    const {user, isSignedIn} = useUser();
 
     const MenuList = [
         {
@@ -61,7 +65,14 @@ const Header = () => {
         </NavbarContent>
 
         <NavbarContent justify="end">
-            <Button color='primary'>Get Started</Button>
+            <Link href={'/dashboard'}>
+            <Button color='primary'
+            >   {
+                    isSignedIn?'Dashboard':'Get Started'
+                }
+            </Button>
+            </Link>
+            <UserButton/>
         </NavbarContent>
 
         <NavbarMenu>
