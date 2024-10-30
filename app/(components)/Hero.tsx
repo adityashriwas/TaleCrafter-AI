@@ -5,7 +5,7 @@ import Link from "next/link";
 
 const Hero = () => {
   return (
-    <div className="px-10 md:px-28 lg:px-44 mt-[20vh]">
+    <div className="px-10 md:px-28 lg:px-44 mt-[20vh] bg-[#0C0414]">
       <div className="flex sm:flex-col md:flex-row justify-center">
         <div>
           <h2 className="text-[6vw] text-extrabold py-10 leading-none">

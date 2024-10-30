@@ -56,7 +56,7 @@ const Header = () => {
 
         <NavbarContent className='hidden sm:flex'>
                 {MenuList.map((item, index) => (
-                    <NavbarItem className='text-xl font-medium hover:underline ml-3'>
+                    <NavbarItem key={index} className='text-xl font-medium hover:underline ml-3'>
                         <Link href={item.path}>
                             {item.name}
                         </Link>
@@ -77,7 +77,7 @@ const Header = () => {
 
         <NavbarMenu>
             {MenuList.map((item, index) => (
-                <NavbarMenuItem>
+                <NavbarMenuItem key={index}>
                     <Link href={item.path}>
                         {
                             item.name
