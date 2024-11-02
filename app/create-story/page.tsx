@@ -50,11 +50,12 @@ const CreateStory = () => {
         {/* story type */}
         <StoryType userSelection={onHandleUserSelection}/>s
 
+        {/* story image */}
+        <ImageStyle userSelection={onHandleUserSelection}/>
+        
         {/* age category */}
         <AgeCategory userSelection={onHandleUserSelection}/>
 
-        {/* story image */}
-        <ImageStyle userSelection={onHandleUserSelection}/>
       </div>
       <div className='flex justify-end '>
         <Button className='mt-5 text-xl p-7' color='primary'>Create Story</Button>

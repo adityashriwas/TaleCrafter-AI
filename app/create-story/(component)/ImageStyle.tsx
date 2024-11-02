@@ -17,11 +17,6 @@ const ImageStyle = ({userSelection}:any) => {
 
     const OptionList=[
         {
-            label:'3D Cartoon',
-            imageUrl: '/3D.png',
-            isFree: true
-        },
-        {
             label:'Paper Cut',
             imageUrl: '/paperCut.png',
             isFree: true
@@ -33,7 +28,17 @@ const ImageStyle = ({userSelection}:any) => {
         },
         {
             label:'Anime Style',
+            imageUrl: '/Anime.webp',
+            isFree: true
+        },
+        {
+            label:'Pixel Art',
             imageUrl: '/pixel.png',
+            isFree: true
+        },
+        {
+            label:'3D Cartoon',
+            imageUrl: '/3D.png',
             isFree: true
         }
     ]
@@ -41,10 +46,10 @@ const ImageStyle = ({userSelection}:any) => {
   return (
     <div className='mt-10'>
         <label className='text-4xl'>Image Style</label>
-        <div className='flex gap-5 mt-8 flex-wrap'>
+        <div className='mt-5 hsb overflow-x-auto whitespace-nowrap'>
             {
                 OptionList.map((item, index)=>(
-                    <div key={index} className={`relative hover:grayscale-0 cursor-pointer ${selectedOption === item.label ? 'border-medium rounded-3xl border-primary' : ''}`}
+                    <div key={index} className={`relative hover:grayscale-0 inline-block m-5 cursor-pointer ${selectedOption === item.label ? 'border-medium rounded-3xl border-primary' : ''}`}
                     onClick={()=>onUserSelect(item)}
                     >
                         <Image src={item.imageUrl} alt={item.label}

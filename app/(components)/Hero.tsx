@@ -8,7 +8,7 @@ const Hero = () => {
     <div className="px-10 md:px-28 lg:px-44 mt-[20vh] bg-[#0C0414]">
       <div className="flex sm:flex-col md:flex-row justify-center">
         <div>
-          <h2 className="text-[6vw] text-extrabold py-10 leading-none">
+          <h2 className="text-[7vw] text-extrabold py-10 leading-none">
             Convert your thoughts into stories✨
           </h2>
           <Link href="/create-story">

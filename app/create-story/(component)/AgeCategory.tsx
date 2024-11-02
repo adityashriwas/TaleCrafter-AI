@@ -16,7 +16,7 @@ const AgeCategory = ({userSelection}:any) => {
 
     const OptionList=[
         {
-            label:'Children',
+            label:'Kids',
             imageUrl: '/toddler.webp',
             isFree: true
         },

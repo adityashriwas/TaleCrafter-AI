@@ -23,8 +23,23 @@ const StoryType = ({userSelection}:any) => {
 
     const OptionList=[
         {
-            label:'Story Book',
-            imageUrl: '/Hero_img.png',
+            label:'Horror',
+            imageUrl: '/Horror.webp',
+            isFree: true, 
+        },
+        {
+            label:'Mythology',
+            imageUrl: '/mythology.webp',
+            isFree: true, 
+        },
+        {
+            label:'Sci-fi',
+            imageUrl: '/sci-fi.webp',
+            isFree: true, 
+        },
+        {
+            label:'Motivational',
+            imageUrl: '/motivational.webp',
             isFree: true, 
         },
         {
@@ -34,32 +49,7 @@ const StoryType = ({userSelection}:any) => {
         },
         {
             label:'Educational',
-            imageUrl: '/sign-in.webp',
-            isFree: true, 
-        },
-        {
-            label:'Educational',
-            imageUrl: '/sign-in.webp',
-            isFree: true, 
-        },
-        {
-            label:'Educational',
-            imageUrl: '/sign-in.webp',
-            isFree: true, 
-        },
-        {
-            label:'Educational',
-            imageUrl: '/sign-in.webp',
-            isFree: true, 
-        },
-        {
-            label:'Educational',
-            imageUrl: '/sign-in.webp',
-            isFree: true, 
-        },
-        {
-            label:'Educational',
-            imageUrl: '/sign-in.webp',
+            imageUrl: '/educational.webp',
             isFree: true, 
         },
     ]
