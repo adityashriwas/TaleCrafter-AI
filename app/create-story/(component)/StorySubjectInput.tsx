@@ -15,8 +15,8 @@ const StorySubjectInput = ({userSelection}:any) => {
                 input: " resize-y min-h-[230px] mt-2 p-5 text-2xl",
             }}
             onChange={(e)=>userSelection({
-                feildValue: e.target.value,
-                feildName: 'storySubject'
+                fieldValue: e.target.value,
+                fieldName: 'storySubject'
             })}
         />
     </div>

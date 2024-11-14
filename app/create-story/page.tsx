@@ -9,8 +9,8 @@ import { p } from 'framer-motion/client';
 import Suggestions from './(component)/Suggestions';
 
 export interface feildData {
-  feildValue: string,
-  feildName: string
+  fieldValue: string,
+  fieldName: string
 }
 
 export interface FormDataType{
@@ -30,7 +30,7 @@ const CreateStory = () => {
   const onHandleUserSelection = (data:feildData)=>{
     setFormData((prev:any)=>({
       ...prev,
-      [data.feildName]: data.feildValue,
+      [data.fieldName]: data.fieldValue,
     }));
     console.log(formData);
   }
@@ -48,7 +48,7 @@ const CreateStory = () => {
         </div>
 
         {/* story type */}
-        <StoryType userSelection={onHandleUserSelection}/>s
+        <StoryType userSelection={onHandleUserSelection}/>
 
         {/* story image */}
         <ImageStyle userSelection={onHandleUserSelection}/>
