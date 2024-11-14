@@ -8,7 +8,7 @@ const StorySubjectInput = ({userSelection}:any) => {
     <div>
         <label className='text-4xl'>Subject of the story</label>
         <Textarea 
-            className='mt-2 w-[40vw] min-w-[300px]'
+            className='mt-2 md:w-[30vw] sm:w-[80vw]'
             placeholder='Enter the subject of the story you want to create'
             size='lg'
             classNames={{

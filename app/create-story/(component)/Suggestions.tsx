@@ -8,7 +8,7 @@ const Suggestions = () => {
     <div>
         <label className='text-4xl'>Suggestions for the story</label>
         <Textarea 
-            className='mt-2 max-w-lg'
+            className='mt-2 md:w-[30vw] sm:w-[80vw]'
             placeholder='Suggestions for the story you want to create'
             size='lg'
             classNames={{

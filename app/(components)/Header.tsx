@@ -46,14 +46,14 @@ const Header = () => {
         <NavbarContent>
             <NavbarMenuToggle 
                 aria-label={isMenuOpen ? 'Close menu' : 'Open menu'} 
-                className='sm:hidden'
+                className=''
             />
             <NavbarBrand>
-                <Image src="/logo.svg" alt="Logo" width={40} height={40} />
-                <h2 className='font-bold text-2xl text-primary ml-3'>Apni Kahani</h2>
+                <Image src="/logo.svg" alt="Logo" width={30} height={30} />
+                <h2 className='font-bold text-2xl text-primary ml-3'>TaleCrafter</h2>
             </NavbarBrand>
         </NavbarContent>
-
+{/* 
         <NavbarContent className='hidden sm:flex'>
                 {MenuList.map((item, index) => (
                     <NavbarItem key={index} className='text-xl font-medium hover:underline ml-3'>
@@ -62,7 +62,7 @@ const Header = () => {
                         </Link>
                     </NavbarItem>
                 ))}
-        </NavbarContent>
+        </NavbarContent> */}
 
         <NavbarContent justify="end">
             <Link href={'/dashboard'}>
