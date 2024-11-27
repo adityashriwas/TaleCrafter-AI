@@ -41,3 +41,10 @@ html, body{
   margin-bottom: 5px;
 }
 
+@media (max-width: 768px){
+  .hero{
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+}
