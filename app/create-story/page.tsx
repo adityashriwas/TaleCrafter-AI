@@ -11,6 +11,7 @@ import { chatSession } from '@/config/GeminiAI';
 import { db } from '@/config/config';
 import { StoryData } from '@/config/schema';
 import uuid4 from 'uuid4';
+import CustomLoader from './(component)/CustomLoader';
 
 const CREATE_STORY_PROMPT=process.env.NEXT_PUBLIC_CREATE_STORY_PROMPT;
 export interface feildData {
@@ -108,6 +109,7 @@ const CreateStory = () => {
         onClick={GenerateStory}
         >Create Story</Button>
       </div>
+      <CustomLoader isLoading={loading}/>
     </div>
   )
 }
