@@ -5,13 +5,14 @@ import StoryType from './(component)/StoryType';
 import AgeCategory from './(component)/AgeCategory';
 import ImageStyle from './(component)/ImageStyle';
 import { Button } from '@nextui-org/button';
-import { p } from 'framer-motion/client';
+import { i, p } from 'framer-motion/client';
 import Suggestions from './(component)/Suggestions';
 import { chatSession } from '@/config/GeminiAI';
 import { db } from '@/config/config';
 import { StoryData } from '@/config/schema';
 import uuid4 from 'uuid4';
 import CustomLoader from './(component)/CustomLoader';
+import axios from 'axios';
 
 const CREATE_STORY_PROMPT=process.env.NEXT_PUBLIC_CREATE_STORY_PROMPT;
 export interface feildData {
@@ -51,7 +52,13 @@ const CreateStory = () => {
     .replace('{imageStyle}', formData?.imageStyle??'')
     try {
       const result = await chatSession.sendMessage(FINAL_PROMPT);
-      const resp = await SaveInDB(result?.response.text())
+      const story = JSON.parse(result?.response.text());
+      let prompt = `Add-text-with-title-"${story?.title?.replace(/\s+/g, "-")}"-in-bold-text-for-book-cover,-${story?.coverImagePrompt?.replace(/\s+/g, "-")}`;
+      const final_image_prompt = prompt;
+      
+      const imageResp = `https://image.pollinations.ai/prompt/${final_image_prompt}`;
+      console.log(imageResp);
+      const resp:any = await SaveInDB(result?.response.text(), imageResp);
       console.log(resp);
       console.log(result?.response.text());      
       setLoading(false);
@@ -61,7 +68,7 @@ const CreateStory = () => {
     }
   }
 
-  const SaveInDB = async (output:string)=>{
+  const SaveInDB = async (output:string, imageResp:string)=>{
     const recordId = uuid4();
     setLoading(true);
     try {
@@ -71,7 +78,8 @@ const CreateStory = () => {
         storyType: formData?.storyType,
         storySubject: formData?.storySubject,
         imageStyle: formData?.imageStyle,
-        output: JSON.parse(output)
+        output: JSON.parse(output),
+        coverImage: imageResp,
       }).returning({StoryId: StoryData?.storyId});
       setLoading(false);
     } catch (error) {
