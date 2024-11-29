@@ -13,6 +13,8 @@ import { StoryData } from '@/config/schema';
 import uuid4 from 'uuid4';
 import CustomLoader from './(component)/CustomLoader';
 import axios from 'axios';
+import { useUser } from '@clerk/nextjs';
+import { toast } from 'react-toastify';
 
 const CREATE_STORY_PROMPT=process.env.NEXT_PUBLIC_CREATE_STORY_PROMPT;
 export interface feildData {
@@ -31,6 +33,9 @@ const CreateStory = () => {
 
   const [formData, setFormData] = useState<FormDataType>();
   const [loading, setLoading] = useState<boolean>(false);
+  const {user} = useUser();
+  const notify = (msg:string) => toast(msg);
+  const notifyError = (msg:string) => toast.error(msg);
 
   // use to add data to the form
   // @param data
@@ -60,6 +65,7 @@ const CreateStory = () => {
       console.log(imageResp);
       const resp:any = await SaveInDB(result?.response.text(), imageResp);
       console.log(resp);
+      notify('Story Created Successfully');
       console.log(result?.response.text());      
       setLoading(false);
     } catch (error) {
@@ -80,10 +86,14 @@ const CreateStory = () => {
         imageStyle: formData?.imageStyle,
         output: JSON.parse(output),
         coverImage: imageResp,
+        userEmail: user?.primaryEmailAddress?.emailAddress,
+        userName: user?.fullName,
+        userImage: user?.imageUrl
       }).returning({StoryId: StoryData?.storyId});
       setLoading(false);
     } catch (error) {
-      console.log(error);    
+      console.log(error);   
+      notifyError('Server Error! Please try again'); 
       setLoading(false);  
     }
   }
