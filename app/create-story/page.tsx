@@ -15,6 +15,7 @@ import CustomLoader from './(component)/CustomLoader';
 import axios from 'axios';
 import { useUser } from '@clerk/nextjs';
 import { toast } from 'react-toastify';
+import { useRouter } from "next/navigation";
 
 const CREATE_STORY_PROMPT=process.env.NEXT_PUBLIC_CREATE_STORY_PROMPT;
 export interface feildData {
@@ -30,7 +31,8 @@ export interface FormDataType{
 }
 
 const CreateStory = () => {
-
+  const router = useRouter();
+  
   const [formData, setFormData] = useState<FormDataType>();
   const [loading, setLoading] = useState<boolean>(false);
   const {user} = useUser();
@@ -66,6 +68,8 @@ const CreateStory = () => {
       const resp:any = await SaveInDB(result?.response.text(), imageResp);
       console.log(resp);
       notify('Story Created Successfully');
+      router.push('/view-story/'+resp);
+
       console.log(result?.response.text());      
       setLoading(false);
     } catch (error) {
@@ -91,6 +95,7 @@ const CreateStory = () => {
         userImage: user?.imageUrl
       }).returning({StoryId: StoryData?.storyId});
       setLoading(false);
+      return result[0]?.StoryId;
     } catch (error) {
       console.log(error);   
       notifyError('Server Error! Please try again'); 
