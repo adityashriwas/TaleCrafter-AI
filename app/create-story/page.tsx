@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import StorySubjectInput from './(component)/StorySubjectInput'
 import StoryType from './(component)/StoryType';
 import AgeCategory from './(component)/AgeCategory';
@@ -16,6 +16,9 @@ import axios from 'axios';
 import { useUser } from '@clerk/nextjs';
 import { toast } from 'react-toastify';
 import { useRouter } from "next/navigation";
+import { UserDetailContext } from '@/app/_context/UserDetailContext';
+import { Users } from '@/config/schema';
+import { eq } from 'drizzle-orm';
 
 const CREATE_STORY_PROMPT=process.env.NEXT_PUBLIC_CREATE_STORY_PROMPT;
 export interface feildData {
@@ -38,6 +41,7 @@ const CreateStory = () => {
   const {user} = useUser();
   const notify = (msg:string) => toast(msg);
   const notifyError = (msg:string) => toast.error(msg);
+  const {userDetail, setUserDetail} = useContext(UserDetailContext);
 
   // use to add data to the form
   // @param data
@@ -51,6 +55,12 @@ const CreateStory = () => {
   }
 
   const GenerateStory = async()=>{
+
+    if (userDetail.credit <=0) {
+      notifyError('You have no credit left! Please buy credit to generate story');
+      return;
+    }
+
     setLoading(true);
     const FINAL_PROMPT = CREATE_STORY_PROMPT
     ?.replace('{ageGroup}', formData?.ageCategory??'')
@@ -67,7 +77,8 @@ const CreateStory = () => {
       console.log(imageResp);
       const resp:any = await SaveInDB(result?.response.text(), imageResp);
       console.log(resp);
-      notify('Story Created Successfully');
+      notify('Story Generated Successfully');
+      await UpdateUserCredits();
       router.push('/view-story/'+resp);
 
       console.log(result?.response.text());      
@@ -101,6 +112,13 @@ const CreateStory = () => {
       notifyError('Server Error! Please try again'); 
       setLoading(false);  
     }
+  }
+
+  const UpdateUserCredits = async()=>{
+    const result = await db.update(Users).set({
+      credit: Number(userDetail?.credit - 1)
+    }).where(eq(Users.userEmail, user?.primaryEmailAddress?.emailAddress??''))
+    .returning({id: Users.id})
   }
 
   return (
