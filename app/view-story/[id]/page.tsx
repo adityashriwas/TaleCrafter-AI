@@ -31,11 +31,11 @@ function ViewStory({ params }: any) {
   };
   return (
     <div className="p-10 md:px-20 lg:px-40 flex items-center bg-[#0C0414] justify-evenly flex-col">
-      <h2 className="font-bold text-4xl text-center p-10 bg-primary text-white">
+      <h2 className="font-bold text-4xl text-center py-5 min-w-full rounded-2xl bg-primary text-white">
         {story?.output?.title}
       </h2>
       {/* @ts-ignore */}
-      <HTMLFlipBook className="mt-10" width={500} height={500}
+      <HTMLFlipBook className="mt-10" width={500} height={650}
       showCover={true}
       useMouseEvents={false}
       ref={bookRef}
@@ -70,6 +70,9 @@ function ViewStory({ params }: any) {
         >
         <IoIosArrowDroprightCircle className="text-4xl cursor-pointer"/>
         </div>}
+
+        
+
     </div>
   );
 }

@@ -4,7 +4,7 @@ import React from 'react'
 const BookCoverPage = ({imageUrl}:any) => {
   return (
     <div>
-        <Image src={imageUrl} width={500} height={500} alt='cover'/>
+        <Image src={imageUrl} className='object-cover w-full h-full' width={500} height={700} alt='cover'/>
     </div>
   )
 }
