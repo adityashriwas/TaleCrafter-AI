@@ -20,8 +20,12 @@ type StoryItemType = {
 };
 const StoryItemCard = ({ story }: StoryItemType) => {
   return (
-    <Link href={'/view-story/'+story?.storyId}>
-      <Card isFooterBlurred radius="lg" className="border-none hover:scale-105 transition-all cursor-pointer overflow-hidden">
+    <Link href={"/view-story/" + story?.storyId}>
+      <Card
+        isFooterBlurred
+        radius="lg"
+        className="border-none hover:scale-105 transition-all cursor-pointer overflow-hidden"
+      >
         <Image
           alt="BookCoverImage"
           className="object-cover w-full "
@@ -29,7 +33,7 @@ const StoryItemCard = ({ story }: StoryItemType) => {
           src={story?.coverImage}
           width="100%"
         />
-        <CardFooter className="justify-between bg-white/10 border-white/20 border-1 py-1 absolute rounded-xl w-full bottom-0 shadow-small z-10"> 
+        <CardFooter className="justify-between bg-white/10 border-white/20 border-1 py-1 absolute rounded-xl w-full bottom-0 shadow-small z-10">
           <p className="text-xl text-black/80">{story?.output?.title}</p>
           <Button
             className="text-tiny text-white bg-black/20"

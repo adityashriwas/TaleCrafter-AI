@@ -18,7 +18,13 @@ const Hero = () => {
           </Link>
         </div>
         <div className="w-[90vw]">
-          <Image className="w-full home-img" src={"/Hero_img.png"} alt="img" height={700} width={800} />
+          <Image
+            className="w-full home-img"
+            src={"/Hero_img.png"}
+            alt="img"
+            height={700}
+            width={800}
+          />
         </div>
       </div>
     </div>
