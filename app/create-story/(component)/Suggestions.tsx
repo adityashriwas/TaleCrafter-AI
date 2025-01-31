@@ -3,12 +3,17 @@
 import { Textarea } from "@nextui-org/react";
 import React from "react";
 
-const Suggestions = () => {
+interface SuggestionsProps {
+  Suggestion: string;
+}
+
+const Suggestions: React.FC<SuggestionsProps> = ({ Suggestion }) => {
   return (
     <div>
       <label className="text-2xl sm:text-3xl lg:text-4xl">Suggestions</label>
       <Textarea
         disabled
+        value={Suggestion}
         className="mt-2 sm:w-[35vw] w-[80vw]"
         placeholder="Suggestions for the story you want to create"
         size="lg"
