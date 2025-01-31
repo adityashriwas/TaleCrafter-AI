@@ -44,7 +44,7 @@ const ImageStyle = ({ userSelection }: any) => {
 
   return (
     <div className="mt-10">
-      <label className="text-4xl">Image Style</label>
+      <label className="text-2xl sm:text-3xl lg:text-4xl">Image Style</label>
       <div className="mt-5 hsb overflow-x-auto whitespace-nowrap">
         {OptionList.map((item, index) => (
           <div

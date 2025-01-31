@@ -6,9 +6,10 @@ import React from "react";
 const Suggestions = () => {
   return (
     <div>
-      <label className="text-4xl">Suggestions for the story</label>
+      <label className="text-2xl sm:text-3xl lg:text-4xl">Suggestions</label>
       <Textarea
-        className="mt-2 md:w-[30vw] sm:w-[80vw]"
+        disabled
+        className="mt-2 sm:w-[35vw] w-[80vw]"
         placeholder="Suggestions for the story you want to create"
         size="lg"
         classNames={{

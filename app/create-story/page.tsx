@@ -123,12 +123,11 @@ const CreateStory = () => {
 
   return (
     <div className='px-10 md:px-20 pb-10 lg:px-40 bg-[#0C0414]'>
-      <h1 className='font-extrabold text-[5vw] text-center'>Create Story</h1>
-      <p className='text-2xl text-center'>Unlock your creativity with AI: Craft stories like never before! Let our AI bring your imagination to life, one story at a time. </p>
+      <h1 className='font-extrabold text-2xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-center'>Create Story</h1>
       <div className=''>
         {/* story subject and suggestions*/}
         
-        <div className='flex justify-between mt-10 flex-wrap gap-5'>
+        <div className='flex justify-between mt-10 flex-col sm:flex-row w-4/5 gap-5'>
         <StorySubjectInput userSelection={onHandleUserSelection}/>
         <Suggestions/>
         </div>
@@ -146,7 +145,7 @@ const CreateStory = () => {
       <div className='flex justify-end '>
         <Button 
         disabled={loading}
-        className='mt-5 text-xl p-7' color='primary'
+        className='mt-5 text-xl p-2 sm:size-full' color='primary'
         onClick={GenerateStory}
         >Create Story</Button>
       </div>

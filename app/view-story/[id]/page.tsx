@@ -30,28 +30,31 @@ function ViewStory({ params }: any) {
     setStory(result[0]);
   };
   return (
-    <div className="p-10 md:px-20 lg:px-40 flex items-center bg-[#0C0414] justify-evenly flex-col">
-      <h2 className="font-bold text-4xl text-center py-5 min-w-full rounded-2xl bg-primary text-white">
+    <div className="p-10 md:px-20 lg:px-40 flex items-center bg-[#0C0414] justify-evenly flex-col overflow-x-hidden"> 
+      <h2 className="font-bold text-3xl sm:text-4xl text-center py-4 min-w-full rounded-2xl bg-primary text-white">
         {story?.output?.title}
       </h2>
       {/* @ts-ignore */}
-      <HTMLFlipBook className="mt-10" width={500} height={650}
+      <HTMLFlipBook className="mt-10 w-full max-w-[90vw] sm:max-w-[80vw] md:max-w-[60vw] lg:max-w-[50vw]" width={410} height={650}
       showCover={true}
       useMouseEvents={false}
       ref={bookRef}
+      style={{ height: 'auto', maxHeight: 'auto' }}
       >
         <div>
           <BookCoverPage imageUrl={story?.coverImage} />
         </div>
         {
           [...Array(story?.output?.chapters?.length)].map((item, index)=>(
-            <div key={index} className="bg-white p-10 border">
+            <div key={index} className="bg-white p-5 md:p-10 border">
               <StoryPages storyChapter={story?.output?.chapters[index]}/>
             </div>
           ))
         }        
       </HTMLFlipBook>
-        { count!=0 && <div className="absolute left-[40%] bottom-4"
+
+      <div className="w-full flex justify-between mt-2 p-4 sm:px-40">
+        { count!=0 && <div className=""
         onClick={()=>{
           // @ts-ignore
           bookRef.current.pageFlip().flipPrev();
@@ -61,7 +64,7 @@ function ViewStory({ params }: any) {
         <IoIosArrowDropleftCircle className="text-4xl cursor-pointer"/>
         </div>}
       
-        { count != (story?.output.chapters?.length-1) && <div className="absolute right-[40%] bottom-4" 
+        { count != (story?.output.chapters?.length-1) && <div className="" 
         onClick={()=>{
           // @ts-ignore
           bookRef.current.pageFlip().flipNext();
@@ -70,7 +73,7 @@ function ViewStory({ params }: any) {
         >
         <IoIosArrowDroprightCircle className="text-4xl cursor-pointer"/>
         </div>}
-
+        </div>
         
 
     </div>

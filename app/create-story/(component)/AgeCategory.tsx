@@ -16,8 +16,18 @@ const AgeCategory = ({ userSelection }: any) => {
 
   const OptionList = [
     {
-      label: "Kids",
+      label: "Toddler",
       imageUrl: "/toddler.webp",
+      isFree: true,
+    },
+    {
+      label: "Kids",
+      imageUrl: "/kids.webp",
+      isFree: true,
+    },
+    {
+      label: "Pre Teen",
+      imageUrl: "/pre-teens.webp",
       isFree: true,
     },
     {
@@ -34,12 +44,12 @@ const AgeCategory = ({ userSelection }: any) => {
 
   return (
     <div className="mt-5">
-      <label className="text-4xl">Age Category</label>
-      <div className="flex gap-5 mt-8 flex-wrap">
+      <label className="text-2xl sm:text-3xl lg:text-4xl">Age Category</label>
+      <div className="mt-5 hsb overflow-x-auto whitespace-nowrap">
         {OptionList.map((item, index) => (
           <div
             key={index}
-            className={`relative hover:grayscale-0 cursor-pointer ${
+            className={`relative hover:grayscale-0 inline-block m-5 cursor-pointer ${
               selectedOption === item.label
                 ? "border-medium rounded-3xl border-primary"
                 : ""

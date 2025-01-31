@@ -30,7 +30,6 @@ const UserStoryList = () => {
   }, [user]);
 
   const getUserStory = async () => {
-    // setLoading(true)
     const result: any = await db
       .select()
       .from(StoryData)
@@ -42,18 +41,17 @@ const UserStoryList = () => {
       )
       .orderBy(desc(StoryData.id));
     setStoryList(result);
-    // setLoading(false)
   };
 
   return (
     <div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 mt-10">
-        {storyList &&
-          storyList.map((item: StoryItemType, index: number) => (
-            <StoryItemCard key={index} story={item} />
-          ))}
-      </div>
-      <CustomLoader isLoading={loading} />
+      {loading ? <CustomLoader /> :(
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-10">
+        {storyList?.map((item: StoryItemType, index: number) => (
+          <StoryItemCard key={index} story={item} />
+        ))}
+      </div>)}
+      
     </div>
   );
 };
