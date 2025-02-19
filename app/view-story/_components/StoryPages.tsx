@@ -20,7 +20,7 @@ const StoryPages = ({ storyChapter }: any) => {
           <IoPlayCircle />
         </span>
       </h2>
-      <p className="text-xl text-black p-10 mt-3 rounded-lg bg-slate-100">
+      <p className="text-xl text-black p-4 mt-3 rounded-lg bg-slate-100">
         {storyChapter?.textPrompt}
       </p>
     </div>
