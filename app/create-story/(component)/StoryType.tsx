@@ -32,8 +32,23 @@ const StoryType = ({ userSelection }: any) => {
       isFree: true,
     },
     {
+      label: "Fantasy",
+      imageUrl: "/fantasy.webp",
+      isFree: true,
+    },
+    {
       label: "Sci-fi",
       imageUrl: "/sci-fi.webp",
+      isFree: true,
+    },
+    {
+      label: "Crime",
+      imageUrl: "/Crime-Thriller.webp",
+      isFree: true,
+    },
+    {
+      label: "History",
+      imageUrl: "/History.webp",
       isFree: true,
     },
     {
@@ -49,6 +64,11 @@ const StoryType = ({ userSelection }: any) => {
     {
       label: "Educational",
       imageUrl: "/educational.webp",
+      isFree: true,
+    },
+    {
+      label: "Romantic",
+      imageUrl: "/Romance.webp",
       isFree: true,
     },
   ];
@@ -72,9 +92,9 @@ const StoryType = ({ userSelection }: any) => {
               alt={item.label}
               width={200}
               height={200}
-              className="obejct-cover rounded-3xl h-[200px] w-[200px]"
+              className="obejct-cover rounded-3xl h-[100px] w-[100px] sm:h-[200px] sm:w-[200px]"
             />
-            <h2 className="font-semibold text-2xl text-center text-primary">
+            <h2 className="font-semibold text-xl sm:text-2xl text-center text-primary">
               {item.label}
             </h2>
           </div>
