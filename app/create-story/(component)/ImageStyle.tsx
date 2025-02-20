@@ -61,9 +61,9 @@ const ImageStyle = ({ userSelection }: any) => {
               alt={item.label}
               width={200}
               height={100}
-              className="obejct-cover rounded-3xl"
+              className="obejct-cover rounded-3xl h-[100px] w-[100px] sm:h-[200px] sm:w-[200px]"
             />
-            <h2 className="text-center font-semibold text-xl text-primary">
+            <h2 className="text-center font-semibold text-xl sm:text-2xl text-primary">
               {item.label}
             </h2>
           </div>
