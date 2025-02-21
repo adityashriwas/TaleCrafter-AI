@@ -16,12 +16,12 @@ const Hero = () => {
           <p className="px-8 sm:px-40 leading-none sm:leading-6 sm:text-xl tracking-tight mb-8 text-center">Unleash your imagination with TaleCrafter AI – the ultimate AI-powered storytelling platform! Create captivating stories tailored to your preferred age group, genre, and theme, complete with stunning AI-generated visuals and immersive text-to-speech narration. Whether you're a writer, educator, or storyteller, bring your ideas to life effortlessly. Start crafting your unique story today!</p>
           <div className="flex flex-row space-x-4">
           <Link href="/create-story">
-            <Button color="primary" className="p-2 sm:size-full">
+            <Button color="primary" className="p-2 sm:p-4 sm:text-base sm:size-full">
               Create Story
             </Button>
           </Link>
           <Link href={"/dashboard"}>
-          <Button color="primary" className="p-2 sm:size-full">
+          <Button color="primary" className="p-2 sm:p-4 sm:text-base sm:size-full ">
             {" "}
            {isSignedIn ? "Dashboard" : "Get Started"}
            </Button>
