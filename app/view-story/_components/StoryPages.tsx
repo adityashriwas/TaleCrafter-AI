@@ -14,7 +14,7 @@ const StoryPages = ({ storyChapter }: any) => {
     if (isPlaying) {
       // Pause if currently speaking
       synth.pause();
-      setPausedPosition(utterance.text.length - synth.pending ? synth.pending : 0); // Store last position
+      setPausedPosition(synth.pending ? utterance.text.length : utterance.text.length); // Store last position
     } else {
       // Resume or restart
       if (synth.paused) {
