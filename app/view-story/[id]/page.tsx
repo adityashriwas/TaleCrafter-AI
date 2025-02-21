@@ -35,7 +35,7 @@ function ViewStory({ params }: any) {
         {story?.output?.title}
       </h2>
       {/* @ts-ignore */}
-      <HTMLFlipBook className="mt-10 w-full max-w-[90vw] sm:max-w-[80vw] md:max-w-[60vw] lg:max-w-[50vw]" width={410} height={650}
+      <HTMLFlipBook className="mt-10 max-w-[80vw] sm:max-w-[80vw] md:max-w-[60vw] lg:max-w-[50vw]" width={410} height={640}
       showCover={true}
       useMouseEvents={false}
       ref={bookRef}
