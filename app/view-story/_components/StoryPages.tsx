@@ -1,37 +1,37 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { IoPlayCircle, IoPauseCircle } from "react-icons/io5";
 
 const StoryPages = ({ storyChapter }: any) => {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [synth] = useState(window.speechSynthesis);
-  const [utterance] = useState(new SpeechSynthesisUtterance(storyChapter?.textPrompt));
-  const [pausedPosition, setPausedPosition] = useState(0); // Track character index
+  const [pausedPosition, setPausedPosition] = useState(0);
+  const synth = window.speechSynthesis; // Get speech synthesis instance
+  let utterance = new SpeechSynthesisUtterance(storyChapter?.textPrompt); // New instance per page
 
   // Function to toggle speech
   const toggleSpeech = () => {
     if (!synth) return;
 
     if (isPlaying) {
-      // Pause if currently speaking
-      synth.pause();
-      setPausedPosition(synth.pending ? utterance.text.length : utterance.text.length); // Store last position
+      synth.cancel(); // Stop speech completely
+      setPausedPosition(0); // Reset paused position
     } else {
-      // Resume or restart
-      if (synth.paused) {
-        synth.resume(); // Resume if paused
-      } else {
-        utterance.text = storyChapter?.textPrompt.slice(pausedPosition); // Resume from last point
-        synth.speak(utterance); // Start speaking
-      }
+      utterance = new SpeechSynthesisUtterance(storyChapter?.textPrompt); // New instance per play
+      synth.speak(utterance);
     }
+
     setIsPlaying(!isPlaying);
   };
 
   // Handle speech completion
   utterance.onend = () => {
-    setIsPlaying(false); // Reset state when finished
-    setPausedPosition(0); // Reset paused position
+    setIsPlaying(false);
+    setPausedPosition(0);
   };
+
+  // Cleanup when unmounting
+  useEffect(() => {
+    return () => synth.cancel();
+  }, []);
 
   return (
     <div>
