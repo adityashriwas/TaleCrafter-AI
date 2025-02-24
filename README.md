@@ -75,12 +75,12 @@ Technologies used in the project:
 
 ## Usage
 
-To use GitHub Profile Tracker:
+To use TaleCrafter AI:
 
 1. Open your web browser and navigate to `https://talecrafter-ai.vercel.app/`
 2. Sign up or log in using Clerk authentication.
 3. Enter a story subject and select preferences (age category, genre, theme, etc.).
-4. Click "Generate Story" to let AI create a unique story for you.
+4. Click "Create Story" to let AI create a unique story for you.
 5. View the animated book format and use text-to-speech for narration.
 6. Purchase credits if you need more story generations.
 
