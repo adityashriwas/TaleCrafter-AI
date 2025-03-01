@@ -14,11 +14,11 @@ const Suggestions: React.FC<SuggestionsProps> = ({ Suggestion }) => {
       <Textarea
         disabled
         value={Suggestion}
-        className="mt-2 sm:w-[35vw] w-[80vw]"
+        className="mt-2 sm:w-[38vw] w-[80vw]"
         placeholder="Story Ideads are generating....."
         size="lg"
         classNames={{
-          input: " resize-y min-h-[230px] mt-2 p-5 text-2xl",
+          input: " resize-y min-h-[230px] mt-2 sm:p-5 p-2 text-xl sm:text-2xl",
         }}
       />
     </div>
