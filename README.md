@@ -1,36 +1,94 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<h1 align="center" id="title">TaleCrafter AI</h1>
 
-## Getting Started
+<p align="center"><img src="https://socialify.git.ci/adityashriwas/TaleCrafter-AI/image?font=Inter&amp;forks=1&amp;issues=1&amp;language=1&amp;name=1&amp;owner=1&amp;pulls=1&amp;stargazers=1&amp;theme=Dark" alt="project-image"></p>
 
-First, run the development server:
+<p id="description">TaleCrafter AI is a full-stack Next.js application that enables users to generate AI-driven stories based on their selected criteria. Users can enter a story subject pick an age category choose a theme for the cover page and select a genre. The AI generates a complete story with an animated book experience text-to-speech support and story idea recommendations. The platform also includes a credit-based system for story creation.</p>
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+<h2>🚀 Demo</h2>
+
+[https://talecrafter-ai.vercel.app/](https://talecrafter-ai.vercel.app/)
+
+  <p align="center"><img src="https://github.com/adityashriwas/TaleCrafter-AI/blob/main/Screenshot.png" alt="project-image"></p>
+  
+<h2>🧐 Features</h2>
+
+Here're some of the project's best features:
+
+*   AI Story Generation: Generates stories based on user input.
+*   Text-to-Speech (TTS): Converts story text into speech for an immersive experience.
+*   Animated Book UI: Interactive and animated storybook presentation.
+*   Story Recommendations: AI-powered suggestions for story creation.
+*   User Authentication: Secure login/signup via Clerk.
+*   Payment System: Users can buy credits to generate more stories.
+*   PostgreSQL Database: Used for storing user data and generated stories.
+*   Responsive UI: Works on mobile and desktop.
+
+<h2>🛠️ Installation Steps:</h2>
+
+<p>1. Clone the repository</p>
+
+```
+https://github.com/adityashriwas/TaleCrafter-AI.git
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+<p>2. Install npm modules</p>
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+npm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+<p>3. Create .env.local File and Set Up Environment Variables</p>
 
-## Learn More
+```
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
+CLERK_SECRET_KEY=
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=
+NEXT_PUBLIC_DATABASE_URL=
+NEXT_PUBLIC_GEMINI_API_KEY=
+NEXT_PUBLIC_GEMINI_API_KEY_SUGGESTION=
+NEXT_PUBLIC_CREATE_STORY_PROMPT=
+NEXT_PUBLIC_SUGGESTION_STORY_PROMPT=
+NEXT_PUBLIC_PAYPAL_CLIENT_ID=
+```
 
-To learn more about Next.js, take a look at the following resources:
+<p>4. Run the Development Server</p>
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+  
+  
+<h2>💻 Built with</h2>
 
-## Deploy on Vercel
+Technologies used in the project:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+*   Next.js
+*   Typescript
+*   Tailwind CSS
+*   PostgreSQL
+*   Clerk
+*   Gemini API
+*   Pollination API
+*   react-paypal-js
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Usage
+
+To use TaleCrafter AI:
+
+1. Open your web browser and navigate to `https://talecrafter-ai.vercel.app/`
+2. Sign up or log in using Clerk authentication.
+3. Enter a story subject and select preferences (age category, genre, theme, etc.).
+4. Click "Create Story" to let AI create a unique story for you.
+5. View the animated book format and use text-to-speech for narration.
+6. Purchase credits if you need more story generations.
+
+<h2>🍰 Contribution Guidelines:</h2>
+
+I welcome contributions to make TaleCrafter AI better, please contribute using GitHub Flow, To contribute, follow these steps:
+1. Fork the repository.
+2. Create a new branch: `git checkout -b feature/your-feature-name`.
+3. Make your changes and commit them: `git commit -m 'Add some feature'`.
+4. Push to the branch: `git push origin feature/your-feature-name`.
+5. Submit a pull request.
