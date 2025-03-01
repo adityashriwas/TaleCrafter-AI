@@ -2,7 +2,7 @@ import { user } from "@nextui-org/theme";
 import { pgTable, text, serial, varchar, json, integer } from "drizzle-orm/pg-core";
 
 export const StoryData = pgTable('storyData', {
-    id:serial('id'),
+    id:serial('id').primaryKey(),
     storyId: varchar('storyId'),
     storySubject: text('storySubject'),
     storyType: varchar('storyType'),
