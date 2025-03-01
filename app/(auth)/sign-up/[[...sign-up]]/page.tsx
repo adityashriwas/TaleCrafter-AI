@@ -7,7 +7,7 @@ export default function Page() {
         <div>
           <Image src="/sign-in.webp" alt="Sign In" width={500} height={500} className='w-full h-full order-first md:order-last'/>
         </div>
-        <div className='h-screen flex justify-center items-center'>
+        <div className='min-h-screen flex justify-center items-center p-4'>
         <SignUp/>
         </div>
       </div>
