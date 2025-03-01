@@ -82,10 +82,13 @@ const CreateStory = () => {
   };
 
   const GenerateStory = async () => {
+    if (!user) { 
+      router.push("/sign-up?redirect_url=/create-story");
+      return;
+    }
+  
     if (userDetail.credit <= 0) {
-      notifyError(
-        "You have no credit left! Please buy credit to generate story"
-      );
+      notifyError("You have no credit left! Please buy credit to generate story");
       return;
     }
 
@@ -124,6 +127,7 @@ const CreateStory = () => {
       setLoading(false);
     }
   };
+  
 
   const SaveInDB = async (output: string, imageResp: string) => {
     const recordId = uuid4();
