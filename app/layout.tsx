@@ -9,7 +9,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 const myAppFont = Nunito({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "TaleCrafter AI - AI Story Generator | Create Engaging Stories with AI",
+  title: "TaleCrafter AI - AI Storyteller and Generator | Create Engaging Stories with AI",
   description:
     "TaleCrafter AI is an AI-powered storytelling platform that lets you create unique, engaging stories with text-to-speech, animated visuals, and recommendations. Perfect for writers, educators, and storytellers!",
   keywords: [
