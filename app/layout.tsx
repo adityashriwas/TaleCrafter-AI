@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     siteName: "TaleCrafter AI",
     images: [
       {
-        url: "/Screenshot.png",
+        url: "/https://github.com/adityashriwas/TaleCrafter-AI/blob/main/Screenshot.png",
         alt: "TaleCrafter AI - AI Story Generator",
       },
     ],
