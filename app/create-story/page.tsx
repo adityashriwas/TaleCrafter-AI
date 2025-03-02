@@ -37,10 +37,9 @@ export interface FormDataType {
   imageStyle: string;
 }
 
-
 const CreateStory = () => {
   const router = useRouter();
-  const [Suggestion, setSuggestion] = useState<string>('');
+  const [Suggestion, setSuggestion] = useState<string>("");
   const [formData, setFormData] = useState<FormDataType>();
   const [loading, setLoading] = useState<boolean>(false);
   const { user } = useUser();
@@ -66,7 +65,7 @@ const CreateStory = () => {
       const data = result.response.text();
       const suggestion = JSON.parse(data);
       console.log(suggestion);
-      
+
       setSuggestion(suggestion.story_idea); // Assuming story_idea is the correct field
     } catch (error) {
       console.log(error);
@@ -82,13 +81,15 @@ const CreateStory = () => {
   };
 
   const GenerateStory = async () => {
-    if (!user) { 
+    if (!user) {
       router.push("/sign-up?redirect_url=/create-story");
       return;
     }
-  
+
     if (userDetail.credit <= 0) {
-      notifyError("You have no credit left! Please buy credit to generate story");
+      notifyError(
+        "You have no credit left! Please buy credit to generate story"
+      );
       return;
     }
 
@@ -98,7 +99,7 @@ const CreateStory = () => {
       formData?.ageCategory ?? ""
     )
       .replace("{storyType}", formData?.storyType ?? "")
-      .replace("{storySubject}", formData?.storySubject ?? "")
+      .replace("{storySubject}", formData?.storySubject ?? Suggestion ?? "")
       .replace("{imageStyle}", formData?.imageStyle ?? "");
     try {
       const result = await chatSession.sendMessage(FINAL_PROMPT);
@@ -127,7 +128,6 @@ const CreateStory = () => {
       setLoading(false);
     }
   };
-  
 
   const SaveInDB = async (output: string, imageResp: string) => {
     const recordId = uuid4();
