@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     title: "TaleCrafter AI - AI Story Generator",
     description:
       "Generate AI-written stories with stunning visuals and immersive text-to-speech narration. Bring your imagination to life with TaleCrafter AI!",
-    url: "https://talecrafter-ai.vercel.app/",
+    url: "https://www.talecrafter.tech/",
     siteName: "TaleCrafter AI",
     images: [
       {
@@ -41,8 +41,8 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     images: [
       {
-        url: "/Screenshot.png",
-        alt: "TaleCrafter AI - AI Story Generator",
+        url: "/https://github.com/adityashriwas/TaleCrafter-AI/blob/main/Screenshot.png",
+        alt: "TaleCrafter AI - AI Storyteller and Generator",
       },
     ],
     creator: "Aditya Shriwas",
