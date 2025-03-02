@@ -6,7 +6,7 @@
 
 <h2>🚀 Demo</h2>
 
-[www.talecrafter.tech/](https://www.talecrafter.tech/)
+[www.talecrafter.tech](https://www.talecrafter.tech/)
 
   <p align="center"><img src="https://github.com/adityashriwas/TaleCrafter-AI/blob/main/Screenshot.png" alt="project-image"></p>
   
