@@ -16,11 +16,6 @@ const ImageStyle = ({ userSelection }: any) => {
 
   const OptionList = [
     {
-      label: "Paper Cut",
-      imageUrl: "/paperCut.png",
-      isFree: true,
-    },
-    {
       label: "Water Color",
       imageUrl: "/watercolor.png",
       isFree: true,
@@ -31,13 +26,38 @@ const ImageStyle = ({ userSelection }: any) => {
       isFree: true,
     },
     {
-      label: "Pixel Art",
-      imageUrl: "/pixel.png",
+      label: "3D Cartoon",
+      imageUrl: "/3D.png",
       isFree: true,
     },
     {
-      label: "3D Cartoon",
-      imageUrl: "/3D.png",
+      label: "Sketch",
+      imageUrl: "/Sketch.webp",
+      isFree: true,
+    },
+    {
+      label: "Oil Paint",
+      imageUrl: "/Oil-painting.webp",
+      isFree: true,
+    },
+    {
+      label: "Charcoal",
+      imageUrl: "/Charcoal-Drawing.webp",
+      isFree: true,
+    },
+    {
+      label: "Comic",
+      imageUrl: "/Comic.webp",
+      isFree: true,
+    },
+    {
+      label: "Paper Cut",
+      imageUrl: "/paperCut.png",
+      isFree: true,
+    },
+    {
+      label: "Pixel Art",
+      imageUrl: "/pixel.png",
       isFree: true,
     },
   ];
@@ -49,7 +69,7 @@ const ImageStyle = ({ userSelection }: any) => {
         {OptionList.map((item, index) => (
           <div
             key={index}
-            className={`relative hover:grayscale-0 inline-block m-5 cursor-pointer ${
+            className={`relative hover:grayscale-0 inline-block m-3 cursor-pointer ${
               selectedOption === item.label
                 ? "border-medium rounded-3xl border-primary"
                 : ""

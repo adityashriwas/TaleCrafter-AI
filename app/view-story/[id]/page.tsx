@@ -10,9 +10,10 @@ import LastPage from "../_components/LastPage";
 import { Button } from "@nextui-org/button";
 import { IoIosArrowDroprightCircle } from "react-icons/io";
 import { IoIosArrowDropleftCircle } from "react-icons/io";
+import {use} from "react";
 
-function ViewStory({ params }: any) {
-  
+function ViewStory({ params }: { params: Promise<{ id: any }> }){
+  const { id } = use(params); 
   const bookRef = useRef();
   const [story, setStory] = useState<any>();
   const [count, setCount] = useState(0);
@@ -25,17 +26,17 @@ function ViewStory({ params }: any) {
     const result = await db
       .select()
       .from(StoryData)
-      .where(eq(StoryData.storyId, params.id));
+      .where(eq(StoryData.storyId, id));
     console.log(result[0]);
     setStory(result[0]);
   };
   return (
-    <div className="p-10 md:px-20 lg:px-40 flex items-center bg-[#0C0414] justify-evenly flex-col overflow-x-hidden"> 
+    <div className="p-10 md:px-20 lg:px-40 flex items-center bg-[#0C0414] justify-evenly flex-col overflow-hidden"> 
       <h2 className="font-bold text-3xl sm:text-4xl text-center py-4 min-w-full rounded-2xl bg-primary text-white">
         {story?.output?.title}
       </h2>
       {/* @ts-ignore */}
-      <HTMLFlipBook className="mt-10 max-w-[80vw] sm:max-w-[80vw] md:max-w-[60vw] lg:max-w-[50vw]" width={410} height={640}
+      <HTMLFlipBook className="mt-10 max-w-[80vw] sm:max-w-[80vw] md:max-w-[60vw] lg:max-w-[50vw]" width={330} height={620}
       showCover={true}
       useMouseEvents={false}
       ref={bookRef}
@@ -46,8 +47,11 @@ function ViewStory({ params }: any) {
         </div>
         {
           [...Array(story?.output?.chapters?.length)].map((item, index)=>(
-            <div key={index} className="bg-white p-5 md:p-6 border">
-              <StoryPages storyChapter={story?.output?.chapters[index]}/>
+            <div key={index} className="bg-white p-4 md:p-5 border">
+              <StoryPages storyChapter={story?.output?.chapters[index]} imagePrompt={story?.output.chapters[index].imagePrompt?.replace(
+        /\s+/g,
+        "-"
+      )}/>
             </div>
           ))
         }        

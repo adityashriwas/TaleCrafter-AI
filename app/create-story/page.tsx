@@ -23,8 +23,7 @@ import { chatSessionSuggestion } from "@/config/GeminiSuggestions";
 import { log } from "console";
 
 const CREATE_STORY_PROMPT = process.env.NEXT_PUBLIC_CREATE_STORY_PROMPT;
-const GENERATE_SUGGESTION_PROMPT =
-  process.env.NEXT_PUBLIC_SUGGESTION_STORY_PROMPT;
+const GENERATE_SUGGESTION_PROMPT = process.env.NEXT_PUBLIC_SUGGESTION_STORY_PROMPT;
 export interface feildData {
   fieldValue: string;
   fieldName: string;
@@ -86,10 +85,13 @@ const CreateStory = () => {
       return;
     }
 
+    if (!userDetail || userDetail.credit === undefined) {
+      notifyError("User details not loaded yet. Please try again.");
+      return;
+    }
+    
     if (userDetail.credit <= 0) {
-      notifyError(
-        "You have no credit left! Please buy credit to generate story"
-      );
+      notifyError("You have no credit left! Please buy credit to generate story");
       return;
     }
 
@@ -107,13 +109,13 @@ const CreateStory = () => {
       let prompt = `Add-text-with-title-"${story?.title?.replace(
         /\s+/g,
         "-"
-      )}"-in-bold-text-for-book-cover,-${story?.coverImagePrompt?.replace(
+      )}"-in-bold-text-for-book-cover-image,-${story?.coverImagePrompt?.replace(
         /\s+/g,
         "-"
       )}`;
       const final_image_prompt = prompt;
 
-      const imageResp = `https://image.pollinations.ai/prompt/${final_image_prompt}`;
+      const imageResp = `https://image.pollinations.ai/prompt/${final_image_prompt}?width=410&height=630`;
       console.log(imageResp);
       const resp: any = await SaveInDB(result?.response.text(), imageResp);
       console.log(resp);

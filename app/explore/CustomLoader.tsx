@@ -41,6 +41,9 @@ import {
                       width={200}
                       alt="loading..."
                     />
+                    <h2 className="font-bold text-2xl text-primary text-center">
+                    Stories are loading...
+                  </h2>
                   </ModalBody>
                 </>
               )}

@@ -37,13 +37,13 @@ const StoryType = ({ userSelection }: any) => {
       isFree: true,
     },
     {
-      label: "Sci-fi",
-      imageUrl: "/sci-fi.webp",
+      label: "Crime",
+      imageUrl: "/Crime-Thriller.webp",
       isFree: true,
     },
     {
-      label: "Crime",
-      imageUrl: "/Crime-Thriller.webp",
+      label: "Sci-fi",
+      imageUrl: "/sci-fi.webp",
       isFree: true,
     },
     {
@@ -80,7 +80,7 @@ const StoryType = ({ userSelection }: any) => {
         {OptionList.map((item, index) => (
           <div
             key={index}
-            className={`relative hover:grayscale-0 m-2 inline-block cursor-pointer ${
+            className={`relative hover:grayscale-0 m-3 inline-block cursor-pointer ${
               selectedOption === item.label
                 ? "border-medium rounded-3xl border-primary"
                 : ""
