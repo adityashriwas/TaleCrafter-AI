@@ -11,6 +11,20 @@ html, body{
   color: #00ABF0;
 }
 
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-gradient {
+  background: linear-gradient(-45deg, #000000, #0a0f25, #14245C, #1f3b5b);
+  background-size: 400% 400%;
+  animation: gradientShift 10s ease infinite;
+}
+
+
+
 /* Scrollbar Styling */
 .hsb::-webkit-scrollbar {
   height: 8px; 

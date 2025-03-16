@@ -83,7 +83,7 @@ function PricingOptions() {
         {plans.map((plan, index) => (
           <div
             key={index}
-            className={`cursor-pointer flex-1 max-w-sm bg-[#224] p-6 m-4 rounded-lg shadow-md transition-all duration-200 
+            className={`cursor-pointer flex-1 max-w-sm bg-[#224] p-6 m-4 rounded-lg w-64 text-center shadow-lg border border-neutral-800 bg-neutral-900/50 transition-all duration-200 
                         ${selectedPlan === index ? "border-4 border-orange-500" : ""}
                         ${selectedPlan === index ? "bg-black" : ""}`}
             onClick={() => setSelectedPlan(index)}

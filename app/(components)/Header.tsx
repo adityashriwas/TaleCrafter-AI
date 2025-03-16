@@ -38,8 +38,8 @@ function Header() {
       {/* Top Navbar */}
       <nav className="sticky top-0 w-full p-2 bg-[#0f031b] backdrop-blur-md shadow-md flex justify-between items-center z-50">
         <div className="text-xl flex items-center">
-        <Image src="/logo.svg" alt="Logo" width={30} height={30} />
-        <h2 className="font-bold text-2xl text-primary ml-3">TaleCrafter</h2>
+        {/* <Image src="/logo.svg" alt="Logo" width={30} height={30} /> */}
+        <h2 className="block w-full bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent text-2xl sm:text-3xl ml-3">TaleCrafterAI</h2>
         </div>
 
         <div className="flex items-center space-x-4">
@@ -50,9 +50,9 @@ function Header() {
           className="flex flex-col space-y-1 p-2 rounded focus:outline-none"
           aria-label="Toggle Navigation Menu"
         >
-          <div className={`w-6 h-0.5 bg-[#6266f0] transition ${isOpen ? "-rotate-45 translate-x-[-6px] translate-y-[6px] " : ""}`}></div>
-          <div className={`w-6 h-0.5 bg-[#6266f0] transition ${isOpen ? "opacity-0" : ""}`}></div>
-          <div className={`w-6 h-0.5 bg-[#6266f0] transition ${isOpen ? "rotate-45 translate-x-[-6px] translate-y-[-6px]" : ""}`}></div>
+          <div className={`w-6 h-0.5 bg-gradient-to-b from-white to-gray-400 transition ${isOpen ? "-rotate-45 translate-x-[-6px] translate-y-[6px] " : ""}`}></div>
+          <div className={`w-6 h-0.5 bg-gradient-to-b from-white to-gray-400 transition ${isOpen ? "opacity-0" : ""}`}></div>
+          <div className={`w-6 h-0.5 bg-gradient-to-b from-white to-gray-400 transition ${isOpen ? "rotate-45 translate-x-[-6px] translate-y-[-6px]" : ""}`}></div>
         </button>
         </div>
       </nav>
