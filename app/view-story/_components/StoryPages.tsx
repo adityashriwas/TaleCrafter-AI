@@ -8,6 +8,7 @@ const StoryPages = ({ storyChapter }: any) => {
   const [imageLoaded, setImageLoaded] = useState(false); // Track image loading state
   const synth = window.speechSynthesis; // Get speech synthesis instance
   let utterance = new SpeechSynthesisUtterance(storyChapter?.textPrompt); // New instance per page
+  const formattedImagePrompt = encodeURIComponent(storyChapter?.imagePrompt ?? "");
 
   // Function to toggle speech
   const toggleSpeech = () => {
@@ -50,7 +51,7 @@ const StoryPages = ({ storyChapter }: any) => {
           </div>
         )}
         <img
-          src={`${storyChapter?.imagePrompt}`}
+          src={`https://image.pollinations.ai/prompt/${formattedImagePrompt}`}
           alt=""
           className={`w-full min-h-full object-cover rounded-lg transition-opacity duration-300 ${
             imageLoaded ? "opacity-100" : "opacity-0"
