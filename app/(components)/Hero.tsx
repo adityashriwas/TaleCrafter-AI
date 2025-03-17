@@ -4,6 +4,7 @@ import Image from "next/image";
 import React from "react";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
+import Video from "./Video";
 
 const Hero = () => {
   const pricingPlans = [
@@ -99,7 +100,7 @@ const Hero = () => {
 
             <div className="rounded-md border border-neutral-800 bg-neutral-900/50 p-8 text-center shadow">
               <h3 className="sm:text-xl mt-6 text-gray-400">
-                🌍 Available in 40+ Languages
+                🌍 Available in 40 Languages
               </h3>
               <p className="my-4 mb-0 font-normal leading-relaxed tracking-wide text-gray-400">
                 Generate books in multiple languages, expanding your reach
@@ -123,11 +124,13 @@ const Hero = () => {
               </h3>
               <p className="my-4 mb-0 font-normal leading-relaxed tracking-wide text-gray-400">
                 Choose premium plans, with options to purchase credits for
-                unlimited story creation.
+                more story creation.
               </p>
             </div>
           </div>
         </section>
+
+          <Video />
 
         {/* pricing section */}
         <section className="min-h-[50vh] mt-[20vh]">
@@ -139,7 +142,7 @@ const Hero = () => {
               {pricingPlans.map((plan, index) => (
                 <div
                   key={index}
-                  className="p-6 rounded-lg w-64 text-center shadow-lg border border-neutral-800 bg-neutral-900/50"
+                  className="p-6 rounded-lg w-full sm:w-64 text-center shadow-lg border border-neutral-800 bg-neutral-900/50"
                 >
                   <h3 className="text-lg font-semibold">{plan.name}</h3>
                   <p className="text-2xl font-bold my-2">{plan.price}</p>
@@ -155,31 +158,6 @@ const Hero = () => {
             </div>
           </div>
         </section>
-
-        {/* footer section */}
-        <footer className="rounded-lg shadow m-4">
-          <div className="w-full max-w-screen-xl mx-auto p-4 md:py-8 flex gap-2 flex-wrap items-center justify-center">
-            <div className="sm:flex sm:items-center sm:justify-between">
-              <div className="flex gap-2 items-center justify-center">
-                <Image
-                  src="/logo.svg"
-                  alt="TaleCrafter AI"
-                  width={40}
-                  height={40}
-                />
-                <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
-                  TaleCrafter AI
-                </span>
-              </div>
-            </div>
-            <div className="flex flex-wrap">
-              <span className="block text-sm text-center text-gray-500 sm:text-center dark:text-gray-400">
-                © {new Date().getFullYear()} TaleCrafter AI™. All Rights
-                Reserved.
-              </span>
-            </div>
-          </div>
-        </footer>
       </div>
     </>
   );

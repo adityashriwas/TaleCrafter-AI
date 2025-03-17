@@ -6,6 +6,7 @@ import { desc, eq } from "drizzle-orm";
 import React, { useEffect, useState } from "react";
 import StoryItemCard from "./StoryItemCard";
 import CustomLoader from "@/app/create-story/(component)/CustomLoader";
+import { h2 } from "framer-motion/client";
 
 type StoryItemType = {
   id: string;
@@ -45,12 +46,13 @@ const UserStoryList = () => {
 
   return (
     <div>
-      {loading ? <CustomLoader /> :(
+      {loading ? <CustomLoader/> :(
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-10">
         {storyList?.map((item: StoryItemType, index: number) => (
           <StoryItemCard key={index} story={item} />
         ))}
-      </div>)}
+      </div>)
+      }
       
     </div>
   );

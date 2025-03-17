@@ -13,6 +13,7 @@ function Header() {
   const { user, isSignedIn } = useUser();
   const toggleOpen = () => setIsOpen(!isOpen);
   const closeNavbar = () => setIsOpen(false);
+  
 
   const MenuList = [
         {
@@ -38,12 +39,12 @@ function Header() {
       {/* Top Navbar */}
       <nav className="sticky top-0 w-full p-2 bg-[#0f031b] backdrop-blur-md shadow-md flex justify-between items-center z-50">
         <div className="text-xl flex items-center">
-        {/* <Image src="/logo.svg" alt="Logo" width={30} height={30} /> */}
-        <h2 className="block w-full bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent text-2xl sm:text-3xl ml-3">TaleCrafterAI</h2>
+        <Image src="/logo.svg" alt="Logo" width={30} height={30} />
+        <h2 className="block w-full bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent text-2xl sm:text-3xl ml-1">TaleCrafterAI</h2>
         </div>
 
         <div className="flex items-center space-x-4">
-         <UserButton />
+         
         {/* Hamburger Menu Button */}
         <button
           onClick={toggleOpen}
@@ -59,18 +60,17 @@ function Header() {
 
       {/* Sidebar Menu */}
       <div
-        className={`fixed top-0 right-0 w-[250px] h-full bg-[#17031b64] backdrop-blur-sm transform transition-transform duration-300 ease-in-out z-40 pt-[100px] ${
+        className={`fixed top-0 right-0 w-[250px] h-full bg-[#17031b64] backdrop-blur-3xl transform transition-transform duration-300 ease-in-out z-40 pt-[100px] ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        
         {
           MenuList.map((item, index) => (
             <Link
               key={index}
               href={item.path}
               className={`block font-bold px-5 py-2.5 text-[20px] no-underline transition-colors duration-300 hover:bg-[#8e8f916a] ${
-                pathname === item.path ? "bg-[#1D1D2F] text-white" : "text-primary"
+                pathname === item.path ? "bg-[#1D1D2F] text-white font-bold" : "block w-full bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent"
               }`}
               onClick={closeNavbar}
             >
@@ -79,7 +79,10 @@ function Header() {
           ))
         }
 
-        
+        <div className="fixed flex items-center justify-center gap-4 bottom-0 w-full p-5 bg-[#0f031b] backdrop-blur-md shadow-md">
+        <UserButton />
+        <h2 className="font-bold text-xl text-gray-300" >{user ? user.fullName : "Guest User"}</h2>
+        </div>
       </div>
     </>
   );

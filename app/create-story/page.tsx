@@ -106,7 +106,7 @@ const CreateStory = () => {
     try {
       const result = await chatSession.sendMessage(FINAL_PROMPT);
       const story = JSON.parse(result?.response.text());
-      let prompt = `Add-text-with-title-"${story?.title?.replace(
+      let prompt = `Add-title-"${story?.title?.replace(
         /\s+/g,
         "-"
       )}"-in-bold-text-for-book-cover-image,-${story?.coverImagePrompt?.replace(
@@ -170,8 +170,8 @@ const CreateStory = () => {
   };
 
   return (
-    <div className="px-10 md:px-20 pb-10 lg:px-40 bg-[#0C0414]">
-      <h1 className="font-extrabold text-2xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-center">
+    <div className="px-7 md:px-20 pb-10 lg:px-40 bg-gradient-to-br from-black via-[#0a0f25] to-[#071340]">
+      <h1 className="text-3xl mt-4 sm:text-4xl md:text-5xl lg:text-6xl xl:text-6xl block w-full bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent text-center">
         Create Story
       </h1>
       <div className="">
@@ -194,7 +194,7 @@ const CreateStory = () => {
       <div className="flex justify-end ">
         <Button
           disabled={loading}
-          className="mt-5 text-xl p-2 sm:size-full"
+          className="mt-5 text-xl p-2 sm:size-full bg-gray-800 text-white shadow-md hover:bg-gray-700 transition"
           color="primary"
           onClick={GenerateStory}
         >

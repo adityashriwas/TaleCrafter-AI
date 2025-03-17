@@ -61,8 +61,8 @@ const ExploreMore = () => {
   };
 
   return (
-    <div className="min-h-screen p-10 md:px-20 md:py-1 lg:px-40 bg-[#0C0414]">
-      <h2 className="font-bold text-2xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-6xl text-primary text-center">
+    <div className="min-h-screen p-10 md:px-20 md:py-1 lg:px-40 bg-gradient-to-br from-black via-[#0a0f25] to-[#071340]">
+      <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-6xl block w-full bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent text-center">
         Explore Stories
       </h2>
 
@@ -88,8 +88,7 @@ const ExploreMore = () => {
             onClick={() => {
               GetAllStories(offset + 12);
             }}
-            className="mt-5"
-            color="primary"
+            className="m-5 bg-gray-800 text-white shadow-md hover:bg-gray-700 transition"
             disabled={loading}
           >
             {loading ? "Loading..." : "Load More"}
@@ -97,7 +96,7 @@ const ExploreMore = () => {
         </div>
       ) : (
         // Message when no more stories are available
-        <div className="text-center mt-10 text-gray-400">
+        <div className="text-center w-full mt-10 text-gray-400">
           <p>🎉 No more stories available! Check back later. 🎉</p>
         </div>
       )}

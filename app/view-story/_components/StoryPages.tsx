@@ -51,7 +51,7 @@ const StoryPages = ({ storyChapter }: any) => {
           </div>
         )}
         <img
-          src={`https://image.pollinations.ai/prompt/${formattedImagePrompt}`}
+          src={`https://image.pollinations.ai/prompt/${storyChapter?.textPrompt}`}
           alt=""
           className={`w-full min-h-full object-cover rounded-lg transition-opacity duration-300 ${
             imageLoaded ? "opacity-100" : "opacity-0"

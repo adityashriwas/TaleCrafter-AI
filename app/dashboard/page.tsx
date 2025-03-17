@@ -4,7 +4,7 @@ import UserStoryList from "./_components/UserStoryList";
 
 const Dashboard = () => {
   return (
-    <div className="p-10 md:px-20 lg:px-40 h-auto bg-[#0C0414]">
+    <div className="p-7 md:px-20 lg:px-40 min-h-screen bg-gradient-to-br from-black via-[#0a0f25] to-[#071340]">
       <DashboardHeader />
       <UserStoryList />
     </div>

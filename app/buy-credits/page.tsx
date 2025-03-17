@@ -76,10 +76,10 @@ function PricingOptions() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0C0414] text-center p-10 md:px-20 lg:px-40 text-white">
-      <h2 className="text-4xl font-bold mb-6">Choose Your Plan</h2>
+    <div className="min-h-screen bg-gradient-to-br from-black via-[#0a0f25] to-[#071340] text-center p-10 md:px-20 lg:px-40 ">
+      <h2 className="text-4xl font-bold mb-6 block bg-gradient-to-b from-white to-gray-400 bg-clip-text text-transparent">Choose Your Plan</h2>
 
-      <div className="flex justify-center items-center space-x-4 flex-wrap">
+      <div className="flex justify-center items-center space-x-4 flex-wrap text-gray-300">
         {plans.map((plan, index) => (
           <div
             key={index}

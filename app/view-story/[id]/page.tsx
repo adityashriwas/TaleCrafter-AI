@@ -31,8 +31,8 @@ function ViewStory({ params }: { params: Promise<{ id: any }> }){
     setStory(result[0]);
   };
   return (
-    <div className="p-10 md:px-20 lg:px-40 flex items-center bg-[#0C0414] justify-evenly flex-col overflow-hidden"> 
-      <h2 className="font-bold text-3xl sm:text-4xl text-center py-4 min-w-full rounded-2xl bg-primary text-white">
+    <div className="min-h-screen p-10 md:px-20 lg:px-40 flex items-center bg-gradient-to-br from-black via-[#0a0f25] to-[#071340] justify-evenly flex-col overflow-hidden"> 
+      <h2 className="text-3xl sm:text-4xl text-center py-4 min-w-full rounded-2xl border border-neutral-800 bg-neutral-900/50 p-8 shadow block bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent">
         {story?.output?.title}
       </h2>
       {/* @ts-ignore */}
@@ -65,7 +65,7 @@ function ViewStory({ params }: { params: Promise<{ id: any }> }){
           setCount(count-1);
         }}
         >
-        <IoIosArrowDropleftCircle className="text-4xl cursor-pointer"/>
+        <IoIosArrowDropleftCircle className="text-4xl cursor-pointer text-gray-300"/>
         </div>}
       
         { count != (story?.output.chapters?.length-1) && <div className="" 
@@ -75,7 +75,7 @@ function ViewStory({ params }: { params: Promise<{ id: any }> }){
           setCount(count+1);
         }}
         >
-        <IoIosArrowDroprightCircle className="text-4xl cursor-pointer"/>
+        <IoIosArrowDroprightCircle className="text-4xl cursor-pointer text-gray-300"/>
         </div>}
         </div>
         
