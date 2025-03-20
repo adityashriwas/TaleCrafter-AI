@@ -115,7 +115,7 @@ const CreateStory = () => {
       )}`;
       const final_image_prompt = prompt;
 
-      const imageResp = `https://image.pollinations.ai/prompt/${final_image_prompt}?width=410&height=630`;
+      const imageResp = `https://image.pollinations.ai/prompt/${final_image_prompt}?enhance=true&nologo=true&width=410&height=630`;
       console.log(imageResp);
       const resp: any = await SaveInDB(result?.response.text(), imageResp);
       console.log(resp);

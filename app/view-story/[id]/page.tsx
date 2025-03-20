@@ -6,11 +6,12 @@ import React, { useEffect, useRef, useState } from "react";
 import HTMLFlipBook from "react-pageflip";
 import BookCoverPage from "../_components/BookCoverPage";
 import StoryPages from "../_components/StoryPages";
-import LastPage from "../_components/LastPage";
+import LastPage from "../_components/shareButton";
 import { Button } from "@nextui-org/button";
 import { IoIosArrowDroprightCircle } from "react-icons/io";
 import { IoIosArrowDropleftCircle } from "react-icons/io";
 import {use} from "react";
+import ShareButton from "../_components/shareButton";
 
 function ViewStory({ params }: { params: Promise<{ id: any }> }){
   const { id } = use(params); 
@@ -30,6 +31,10 @@ function ViewStory({ params }: { params: Promise<{ id: any }> }){
     console.log(result[0]);
     setStory(result[0]);
   };
+
+  // share story
+  const storyUrl = typeof window !== "undefined" ? window.location.href : "";
+
   return (
     <div className="min-h-screen p-10 md:px-20 lg:px-40 flex items-center bg-gradient-to-br from-black via-[#0a0f25] to-[#071340] justify-evenly flex-col overflow-hidden"> 
       <h2 className="text-3xl sm:text-4xl text-center py-4 min-w-full rounded-2xl border border-neutral-800 bg-neutral-900/50 p-8 shadow block bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent">
@@ -54,10 +59,10 @@ function ViewStory({ params }: { params: Promise<{ id: any }> }){
       )}/>
             </div>
           ))
-        }        
+        } 
       </HTMLFlipBook>
 
-      <div className="w-full flex justify-between mt-2 p-4 sm:px-40">
+      <div className="w-full flex justify-between items-center mt-2 p-4 sm:px-40">
         { count!=0 && <div className=""
         onClick={()=>{
           // @ts-ignore
@@ -67,6 +72,7 @@ function ViewStory({ params }: { params: Promise<{ id: any }> }){
         >
         <IoIosArrowDropleftCircle className="text-4xl cursor-pointer text-gray-300"/>
         </div>}
+        <ShareButton storyTitle={story?.output?.title} storyUrl={storyUrl}/>       
       
         { count != (story?.output.chapters?.length-1) && <div className="" 
         onClick={()=>{
