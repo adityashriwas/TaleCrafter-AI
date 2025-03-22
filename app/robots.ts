@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '*',
       disallow: '/private/',
     },
-    sitemap: 'https://www.talecrafter.tech/sitemap.xml',
+    sitemap: 'https://talecrafter-ai.vercel.app/sitemap.xml',
   }
 }

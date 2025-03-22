@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import "./globals.css";
 import Provider from "./Provider";
 import Header from "./(components)/Header";
@@ -25,7 +24,7 @@ export const metadata: Metadata = {
     title: "TaleCrafter AI - AI Story Generator",
     description:
       "Generate AI-written stories with stunning visuals and immersive text-to-speech narration. Bring your imagination to life with TaleCrafter AI!",
-    url: "https://www.talecrafter.tech/",
+    url: "https://talecrafter-ai.vercel.app/",
     siteName: "TaleCrafter AI",
     images: [
       {

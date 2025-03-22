@@ -3,31 +3,31 @@ import type { MetadataRoute } from 'next'
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
-      url: 'https://www.talecrafter.tech/',
+      url: 'https://talecrafter-ai.vercel.app/',
       lastModified: new Date(),
       changeFrequency: 'yearly',
       priority: 1,
     },
     {
-      url: 'https://www.talecrafter.tech/create-story',
+      url: 'https://talecrafter-ai.vercel.app/create-story',
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
-      url: 'https://www.talecrafter.tech/explore',
+      url: 'https://talecrafter-ai.vercel.app/explore',
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
-      url: 'https://www.talecrafter.tech/dashboard',
+      url: 'https://talecrafter-ai.vercel.app/dashboard',
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.5,
     },
     {
-      url: 'https://www.talecrafter.tech/buy-credits',
+      url: 'https://talecrafter-ai.vercel.app/buy-credits',
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.5,
