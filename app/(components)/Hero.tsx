@@ -1,6 +1,5 @@
 "use client";
 import { Button } from "@nextui-org/button";
-import Image from "next/image";
 import React from "react";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
@@ -10,10 +9,10 @@ const Hero = () => {
   const pricingPlans = [
     { name: "Basic", price: "$1.99", credits: "10", color: "bg-blue-600" },
     { name: "Standard", price: "$2.99", credits: "30", color: "bg-blue-600" },
-    { name: "Premium", price: "$5.99", credits: "75", color: "bg-blue-500" },
+    { name: "Premium", price: "$3.99", credits: "75", color: "bg-blue-500" },
     {
       name: "Ultimate",
-      price: "$9.99",
+      price: "$5.99",
       credits: "150",
       color: "bg-blue-500",
     },

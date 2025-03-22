@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { IoPlayCircle, IoPauseCircle } from "react-icons/io5";
-import Image from "next/image";
 
 const StoryPages = ({ storyChapter }: any) => {
   const [isPlaying, setIsPlaying] = useState(false);

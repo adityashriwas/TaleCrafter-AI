@@ -6,8 +6,6 @@ import React, { useEffect, useRef, useState } from "react";
 import HTMLFlipBook from "react-pageflip";
 import BookCoverPage from "../_components/BookCoverPage";
 import StoryPages from "../_components/StoryPages";
-import LastPage from "../_components/shareButton";
-import { Button } from "@nextui-org/button";
 import { IoIosArrowDroprightCircle } from "react-icons/io";
 import { IoIosArrowDropleftCircle } from "react-icons/io";
 import {use} from "react";
@@ -28,7 +26,7 @@ function ViewStory({ params }: { params: Promise<{ id: any }> }){
       .select()
       .from(StoryData)
       .where(eq(StoryData.storyId, id));
-    console.log(result[0]);
+    // console.log(result[0]);
     setStory(result[0]);
   };
 

@@ -5,14 +5,12 @@ import StoryType from "./(component)/StoryType";
 import AgeCategory from "./(component)/AgeCategory";
 import ImageStyle from "./(component)/ImageStyle";
 import { Button } from "@nextui-org/button";
-import { i, p } from "framer-motion/client";
 import Suggestions from "./(component)/Suggestions";
 import { chatSession } from "@/config/GeminiAI";
 import { db } from "@/config/config";
 import { StoryData } from "@/config/schema";
 import uuid4 from "uuid4";
 import CustomLoader from "./(component)/CustomLoader";
-import axios from "axios";
 import { useUser } from "@clerk/nextjs";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
@@ -20,7 +18,6 @@ import { UserDetailContext } from "@/app/_context/UserDetailContext";
 import { Users } from "@/config/schema";
 import { eq } from "drizzle-orm";
 import { chatSessionSuggestion } from "@/config/GeminiSuggestions";
-import { log } from "console";
 
 const CREATE_STORY_PROMPT = process.env.NEXT_PUBLIC_CREATE_STORY_PROMPT;
 const GENERATE_SUGGESTION_PROMPT = process.env.NEXT_PUBLIC_SUGGESTION_STORY_PROMPT;
@@ -63,11 +60,11 @@ const CreateStory = () => {
       );
       const data = result.response.text();
       const suggestion = JSON.parse(data);
-      console.log(suggestion);
+      // console.log(suggestion);
 
       setSuggestion(suggestion.story_idea); // Assuming story_idea is the correct field
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 
@@ -76,7 +73,7 @@ const CreateStory = () => {
       ...prev,
       [data.fieldName]: data.fieldValue,
     }));
-    console.log(formData);
+    // console.log(formData);
   };
 
   const GenerateStory = async () => {
@@ -116,17 +113,18 @@ const CreateStory = () => {
       const final_image_prompt = prompt;
 
       const imageResp = `https://image.pollinations.ai/prompt/${final_image_prompt}?enhance=true&nologo=true&width=410&height=630`;
-      console.log(imageResp);
+      // console.log(imageResp);
       const resp: any = await SaveInDB(result?.response.text(), imageResp);
-      console.log(resp);
+      // console.log(resp);
       notify("Story Generated Successfully");
       await UpdateUserCredits();
       router.push("/view-story/" + resp);
 
-      console.log(result?.response.text());
+      // console.log(result?.response.text());
       setLoading(false);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
+      notifyError("Server Error! Please try again");
       setLoading(false);
     }
   };
@@ -153,7 +151,7 @@ const CreateStory = () => {
       setLoading(false);
       return result[0]?.StoryId;
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       notifyError("Server Error! Please try again");
       setLoading(false);
     }

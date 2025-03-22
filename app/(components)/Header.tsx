@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import { Button } from "@nextui-org/button";
 import { UserButton, useUser } from "@clerk/nextjs";
 
 function Header() {

@@ -28,14 +28,14 @@ function PricingOptions() {
     {
       id: 3,
       title: "Premium",
-      price: 5.99,
+      price: 3.99,
       credits: 75,
       highlighted: true,
     },
     {
       id: 4,
       title: "Ultimate",
-      price: 9.99,
+      price: 5.99,
       credits: 150,
       highlighted: true,
     },

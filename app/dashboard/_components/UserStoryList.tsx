@@ -6,7 +6,6 @@ import { desc, eq } from "drizzle-orm";
 import React, { useEffect, useState } from "react";
 import StoryItemCard from "./StoryItemCard";
 import CustomLoader from "@/app/create-story/(component)/CustomLoader";
-import { h2 } from "framer-motion/client";
 
 type StoryItemType = {
   id: string;
