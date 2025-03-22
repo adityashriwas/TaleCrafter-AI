@@ -31,18 +31,8 @@ const ImageStyle = ({ userSelection }: any) => {
       isFree: true,
     },
     {
-      label: "Sketch",
-      imageUrl: "/Sketch.webp",
-      isFree: true,
-    },
-    {
       label: "Oil Paint",
       imageUrl: "/Oil-painting.webp",
-      isFree: true,
-    },
-    {
-      label: "Charcoal",
-      imageUrl: "/Charcoal-Drawing.webp",
       isFree: true,
     },
     {

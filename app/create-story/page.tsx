@@ -111,7 +111,7 @@ const CreateStory = () => {
         "-"
       )}`;
       const final_image_prompt = prompt;
-
+      console.log(final_image_prompt);
       const imageResp = `https://image.pollinations.ai/prompt/${final_image_prompt}?enhance=true&nologo=true&width=410&height=630`;
       // console.log(imageResp);
       const resp: any = await SaveInDB(result?.response.text(), imageResp);
@@ -120,7 +120,7 @@ const CreateStory = () => {
       await UpdateUserCredits();
       router.push("/view-story/" + resp);
 
-      // console.log(result?.response.text());
+      console.log(result?.response.text());
       setLoading(false);
     } catch (error) {
       // console.log(error);
