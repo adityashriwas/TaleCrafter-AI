@@ -15,6 +15,7 @@
 Here're some of the project's best features:
 
 *   AI Story Generation: Generates stories based on user input.
+*   Image to Story: Generate story book by uploading and image.
 *   Text-to-Speech (TTS): Converts story text into speech for an immersive experience.
 *   Animated Book UI: Interactive and animated storybook presentation.
 *   Story Recommendations: AI-powered suggestions for story creation.
@@ -38,19 +39,6 @@ npm install
 ```
 
 <p>3. Create .env.local File and Set Up Environment Variables</p>
-
-```
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
-CLERK_SECRET_KEY=
-NEXT_PUBLIC_CLERK_SIGN_IN_URL=
-NEXT_PUBLIC_CLERK_SIGN_UP_URL=
-NEXT_PUBLIC_DATABASE_URL=
-NEXT_PUBLIC_GEMINI_API_KEY=
-NEXT_PUBLIC_GEMINI_API_KEY_SUGGESTION=
-NEXT_PUBLIC_CREATE_STORY_PROMPT=
-NEXT_PUBLIC_SUGGESTION_STORY_PROMPT=
-NEXT_PUBLIC_PAYPAL_CLIENT_ID=
-```
 
 <p>4. Run the Development Server</p>
 
@@ -84,7 +72,7 @@ To use TaleCrafter AI:
 5. View the animated book format and use text-to-speech for narration.
 6. Purchase credits if you need more story generations.
 
-<h2>🍰 Contribution Guidelines:</h2>
+<h2>Contribution Guidelines:</h2>
 
 I welcome contributions to make TaleCrafter AI better, please contribute using GitHub Flow, To contribute, follow these steps:
 1. Fork the repository.
