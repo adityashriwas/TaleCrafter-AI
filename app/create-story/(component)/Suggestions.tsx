@@ -5,20 +5,20 @@ import React from "react";
 
 interface SuggestionsProps {
   Suggestion: string;
+  text: string;
 }
 
-const Suggestions: React.FC<SuggestionsProps> = ({ Suggestion }) => {
+const Suggestions: React.FC<SuggestionsProps> = ({ Suggestion, text }) => {
   return (
     <div>
       <label className="text-2xl sm:text-3xl lg:text-4xl block w-full bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent">Story Ideas</label>
       <Textarea
         disabled
-        value={Suggestion}
-        className="mt-2 sm:w-[38vw] w-[80vw]"
+        value={text ? text.replace("Here's a short story idea based on the image:", ""): Suggestion}
+        className="mt-2 w-full"
         placeholder="Story Ideads are generating....."
-        size="lg"
         classNames={{
-          input: " resize-y min-h-[230px] mt-2 sm:p-5 p-2 text-xl sm:text-2xl",
+          input: "mt-2 sm:p-2 p-1 sm:text-2xl bg-transparent",
         }}
       />
     </div>

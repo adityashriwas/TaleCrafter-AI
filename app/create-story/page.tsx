@@ -18,6 +18,8 @@ import { UserDetailContext } from "@/app/_context/UserDetailContext";
 import { Users } from "@/config/schema";
 import { eq } from "drizzle-orm";
 import { chatSessionSuggestion } from "@/config/GeminiSuggestions";
+import UploadImage from "./(component)/UploadImage";
+
 
 const CREATE_STORY_PROMPT = process.env.NEXT_PUBLIC_CREATE_STORY_PROMPT;
 const GENERATE_SUGGESTION_PROMPT = process.env.NEXT_PUBLIC_SUGGESTION_STORY_PROMPT;
@@ -33,7 +35,7 @@ export interface FormDataType {
   imageStyle: string;
 }
 
-const CreateStory = () => {
+const CreateStory = ({ passData} : any) => {
   const router = useRouter();
   const [Suggestion, setSuggestion] = useState<string>("");
   const [formData, setFormData] = useState<FormDataType>();
@@ -42,6 +44,8 @@ const CreateStory = () => {
   const notify = (msg: string) => toast(msg);
   const notifyError = (msg: string) => toast.error(msg);
   const { userDetail, setUserDetail } = useContext(UserDetailContext);
+  const [storySubject, setStorySubject] = useState("");
+  
 
   // use to add data to the form
   // @param data
@@ -72,7 +76,9 @@ const CreateStory = () => {
     setFormData((prev: any) => ({
       ...prev,
       [data.fieldName]: data.fieldValue,
-    }));
+    }
+  ));
+  setStorySubject(storySubject);
     // console.log(formData);
   };
 
@@ -98,7 +104,7 @@ const CreateStory = () => {
       formData?.ageCategory ?? ""
     )
       .replace("{storyType}", formData?.storyType ?? "")
-      .replace("{storySubject}", formData?.storySubject ?? Suggestion ?? "")
+      .replace("{storySubject}", storySubject.replace("Here's a short story idea based on the image:", "") || formData?.storySubject || Suggestion || "")
       .replace("{imageStyle}", formData?.imageStyle ?? "");
     try {
       const result = await chatSession.sendMessage(FINAL_PROMPT);
@@ -175,10 +181,12 @@ const CreateStory = () => {
       <div className="">
         {/* story subject and suggestions*/}
 
-        <div className="flex justify-between mt-10 flex-col sm:flex-row w-4/5 gap-5">
+        <div className="flex flex-col justify-between mt-10 gap-5">
           <StorySubjectInput userSelection={onHandleUserSelection} />
-          <Suggestions Suggestion={Suggestion} />
+          <Suggestions Suggestion={Suggestion} text={storySubject} />
         </div>
+        <UploadImage setImageSubject={setStorySubject}/>
+
 
         {/* story type */}
         <StoryType userSelection={onHandleUserSelection} />
