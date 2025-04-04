@@ -76,6 +76,14 @@ const Hero = () => {
                 theme, and let AI bring your ideas to life.
               </p>
             </div>
+            <div className="rounded-md border border-neutral-800 bg-neutral-900/50 p-8 text-center shadow">
+              <h3 className="sm:text-xl mt-6 text-gray-400">
+              🖼️ Image to Story Generation
+              </h3>
+              <p className="my-4 mb-0 font-normal leading-relaxed tracking-wide text-gray-400">
+              Upload any image and watch it come to life as a story! Our AI smartly analyzes visuals, detects characters and turns them into immersive, structured stories
+              </p>
+            </div>
 
             <div className="rounded-md border border-neutral-800 bg-neutral-900/50 p-8 text-center shadow">
               <h3 className="sm:text-xl mt-6 text-gray-400">
@@ -114,16 +122,6 @@ const Hero = () => {
               <p className="my-4 mb-0 font-normal leading-relaxed tracking-wide text-gray-400">
                 Experience books like never before with interactive animations
                 that make reading fun and visually engaging.
-              </p>
-            </div>
-
-            <div className="rounded-md border border-neutral-800 bg-neutral-900/50 p-8 text-center shadow">
-              <h3 className="sm:text-xl mt-6 text-gray-400">
-                💰 Flexible Pricing Plans
-              </h3>
-              <p className="my-4 mb-0 font-normal leading-relaxed tracking-wide text-gray-400">
-                Choose premium plans, with options to purchase credits for
-                more story creation.
               </p>
             </div>
           </div>
