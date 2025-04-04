@@ -11,10 +11,10 @@ interface SuggestionsProps {
 const Suggestions: React.FC<SuggestionsProps> = ({ Suggestion, text }) => {
   return (
     <div>
-      <label className="text-2xl sm:text-3xl lg:text-4xl block w-full bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent">Story Ideas</label>
+      <label className="text-2xl sm:text-3xl lg:text-4xl block w-full bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent">AI Genrated Ideas</label>
       <Textarea
         disabled
-        value={text ? text.replace("Here's a short story idea based on the image:", ""): Suggestion}
+        value={text ? text : Suggestion}
         className="mt-2 w-full"
         placeholder="Story Ideads are generating....."
         classNames={{

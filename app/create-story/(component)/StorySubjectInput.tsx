@@ -6,7 +6,7 @@ import React from "react";
 const StorySubjectInput = ({ userSelection }: any) => {
   return (
     <div>
-      <label className="text-2xl sm:text-3xl lg:text-4xl block w-full bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent">Subject of the story</label>
+      <label className="text-2xl sm:text-3xl lg:text-4xl block w-full bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent">Your Imagination</label>
       <Textarea
         className="mt-2 w-full"
         placeholder="Enter the subject of the story or pick an image to generate a story"

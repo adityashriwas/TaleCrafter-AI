@@ -81,7 +81,7 @@ const StoryType = ({ userSelection }: any) => {
             key={index}
             className={`relative hover:grayscale-0 m-1 p-1 sm:m-3 inline-block cursor-pointer ${
               selectedOption === item.label
-                ? "border-medium rounded-3xl border-primary"
+                ? "border-medium rounded-3xl border-gray-400"
                 : ""
             }`}
             onClick={() => onUserSelect(item)}

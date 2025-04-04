@@ -122,7 +122,7 @@ export default function UploadImage({ setImageSubject }: { setImageSubject: (tex
                   if (line.trim() !== "") {
                     return (
                       <p key={index} className="mb-1 text-gray-100 sm:text-xl p-4">
-                        {line.replace("Here's a short story idea based on the image:", "")}
+                        {line}
                       </p>
                     );
                   }

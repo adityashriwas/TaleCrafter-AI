@@ -104,7 +104,7 @@ const CreateStory = ({ passData} : any) => {
       formData?.ageCategory ?? ""
     )
       .replace("{storyType}", formData?.storyType ?? "")
-      .replace("{storySubject}", storySubject.replace("Here's a short story idea based on the image:", "") || formData?.storySubject || Suggestion || "")
+      .replace("{storySubject}",formData?.storySubject || storySubject.replace("Here's a short story idea based on the image:", "") || Suggestion || "")
       .replace("{imageStyle}", formData?.imageStyle ?? "");
     try {
       const result = await chatSession.sendMessage(FINAL_PROMPT);
