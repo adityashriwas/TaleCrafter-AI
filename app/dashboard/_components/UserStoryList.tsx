@@ -48,7 +48,7 @@ const UserStoryList = () => {
       {loading ? <CustomLoader/> :(
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-10">
         {storyList?.map((item: StoryItemType, index: number) => (
-          <StoryItemCard key={index} story={item} />
+          <StoryItemCard story={item} currentUserEmail={user?.user?.primaryEmailAddress?.emailAddress ?? ""} />
         ))}
       </div>)
       }

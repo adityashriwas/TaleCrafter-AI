@@ -1,8 +1,14 @@
+"use client";
 import React from "react";
-import { Card, CardHeader, CardBody, CardFooter } from "@nextui-org/card";
+import { Card, CardFooter } from "@nextui-org/card";
 import { Button } from "@nextui-org/react";
 import { Image } from "@nextui-org/react";
 import Link from "next/link";
+import { db } from "@/config/config";
+import { StoryData } from "@/config/schema";
+import { eq } from "drizzle-orm";
+import { toast } from "react-toastify";
+
 type StoryItemType = {
   story: {
     id: string;
@@ -17,8 +23,36 @@ type StoryItemType = {
     userEmail: string;
     output: [] | any;
   };
+  currentUserEmail: string; // new prop
 };
-const StoryItemCard = ({ story }: StoryItemType) => {
+
+const deleteStoryFromDB = async (storyId: string) => {
+  try {
+    const result = await db
+      .delete(StoryData)
+      .where(eq(StoryData.storyId, storyId));
+
+    return result;
+  } catch (error) {
+    console.error("Error deleting story:", error);
+    throw new Error("Failed to delete story.");
+  }
+};
+
+const StoryItemCard = ({ story, currentUserEmail }: StoryItemType) => {
+  const isOwner = story.userEmail === currentUserEmail;
+
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault(); // prevent navigating via <Link>
+    try {
+      await deleteStoryFromDB(story.storyId);
+      toast.success("Story deleted successfully");
+    } catch (error) {
+      toast.error("Failed to delete story");
+    }
+  };
+
   return (
     <Link href={"/view-story/" + story?.storyId}>
       <Card
@@ -28,22 +62,35 @@ const StoryItemCard = ({ story }: StoryItemType) => {
       >
         <Image
           alt="BookCoverImage"
-          className="object-cover w-full "
+          className="object-cover w-full"
           height={200}
           src={story?.coverImage}
           width="100%"
         />
         <CardFooter className="justify-between bg-white/10 border-white/20 border-1 py-1 absolute rounded-xl w-full bottom-0 shadow-small z-10">
-          <p className="text-xl text-black/80">{story?.output?.title}</p>
-          <Button
-            className="text-tiny text-white bg-black/20"
-            variant="flat"
-            color="default"
-            radius="full"
-            size="sm"
-          >
-            Read
-          </Button>
+          <p className="text-xl text-black/80 truncate max-w-[80%]">
+            {story?.output?.title}
+          </p>
+          {isOwner ? (
+            <Button
+              onClick={handleDelete}
+              className="text-tiny text-white bg-black/20"
+              variant="flat"
+              radius="full"
+              size="sm"
+            >
+              Delete
+            </Button>
+          ) : (
+            <Button
+              className="text-tiny text-white bg-black/20"
+              variant="flat"
+              radius="full"
+              size="sm"
+            >
+              Read
+            </Button>
+          )}
         </CardFooter>
       </Card>
     </Link>
