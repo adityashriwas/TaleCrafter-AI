@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
 import Video from "./Video";
+import Feedback from "./Feedback";
 
 const Hero = () => {
   const pricingPlans = [
@@ -155,6 +156,8 @@ const Hero = () => {
             </div>
           </div>
         </section>
+
+        <Feedback/>
       </div>
     </>
   );

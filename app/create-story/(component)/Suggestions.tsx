@@ -11,7 +11,7 @@ interface SuggestionsProps {
 const Suggestions: React.FC<SuggestionsProps> = ({ Suggestion, text }) => {
   return (
     <div>
-      <label className="text-2xl sm:text-3xl lg:text-4xl block w-full bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent">AI Genrated Ideas</label>
+      <label className="text-2xl sm:text-3xl lg:text-4xl block w-full bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent">AI Generated Ideas</label>
       <Textarea
         disabled
         value={text ? text : Suggestion}

@@ -38,8 +38,8 @@ function Header() {
       {/* Top Navbar */}
       <nav className="sticky top-0 w-full p-2 bg-[#0f031b] backdrop-blur-md shadow-md flex justify-between items-center z-50">
         <div className="text-xl flex items-center">
-        <Image src="/logo.svg" alt="Logo" width={30} height={30} />
-        <h2 className="block w-full bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent text-2xl sm:text-3xl ml-1">TaleCrafterAI</h2>
+        <Image src="/logo.png" alt="Logo" width={50} height={50} />
+        <h2 className="block w-full bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent text-lg sm:text-xl ml-1">TaleCrafterAI</h2>
         </div>
 
         <div className="flex items-center space-x-4">
