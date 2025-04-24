@@ -7,7 +7,9 @@ const StoryPages = ({ storyChapter }: any) => {
   const [imageLoaded, setImageLoaded] = useState(false); // Track image loading state
   const synth = window.speechSynthesis; // Get speech synthesis instance
   let utterance = new SpeechSynthesisUtterance(storyChapter?.textPrompt); // New instance per page
-  const formattedImagePrompt = encodeURIComponent(storyChapter?.imagePrompt ?? "");
+  const formattedImagePrompt = encodeURIComponent(
+    storyChapter?.imagePrompt ?? ""
+  );
 
   // Function to toggle speech
   const toggleSpeech = () => {
@@ -60,7 +62,10 @@ const StoryPages = ({ storyChapter }: any) => {
       </div>
       <div className="hsb2 max-h-52 overflow-y-scroll mt-2">
         <p className="text-xl text-black p-4 mt-3 rounded-lg bg-slate-100">
-          {storyChapter?.textPrompt}
+          {storyChapter?.textPrompt
+            ?.split(storyChapter?.imagePrompt?.substring(0, 20) || "")[0]
+            ?.replace(/\{[^}]*\}/g, "")
+            ?.trim()}
         </p>
       </div>
     </div>

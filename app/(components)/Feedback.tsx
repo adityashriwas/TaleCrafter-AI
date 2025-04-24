@@ -1,8 +1,10 @@
 import React from 'react'
-import { Button, Textarea } from "@nextui-org/react";
+import { toast } from "react-toastify";
+import { Textarea } from "@nextui-org/react";
 
 const Contact = () => {
-
+  
+  const notify = (message: string) => toast(message);  
   const [result, setResult] = React.useState("");
   
     const onSubmit = async (event:any) => {
@@ -25,7 +27,7 @@ const Contact = () => {
         console.log("Error", data);
         setResult(data.message);
       }
-      setTimeout(() => {}, 3000);    
+      notify("Feedback submitted successfully!");
       setResult("Submit now")
     };
 
