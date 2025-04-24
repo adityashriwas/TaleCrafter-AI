@@ -65,6 +65,10 @@ const StoryPages = ({ storyChapter }: any) => {
           {storyChapter?.textPrompt
             ?.split(storyChapter?.imagePrompt?.substring(0, 20) || "")[0]
             ?.replace(/\{[^}]*\}/g, "")
+            ?.replace(
+              /(Water ?Color|Watercolor|Anime( style)?|3D ?Cartoon|Oil (Paint|painting)|Comic( book)?|Paper ?Cut|Papercut|Pixel ?Art)[\s\S]*/i,
+              ""
+            )
             ?.trim()}
         </p>
       </div>
