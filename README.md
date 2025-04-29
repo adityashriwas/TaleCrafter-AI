@@ -6,6 +6,8 @@
 
 <h2>🚀 Demo</h2>
 
+[https://www.talecrafter.tech/](https://www.talecrafter.tech/)
+<br>
 [https://talecrafter-ai.vercel.app](https://talecrafter-ai.vercel.app/)
 
   <p align="center"><img src="https://github.com/adityashriwas/TaleCrafter-AI/blob/main/Screenshot.png" alt="project-image"></p>
