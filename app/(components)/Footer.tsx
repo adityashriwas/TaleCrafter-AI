@@ -10,10 +10,10 @@ const Footer = () => {
             <div className="sm:flex sm:items-center sm:justify-between">
               <div className="flex gap-2 items-center justify-center">
                 <Image
-                  src="/logo.svg"
+                  src="/app_logo.png"
                   alt="TaleCrafter AI"
-                  width={30}
-                  height={30}
+                  width={70}
+                  height={70}
                 />
                 <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
                   TaleCrafter AI
