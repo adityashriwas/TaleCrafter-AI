@@ -26,7 +26,10 @@ export default function AdminDashboard() {
   const [stories, setStories] = useState<StoryItemType[]>([]);
 
   useEffect(() => {
-    if (isLoaded && user?.primaryEmailAddress?.emailAddress !== "adityashriwas08@gmail.com") {
+    if (
+      isLoaded &&
+      user?.primaryEmailAddress?.emailAddress !== "adityashriwas08@gmail.com"
+    ) {
       router.push("/unauthorized");
     } else if (isLoaded) {
       fetchStories();
@@ -34,7 +37,10 @@ export default function AdminDashboard() {
   }, [user, isLoaded]);
 
   const fetchStories = async () => {
-    const result: any = await db.select().from(StoryData).orderBy(desc(StoryData.id));
+    const result: any = await db
+      .select()
+      .from(StoryData)
+      .orderBy(desc(StoryData.id));
     setStories(result);
   };
 
@@ -50,7 +56,9 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-[#0a0f25] to-[#071340] text-center p-10 md:px-20 lg:px-40">
-      <h1 className="text-4xl font-bold mb-6 block bg-gradient-to-b from-white to-gray-400 bg-clip-text text-transparent">Admin Dashboard</h1>
+      <h1 className="text-4xl font-bold mb-6 block bg-gradient-to-b from-white to-gray-400 bg-clip-text text-transparent">
+        Admin Dashboard
+      </h1>
       <div className="overflow-x-auto">
         <table className="min-w-full bg-[#071340] text-gray-100 border-gray-100">
           <thead>
@@ -58,24 +66,18 @@ export default function AdminDashboard() {
               <th className="py-3 px-2">Title</th>
               <th className="py-3 px-2">User Name</th>
               <th className="py-3 px-2">Email</th>
-              {/* <th className="py-3 px-4">Age Group</th> */}
-              {/* <th className="py-3 px-4">Story Type</th> */}
-              <th className="py-3 px-4">Actions</th>
+              <th className="py-3 px-4">StoryPrompt</th>
             </tr>
           </thead>
           <tbody>
             {stories.map((story) => (
-              <tr key={story.storyId} className="border-t">
-                <td className="py-2 px-2">{story.output?.title}</td>
-                <td className="py-2 px-2">{story.userName}</td>
-                <td className="py-2 px-2">{story.userEmail}</td>
-                {/* <td className="py-2 px-4">{story.ageGroup}</td> */}
-                {/* <td className="py-2 px-4">{story.storyType}</td> */}
+              <tr key={story.storyId} className="border-t hover:bg-gray-900">
+                <td className="py-2 px-3">{story.output?.title}</td>
+                <td className="py-2 px-3">{story.userName}</td>
+                <td className="py-2 px-3">{story.userEmail}</td>
                 <td className="py-2 px-1 max-w-[400px] overflow-x-auto whitespace-nowrap">
-  <div className="overflow-x-auto">
-    {story.storySubject}
-  </div>
-</td>
+                  <div className="overflow-x-auto">{story.storySubject}</div>
+                </td>
 
                 <td className="py-2 px-4">
                   <button
