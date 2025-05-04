@@ -15,6 +15,7 @@ export default function Video() {
             loop
             muted
             controls
+            onError={() => console.error("Video failed to load")}
           />
         </div>
       </div>
