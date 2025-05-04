@@ -5,6 +5,7 @@ import Header from "./(components)/Header";
 import { Nunito } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import Footer from "./(components)/Footer";
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const myAppFont = Nunito({ subsets: ["latin"] });
 
@@ -61,6 +62,7 @@ export default function RootLayout({
           <Provider>
             <Header />
             {children}
+            <SpeedInsights />
             <Footer />
           </Provider>
         </body>

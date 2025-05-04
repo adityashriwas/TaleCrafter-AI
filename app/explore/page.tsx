@@ -55,7 +55,10 @@ const ExploreMore = () => {
     // Keep the previous stories in view while new ones load
     setTimeout(() => {
       if (lastStoryRef.current) {
-        lastStoryRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+        lastStoryRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
       }
     }, 300);
   };
@@ -68,8 +71,11 @@ const ExploreMore = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-8">
         {storyList?.map((item: StoryItemType, index: number) => (
-          <div key={index} ref={index === storyList.length - 12 ? lastStoryRef : null}>
-           <StoryItemCard story={item} currentUserEmail={""} />
+          <div
+            key={index}
+            ref={index === storyList.length - 12 ? lastStoryRef : null}
+          >
+            <StoryItemCard story={item} currentUserEmail={""} />
           </div>
         ))}
       </div>

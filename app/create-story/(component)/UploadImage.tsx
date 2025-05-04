@@ -4,7 +4,11 @@ import { useState } from "react";
 import Image from "next/image";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-export default function UploadImage({ setImageSubject }: { setImageSubject: (text: string) => void }) {
+export default function UploadImage({
+  setImageSubject,
+}: {
+  setImageSubject: (text: string) => void;
+}) {
   const [image, setImage] = useState<File | null>(null);
   const [result, setResult] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -32,7 +36,7 @@ export default function UploadImage({ setImageSubject }: { setImageSubject: (tex
       ]);
       const response = await result.response;
       // console.log(response);
-      
+
       const text = response
         .text()
         .trim()
@@ -77,61 +81,64 @@ export default function UploadImage({ setImageSubject }: { setImageSubject: (tex
   }
 
   return (
-      <main className=" w-full mt-4">
-        <div className="bg-gradient-to-br from-[#071340] via-[#0a0f25] to-[#071340] rounded-lg shadow-xl overflow-hidden ">
-          <div className="p-8">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent text-center">
-              Pick an Image to generate a story
-            </h2>
-            <div className="mb-8 flex items-center justify-center">
-              <input
-                id="image-upload"
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="block mt-2 w-full cursor-pointer text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition duration-150 ease-in-out"
+    <main className=" w-full mt-4">
+      <div className="bg-gradient-to-br from-[#071340] via-[#0a0f25] to-[#071340] rounded-lg shadow-xl overflow-hidden ">
+        <div className="p-8">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent text-center">
+            Pick an Image to generate a story
+          </h2>
+          <div className="mb-8 flex items-center justify-center">
+            <input
+              id="image-upload"
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="block mt-2 w-full cursor-pointer text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition duration-150 ease-in-out"
+            />
+          </div>
+          {image && (
+            <div className="mb-8 flex justify-center">
+              <Image
+                src={URL.createObjectURL(image)}
+                alt="Uploaded image"
+                width={300}
+                height={300}
+                className="rounded-lg shadow-md"
               />
             </div>
-            {image && (
-              <div className="mb-8 flex justify-center">
-                <Image
-                  src={URL.createObjectURL(image)}
-                  alt="Uploaded image"
-                  width={300}
-                  height={300}
-                  className="rounded-lg shadow-md"
-                />
-              </div>
-            )}
-            <button
-              onClick={() => identifyImage()}
-              disabled={!image || loading}
-              className="mt-5 text-xl p-2 sm:size-full bg-gray-800 text-white shadow-md hover:bg-gray-700 transition cursor-pointer"
-            >
-              {loading ? "Identifying image..." : "Generate Idea"}
-            </button>
-          </div>
-
-          {result && (
-            <div className="">
-              <h3 className="text-2xl font-bold bg-gradient-to-b from-white to-gray-400 bg-clip-text text-transparent text-center m-2">
-                Story Idea Description
-              </h3>
-              <div className="prose prose-blue max-w-none">
-                {result.split("\n").map((line, index) => {
-                  if (line.trim() !== "") {
-                    return (
-                      <p key={index} className="mb-1 text-gray-100 sm:text-xl p-4">
-                        {line}
-                      </p>
-                    );
-                  }
-                  return null;
-                })}
-              </div>
-            </div>
           )}
-        </div>        
-      </main>
+          <button
+            onClick={() => identifyImage()}
+            disabled={!image || loading}
+            className="mt-5 text-xl p-2 sm:size-full bg-gray-800 text-white shadow-md hover:bg-gray-700 transition cursor-pointer"
+          >
+            {loading ? "Identifying image..." : "Generate Idea"}
+          </button>
+        </div>
+
+        {result && (
+          <div className="">
+            <h3 className="text-2xl font-bold bg-gradient-to-b from-white to-gray-400 bg-clip-text text-transparent text-center m-2">
+              Story Idea Description
+            </h3>
+            <div className="prose prose-blue max-w-none">
+              {result.split("\n").map((line, index) => {
+                if (line.trim() !== "") {
+                  return (
+                    <p
+                      key={index}
+                      className="mb-1 text-gray-100 sm:text-xl p-4"
+                    >
+                      {line}
+                    </p>
+                  );
+                }
+                return null;
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+    </main>
   );
 }

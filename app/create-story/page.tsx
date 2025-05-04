@@ -20,9 +20,9 @@ import { eq } from "drizzle-orm";
 import { chatSessionSuggestion } from "@/config/GeminiSuggestions";
 import UploadImage from "./(component)/UploadImage";
 
-
 const CREATE_STORY_PROMPT = process.env.NEXT_PUBLIC_CREATE_STORY_PROMPT;
-const GENERATE_SUGGESTION_PROMPT = process.env.NEXT_PUBLIC_SUGGESTION_STORY_PROMPT;
+const GENERATE_SUGGESTION_PROMPT =
+  process.env.NEXT_PUBLIC_SUGGESTION_STORY_PROMPT;
 export interface feildData {
   fieldValue: string;
   fieldName: string;
@@ -35,7 +35,7 @@ export interface FormDataType {
   imageStyle: string;
 }
 
-const CreateStory = ({ passData} : any) => {
+const CreateStory = ({ passData }: any) => {
   const router = useRouter();
   const [Suggestion, setSuggestion] = useState<string>("");
   const [formData, setFormData] = useState<FormDataType>();
@@ -45,7 +45,6 @@ const CreateStory = ({ passData} : any) => {
   const notifyError = (msg: string) => toast.error(msg);
   const { userDetail, setUserDetail } = useContext(UserDetailContext);
   const [storySubject, setStorySubject] = useState("");
-  
 
   // use to add data to the form
   // @param data
@@ -76,9 +75,8 @@ const CreateStory = ({ passData} : any) => {
     setFormData((prev: any) => ({
       ...prev,
       [data.fieldName]: data.fieldValue,
-    }
-  ));
-  setStorySubject(storySubject);
+    }));
+    setStorySubject(storySubject);
     // console.log(formData);
   };
 
@@ -92,9 +90,11 @@ const CreateStory = ({ passData} : any) => {
       notifyError("User details not loaded yet. Please try again.");
       return;
     }
-    
+
     if (userDetail.credit <= 0) {
-      notifyError("You have no credit left! Please buy credit to generate story");
+      notifyError(
+        "You have no credit left! Please buy credit to generate story"
+      );
       return;
     }
 
@@ -104,7 +104,16 @@ const CreateStory = ({ passData} : any) => {
       formData?.ageCategory ?? ""
     )
       .replace("{storyType}", formData?.storyType ?? "")
-      .replace("{storySubject}",formData?.storySubject || storySubject.replace("Here's a short story idea based on the image:", "") || Suggestion || "")
+      .replace(
+        "{storySubject}",
+        formData?.storySubject ||
+          storySubject.replace(
+            "Here's a short story idea based on the image:",
+            ""
+          ) ||
+          Suggestion ||
+          ""
+      )
       .replace("{imageStyle}", formData?.imageStyle ?? "");
     try {
       const result = await chatSession.sendMessage(FINAL_PROMPT);
@@ -185,8 +194,7 @@ const CreateStory = ({ passData} : any) => {
           <StorySubjectInput userSelection={onHandleUserSelection} />
           <Suggestions Suggestion={Suggestion} text={storySubject} />
         </div>
-        <UploadImage setImageSubject={setStorySubject}/>
-
+        <UploadImage setImageSubject={setStorySubject} />
 
         {/* story type */}
         <StoryType userSelection={onHandleUserSelection} />

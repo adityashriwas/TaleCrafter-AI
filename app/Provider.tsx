@@ -28,7 +28,7 @@ const Provider = ({ children }: { children: React.ReactNode }) => {
       .where(
         eq(Users.userEmail, user?.primaryEmailAddress?.emailAddress ?? "")
       );
-    console.log("existing user", userResp);
+    // console.log("existing user", userResp);
 
     // if not will add new user to db
     if (!userResp[0]) {

@@ -1,6 +1,12 @@
 import { useState } from "react";
 
-const ShareButton = ({ storyTitle, storyUrl }: { storyTitle: string; storyUrl: string }) => {
+const ShareButton = ({
+  storyTitle,
+  storyUrl,
+}: {
+  storyTitle: string;
+  storyUrl: string;
+}) => {
   const [copied, setCopied] = useState(false);
 
   const handleShare = async () => {

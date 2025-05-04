@@ -1,6 +1,5 @@
 "use client";
 
-import { Textarea } from "@nextui-org/react";
 import React from "react";
 
 interface SuggestionsProps {
@@ -12,14 +11,11 @@ const Suggestions: React.FC<SuggestionsProps> = ({ Suggestion, text }) => {
   return (
     <div>
       <label className="text-2xl sm:text-3xl lg:text-4xl block w-full bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent">AI Generated Ideas</label>
-      <Textarea
+      <textarea
         disabled
         value={text ? text : Suggestion}
-        className="mt-2 w-full"
+        className="mt-2 w-full px-4 py-2 text-md text-xl h-28 sm:h-full text-white bg-[#1c0f2b] border border-purple-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 transition-all"
         placeholder="Story Ideads are generating....."
-        classNames={{
-          input: "mt-2 sm:p-2 p-1 sm:text-2xl bg-transparent",
-        }}
       />
     </div>
   );

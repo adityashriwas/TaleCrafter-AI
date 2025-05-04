@@ -36,7 +36,7 @@ const AgeCategory = ({ userSelection }: any) => {
       isFree: true,
     },
     {
-      label: "Adult",
+      label: "Mature",
       imageUrl: "/adult.webp",
       isFree: true,
     },
@@ -44,7 +44,9 @@ const AgeCategory = ({ userSelection }: any) => {
 
   return (
     <div className="mt-5">
-      <label className="text-2xl sm:text-3xl lg:text-4xl block w-full bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent">Age Category</label>
+      <label className="text-2xl sm:text-3xl lg:text-4xl block w-full bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent">
+        Age Category
+      </label>
       <div className="mt-5 hsb overflow-x-auto whitespace-nowrap">
         {OptionList.map((item, index) => (
           <div

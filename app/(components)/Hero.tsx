@@ -4,7 +4,6 @@ import React from "react";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
 import Video from "./Video";
-import Feedback from "./Feedback";
 
 const Hero = () => {
   const pricingPlans = [
@@ -25,7 +24,7 @@ const Hero = () => {
       <div className="px-4 md:px-28 lg:px-44 relative min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-black via-[#0a0f25] to-[#071340] overflow-hidden">
         <div className="flex flex-col items-center min-h-screen mt-[20vh]">
           <h2 className="text-4xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold py-6 leading-none text-center block w-full bg-gradient-to-b from-gray-100 via-gray-300 to-gray-500 bg-clip-text text-transparent drop-shadow-lg">
-            Convert your thoughts into stories with TaleCrafter AI
+            Convert your imaginations into stories with TaleCrafter AI
           </h2>
 
           <p className="px-8 sm:px-40 sm:leading-6 sm:text-xl bg-transparent text-center leading-none tracking-tight mb-8 font-semibold text-gray-400">
@@ -79,10 +78,12 @@ const Hero = () => {
             </div>
             <div className="rounded-md border border-neutral-800 bg-neutral-900/50 p-8 text-center shadow">
               <h3 className="sm:text-xl mt-6 text-gray-400">
-              🖼️ Image to Story Generation
+                🖼️ Image to Story Generation
               </h3>
               <p className="my-4 mb-0 font-normal leading-relaxed tracking-wide text-gray-400">
-              Upload any image and watch it come to life as a story! Our AI smartly analyzes visuals, detects characters and turns them into immersive, structured stories
+                Upload any image and watch it come to life as a story! Our AI
+                smartly analyzes visuals, detects characters and turns them into
+                immersive, structured stories
               </p>
             </div>
 
@@ -128,7 +129,7 @@ const Hero = () => {
           </div>
         </section>
 
-          <Video />
+        <Video />
 
         {/* pricing section */}
         <section className="min-h-[50vh] mt-[20vh]">
@@ -156,8 +157,6 @@ const Hero = () => {
             </div>
           </div>
         </section>
-
-        <Feedback/>
       </div>
     </>
   );

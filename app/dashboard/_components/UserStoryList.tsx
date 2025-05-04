@@ -45,14 +45,27 @@ const UserStoryList = () => {
 
   return (
     <div>
-      {loading ? <CustomLoader/> :(
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-10">
-        {storyList?.map((item: StoryItemType, index: number) => (
-          <StoryItemCard story={item} currentUserEmail={user?.user?.primaryEmailAddress?.emailAddress ?? ""} />
-        ))}
-      </div>)
-      }
-      
+      {loading ? (
+        <CustomLoader />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-10">
+          {storyList?.length === 0 && (
+            <div className="col-span-4 text-center">
+              <h1 className="text-2xl font-bold text-gray-200">
+                You haven't created any story yet.
+              </h1>
+            </div>
+          )}
+          {storyList?.map((item: StoryItemType, index: number) => (
+            <StoryItemCard
+              story={item}
+              currentUserEmail={
+                user?.user?.primaryEmailAddress?.emailAddress ?? ""
+              }
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

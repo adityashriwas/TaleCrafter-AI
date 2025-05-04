@@ -54,7 +54,9 @@ const ImageStyle = ({ userSelection }: any) => {
 
   return (
     <div className="mt-10">
-      <label className="text-2xl sm:text-3xl lg:text-4xl block w-full bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent">Image Style</label>
+      <label className="text-2xl sm:text-3xl lg:text-4xl block w-full bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent">
+        Image Style
+      </label>
       <div className="mt-5 hsb overflow-x-auto whitespace-nowrap">
         {OptionList.map((item, index) => (
           <div

@@ -56,11 +56,6 @@ const StoryType = ({ userSelection }: any) => {
       isFree: true,
     },
     {
-      label: "Bed Story",
-      imageUrl: "/sign-in.webp",
-      isFree: true,
-    },
-    {
       label: "Educational",
       imageUrl: "/educational.webp",
       isFree: true,
@@ -74,7 +69,9 @@ const StoryType = ({ userSelection }: any) => {
 
   return (
     <div className="mt-10">
-      <label className="text-2xl sm:text-3xl lg:text-4xl block w-full bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent">Story Genres</label>
+      <label className="text-2xl sm:text-3xl lg:text-4xl block w-full bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent">
+        Story Genres
+      </label>
       <div className="mt-5 hsb overflow-x-auto whitespace-nowrap">
         {OptionList.map((item, index) => (
           <div

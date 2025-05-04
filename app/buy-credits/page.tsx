@@ -57,7 +57,7 @@ function PricingOptions() {
 
   const handlePaymentSuccess = async () => {
     const selectedCredits = plans[selectedPlan!].credits;
-    
+
     const result = await db
       .update(Users)
       .set({ credit: selectedCredits + userDetail?.credits })
@@ -77,14 +77,20 @@ function PricingOptions() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-[#0a0f25] to-[#071340] text-center p-10 md:px-20 lg:px-40 ">
-      <h2 className="text-4xl font-bold mb-6 block bg-gradient-to-b from-white to-gray-400 bg-clip-text text-transparent">Choose Your Plan</h2>
+      <h2 className="text-4xl font-bold mb-6 block bg-gradient-to-b from-white to-gray-400 bg-clip-text text-transparent">
+        Choose Your Plan
+      </h2>
 
       <div className="flex justify-center items-center space-x-4 flex-wrap text-gray-300">
         {plans.map((plan, index) => (
           <div
             key={index}
             className={`cursor-pointer flex-1 max-w-sm bg-[#224] p-6 m-4 rounded-lg w-64 text-center shadow-lg border border-neutral-800 bg-neutral-900/50 transition-all duration-200 
-                        ${selectedPlan === index ? "border-4 border-orange-500" : ""}
+                        ${
+                          selectedPlan === index
+                            ? "border-4 border-orange-500"
+                            : ""
+                        }
                         ${selectedPlan === index ? "bg-black" : ""}`}
             onClick={() => setSelectedPlan(index)}
           >
@@ -92,11 +98,16 @@ function PricingOptions() {
             <p className="text-2xl my-2">${plan.price}</p>
             <ul className="text-sm">
               <li className="flex items-center">
-                <AiOutlineCheck className="mr-2 text-green-400" /> Get {plan.credits} Credits
+                <AiOutlineCheck className="mr-2 text-green-400" /> Get{" "}
+                {plan.credits} Credits
               </li>
             </ul>
             <button
-              className={`mt-4 w-full ${plan.highlighted ? "bg-yellow-500 hover:bg-yellow-600" : "bg-blue-500 hover:bg-blue-600"} 
+              className={`mt-4 w-full ${
+                plan.highlighted
+                  ? "bg-yellow-500 hover:bg-yellow-600"
+                  : "bg-blue-500 hover:bg-blue-600"
+              } 
                           text-white font-bold py-2 px-4 rounded`}
             >
               Select Plan
@@ -104,6 +115,8 @@ function PricingOptions() {
           </div>
         ))}
       </div>
+
+      <p><strong>Having payment issues?</strong> Request credits via the feedback form. Make sure to mention your registered email to help us process your request.</p>
 
       {selectedPlan !== null && selectedPrice > 0 && (
         <div className="mt-8">
@@ -122,7 +135,7 @@ function PricingOptions() {
                     },
                   },
                 ],
-                intent: "CAPTURE"
+                intent: "CAPTURE",
               });
             }}
           />
