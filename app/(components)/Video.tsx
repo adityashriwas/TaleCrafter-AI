@@ -9,7 +9,7 @@ export default function Video() {
       <div className="w-full">
         <div className="relative">
           <video
-            src="/App_Demo_video.mp4"
+            src="/Demo_video.mp4"
             className="w-full h-full"
             autoPlay
             loop
