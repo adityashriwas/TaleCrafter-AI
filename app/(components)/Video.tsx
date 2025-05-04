@@ -9,12 +9,11 @@ export default function Video() {
       <div className="w-full">
         <div className="relative">
           <video
-            src="/Demo_Video.mp4"
+            src="/App_Demo_Video.mp4"
             className="w-full h-full"
             autoPlay
             loop
             muted
-            controls
             onError={() => console.error("Video failed to load")}
           />
         </div>
