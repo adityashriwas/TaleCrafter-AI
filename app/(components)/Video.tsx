@@ -14,7 +14,6 @@ export default function Video() {
             autoPlay
             loop
             muted
-            controls
             onError={() => console.error("Video failed to load")}
           />
         </div>
