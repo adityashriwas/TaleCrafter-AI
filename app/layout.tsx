@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     title: "TaleCrafter AI - AI Story Generator",
     description:
       "Generate AI-written stories with stunning visuals and immersive text-to-speech narration. Bring your imagination to life with TaleCrafter AI!",
-    url: "https://talecrafter-ai.vercel.app/",
+    url: "https://www.talecrafter.tech/",
     siteName: "TaleCrafter AI",
     images: [
       {
