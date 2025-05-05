@@ -38,9 +38,17 @@ const Contact = () => {
       <div className="w-full max-w-md mx-auto p-4">
         <form onSubmit={onSubmit}>
           <input
+            type="email"
+            id="userInput"
+            className="w-full mb-2 px-4 h-10 text-lg text-white bg-[#1c0f2b] border border-purple-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 transition-all"
+            placeholder="Enter your email"
+            required
+            name="email"
+          />
+          <input
             type="text"
             id="userInput"
-            className="w-full px-4 h-14 text-lg text-white bg-[#1c0f2b] border border-purple-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 transition-all"
+            className="w-full px-4 h-10 text-lg text-white bg-[#1c0f2b] border border-purple-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 transition-all"
             placeholder="Report a bug or give feedback"
             required
             name="message"

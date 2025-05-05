@@ -15,7 +15,7 @@ const Footer = () => {
             width={60}
             height={60}
           />
-          <span className="text-2xl font-semibold text-white">
+          <span className="block w-full bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent text-xl sm:text-2xl ml-1">
             TaleCrafter AI
           </span>
         </a>
