@@ -58,6 +58,18 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
+      <head>
+          {/* Google Analytics script */}
+          <script async src="https://www.googletagmanager.com/gtag/js?id=G-59BYFVQQML"></script>
+          <script>
+            {`
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-59BYFVQQML');
+            `}
+          </script>
+        </head>
         <body className={myAppFont.className}>
           <Provider>
             <Header />
