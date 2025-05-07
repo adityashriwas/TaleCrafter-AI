@@ -50,7 +50,7 @@ function Header() {
               height={70}
               className=""
             />
-          <h2 className="block w-full bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent text-xl sm:text-2xl ml-1">
+          <h2 className="sm:block hidden w-full bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent text-xl sm:text-2xl ml-1">
             TaleCrafterAI
           </h2>
           </a>

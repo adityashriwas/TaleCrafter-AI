@@ -2,6 +2,7 @@
 import React from "react";
 import Image from "next/image";
 import Feedback from "./Feedback";
+import Link from "next/link";
 
 const Footer = () => {
   return (
@@ -19,6 +20,28 @@ const Footer = () => {
             TaleCrafter AI
           </span>
         </a>
+
+        {/* Navigation Links */}
+        <div className="flex flex-wrap gap-4 justify-center text-sm md:text-base">
+          <Link
+            href="/"
+            className="hover:text-white transition duration-300"
+          >
+            Home
+          </Link>
+          <Link
+            href="/about"
+            className="hover:text-white transition duration-300"
+          >
+            About
+          </Link>
+          <a
+            className="hover:text-white transition duration-300"
+            href="mailto:adityashriwas08@gmail.com"
+          >
+            Contact
+          </a>
+        </div>
 
         {/* Feedback Component */}
         <div className="flex-shrink-0">

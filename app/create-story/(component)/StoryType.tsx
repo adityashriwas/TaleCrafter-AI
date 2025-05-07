@@ -21,13 +21,23 @@ const StoryType = ({ userSelection }: any) => {
 
   const OptionList = [
     {
-      label: "Horror",
-      imageUrl: "/Horror.webp",
+      label: "Mythology",
+      imageUrl: "/mythology.webp",
       isFree: true,
     },
     {
-      label: "Mythology",
-      imageUrl: "/mythology.webp",
+      label: "Sci-fi",
+      imageUrl: "/sci-fi.webp",
+      isFree: true,
+    },
+    {
+      label: "Educational",
+      imageUrl: "/educational.webp",
+      isFree: true,
+    },
+    {
+      label: "History",
+      imageUrl: "/History.webp",
       isFree: true,
     },
     {
@@ -41,23 +51,13 @@ const StoryType = ({ userSelection }: any) => {
       isFree: true,
     },
     {
-      label: "Sci-fi",
-      imageUrl: "/sci-fi.webp",
-      isFree: true,
-    },
-    {
-      label: "History",
-      imageUrl: "/History.webp",
-      isFree: true,
-    },
-    {
       label: "Motivational",
       imageUrl: "/motivational.webp",
       isFree: true,
     },
     {
-      label: "Educational",
-      imageUrl: "/educational.webp",
+      label: "Horror",
+      imageUrl: "/Horror.webp",
       isFree: true,
     },
     {

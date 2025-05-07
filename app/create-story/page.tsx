@@ -51,7 +51,7 @@ const CreateStory = ({ passData }: any) => {
 
   useEffect(() => {
     GenerateSuggestion();
-  }, []);
+  }, []);  
 
   let data;
   let suggestion;
@@ -84,7 +84,7 @@ const CreateStory = ({ passData }: any) => {
     if (!user) {
       router.push("/sign-up?redirect_url=/create-story");
       return;
-    }
+    }    
 
     if (!userDetail || userDetail.credit === undefined) {
       notifyError("User details not loaded yet. Please try again.");
@@ -212,7 +212,9 @@ const CreateStory = ({ passData }: any) => {
           color="primary"
           onClick={GenerateStory}
         >
-          Create Story
+          {
+            user ? "Create Story" : "Login to Create Story"
+          }
         </Button>
       </div>
       <CustomLoader isLoading={loading} />

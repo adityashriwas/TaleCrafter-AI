@@ -16,18 +16,8 @@ const AgeCategory = ({ userSelection }: any) => {
 
   const OptionList = [
     {
-      label: "Toddler",
-      imageUrl: "/toddler.webp",
-      isFree: true,
-    },
-    {
-      label: "Kids",
-      imageUrl: "/kids.webp",
-      isFree: true,
-    },
-    {
-      label: "Pre Teen",
-      imageUrl: "/pre-teens.webp",
+      label: "Mature",
+      imageUrl: "/adult.webp",
       isFree: true,
     },
     {
@@ -36,10 +26,20 @@ const AgeCategory = ({ userSelection }: any) => {
       isFree: true,
     },
     {
-      label: "Mature",
-      imageUrl: "/adult.webp",
+      label: "Pre Teen",
+      imageUrl: "/pre-teens.webp",
       isFree: true,
     },
+    {
+      label: "Kids",
+      imageUrl: "/kids.webp",
+      isFree: true,
+    },
+    {
+      label: "Toddler",
+      imageUrl: "/toddler.webp",
+      isFree: true,
+    }
   ];
 
   return (
