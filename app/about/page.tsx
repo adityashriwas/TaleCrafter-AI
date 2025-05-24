@@ -31,7 +31,7 @@ const About = () => {
           <div>
             <h2 className="text-2xl font-semibold text-white mb-4">Why TaleCrafter?</h2>
             <ul className="list-disc pl-5 space-y-3 text-base leading-relaxed">
-              <li>🎙️ Generates AI-powered educational stories with audio and visuals.</li>
+              <li>🎙️ Generates AI-powered stories with audio and visuals.</li>
               <li>📚 Creates shareable digital books for kids, students, and educators.</li>
               <li>🌐 Supports multilingual storytelling (English, Hindi and more).</li>
               <li>🧠 Offers historical insights and moral lessons in minutes.</li>
@@ -42,7 +42,7 @@ const About = () => {
 
         {/* CTA Section */}
         <div className="mt-16 text-center">
-          <h3 className="text-2xl md:text-3xl font-semibold text-white mb-4">Join the Revolution in Smart Education</h3>
+          <h3 className="text-2xl md:text-3xl font-semibold text-white mb-4">Join the Revolution in Storytelling</h3>
           <p className="text-md md:text-lg text-gray-400 mb-6">
             Whether you're a student, teacher, or content creator — TaleCrafter AI empowers you to tell better stories, learn smarter, and preserve culture in a digital way.
           </p>

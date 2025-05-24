@@ -116,7 +116,7 @@ function PricingOptions() {
         ))}
       </div>
 
-      <p><strong>Having payment issues?</strong> Request credits via the feedback form. Make sure to mention your registered email to help us process your request.</p>
+      {/* <p><strong>Having payment issues?</strong> Request credits via the feedback form. Make sure to mention your registered email to help us process your request.</p> */}
 
       {selectedPlan !== null && selectedPrice > 0 && (
         <div className="mt-8">
