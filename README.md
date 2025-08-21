@@ -74,11 +74,3 @@ To use TaleCrafter AI:
 5. View the animated book format and use text-to-speech for narration.
 6. Purchase credits if you need more story generations.
 
-<h2>Contribution Guidelines:</h2>
-
-I welcome contributions to make TaleCrafter AI better, please contribute using GitHub Flow, To contribute, follow these steps:
-1. Fork the repository.
-2. Create a new branch: `git checkout -b feature/your-feature-name`.
-3. Make your changes and commit them: `git commit -m 'Add some feature'`.
-4. Push to the branch: `git push origin feature/your-feature-name`.
-5. Submit a pull request.
