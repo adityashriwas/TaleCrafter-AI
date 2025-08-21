@@ -25,29 +25,6 @@ Here're some of the project's best features:
 *   Payment System: Users can buy credits to generate more stories.
 *   PostgreSQL Database: Used for storing user data and generated stories.
 *   Responsive UI: Works on mobile and desktop.
-
-<h2>🛠️ Installation Steps:</h2>
-
-<p>1. Clone the repository</p>
-
-```
-https://github.com/adityashriwas/TaleCrafter-AI.git
-```
-
-<p>2. Install npm modules</p>
-
-```
-npm install
-```
-
-<p>3. Create .env.local File and Set Up Environment Variables</p>
-
-<p>4. Run the Development Server</p>
-
-```
-npm run dev
-```
-
   
   
 <h2>💻 Built with</h2>
