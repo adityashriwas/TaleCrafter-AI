@@ -3,17 +3,16 @@ import { db } from "@/config/config";
 import { StoryData } from "@/config/schema";
 import { eq } from "drizzle-orm";
 import React, { useEffect, useRef, useState } from "react";
-import HTMLFlipBook from "react-pageflip";
 import BookCoverPage from "../_components/BookCoverPage";
 import StoryPages from "../_components/StoryPages";
+import HTMLFlipBook from "react-pageflip";
 import { IoIosArrowDroprightCircle } from "react-icons/io";
 import { IoIosArrowDropleftCircle } from "react-icons/io";
 import { use } from "react";
-import ShareButton from "../_components/shareButton";
 
 function ViewStory({ params }: { params: Promise<{ id: any }> }) {
   const { id } = use(params);
-  const bookRef = useRef();
+  const bookRef = useRef<typeof HTMLFlipBook | null>(null);
   const [story, setStory] = useState<any>();
   const [count, setCount] = useState(0);
   useEffect(() => {
@@ -31,7 +30,7 @@ function ViewStory({ params }: { params: Promise<{ id: any }> }) {
   };
 
   // share story
-  const storyUrl = typeof window !== "undefined" ? window.location.href : "";
+  // const storyUrl = typeof window !== "undefined" ? window.location.href : "";
 
   return (
     <div className="min-h-screen p-10 md:px-20 lg:px-40 flex items-center bg-gradient-to-br from-black via-[#0a0f25] to-[#071340] justify-evenly flex-col overflow-hidden">
@@ -77,7 +76,7 @@ function ViewStory({ params }: { params: Promise<{ id: any }> }) {
             <IoIosArrowDropleftCircle className="text-4xl cursor-pointer text-gray-300" />
           </div>
         )}
-        <ShareButton storyTitle={story?.output?.title} storyUrl={storyUrl} />
+        {/* <ShareButton storyTitle={story?.output?.title} storyUrl={storyUrl} /> */}
 
         {count != story?.output.chapters?.length - 1 && (
           <div
