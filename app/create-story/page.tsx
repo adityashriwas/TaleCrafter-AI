@@ -127,7 +127,7 @@ const CreateStory = ({ passData }: any) => {
       )}`;
       const final_image_prompt = prompt;
       // console.log(final_image_prompt);
-      const imageResp = `https://gen.pollinations.ai/image/${final_image_prompt}?model=flux&width=410&height=630&enhance=false&negative_prompt=worst+quality%2C+blurry&safe=false&seed=0&key=${process.env.NEXT_PUBLIC_POLLINATIONS_API_KEY}`;
+      const imageResp = `https://gen.pollinations.ai/image/${final_image_prompt}?model=nanobanana-pro&width=410&height=630&enhance=false&negative_prompt=worst+quality%2C+blurry&safe=false&seed=0&key=${process.env.NEXT_PUBLIC_POLLINATIONS_API_KEY}`;
       // console.log(imageResp);
       const resp: any = await SaveInDB(result?.response.text(), imageResp);
       // console.log(resp);
