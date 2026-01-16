@@ -26,7 +26,7 @@ export default function UploadImage({
     const genAI = new GoogleGenerativeAI(
       process.env.NEXT_PUBLIC_GEMINI_API_KEY_IMAGE_ANALYSIS!
     );
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     try {
       const imageParts = await fileToGenerativePart(image);

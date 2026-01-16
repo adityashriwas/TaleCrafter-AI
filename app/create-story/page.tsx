@@ -63,11 +63,11 @@ const CreateStory = ({ passData }: any) => {
       );
       const data = result.response.text();
       const suggestion = JSON.parse(data);
-      // console.log(suggestion);
+      console.log(suggestion);
 
       setSuggestion(suggestion.story_idea); // Assuming story_idea is the correct field
     } catch (error) {
-      // console.log(error);
+      console.log(error);
     }
   };
 
@@ -128,9 +128,9 @@ const CreateStory = ({ passData }: any) => {
       const final_image_prompt = prompt;
       console.log(final_image_prompt);
       const imageResp = `https://image.pollinations.ai/prompt/${final_image_prompt}?enhance=true&nologo=true&width=410&height=630`;
-      // console.log(imageResp);
+      console.log(imageResp);
       const resp: any = await SaveInDB(result?.response.text(), imageResp);
-      // console.log(resp);
+      console.log(resp);
       notify("Story Generated Successfully");
       await UpdateUserCredits();
       router.push("/view-story/" + resp);
@@ -138,7 +138,7 @@ const CreateStory = ({ passData }: any) => {
       console.log(result?.response.text());
       setLoading(false);
     } catch (error) {
-      // console.log(error);
+      console.log(error);
       notifyError("Server Error! Please try again");
       setLoading(false);
     }
