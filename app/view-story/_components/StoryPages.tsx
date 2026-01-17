@@ -1,15 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { IoPlayCircle, IoPauseCircle } from "react-icons/io5";
 
 const StoryPages = ({ storyChapter }: any) => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [pausedPosition, setPausedPosition] = useState(0);
-  const [imageLoaded, setImageLoaded] = useState(false); // Track image loading state
-  const synth = window.speechSynthesis; // Get speech synthesis instance
+  const [isPlaying, setIsPlaying] = React.useState(false);
+  const synth = typeof window !== "undefined" ? window.speechSynthesis : null;
   let utterance = new SpeechSynthesisUtterance(storyChapter?.textPrompt); // New instance per page
-  const formattedImagePrompt = encodeURIComponent(
-    storyChapter?.imagePrompt ?? ""
-  );
 
   // Function to toggle speech
   const toggleSpeech = () => {
@@ -17,25 +12,20 @@ const StoryPages = ({ storyChapter }: any) => {
 
     if (isPlaying) {
       synth.cancel(); // Stop speech completely
-      setPausedPosition(0); // Reset paused position
     } else {
-      utterance = new SpeechSynthesisUtterance(storyChapter?.textPrompt); // New instance per play
+      const utterance = new SpeechSynthesisUtterance(storyChapter?.textPrompt);
       synth.speak(utterance);
     }
 
     setIsPlaying(!isPlaying);
   };
 
-  // Handle speech completion
-  utterance.onend = () => {
-    setIsPlaying(false);
-    setPausedPosition(0);
-  };
-
   // Cleanup when unmounting
-  useEffect(() => {
-    return () => synth.cancel();
-  }, []);
+  React.useEffect(() => {
+    return () => {
+      if (synth) synth.cancel();
+    };
+  }, [synth]);
 
   return (
     <div>
@@ -46,19 +36,13 @@ const StoryPages = ({ storyChapter }: any) => {
         </span>
       </h2>
       <div className="relative w-full min-h-[300px] mt-2">
-        {!imageLoaded && (
-          <div className="absolute inset-0 flex items-center justify-center bg-gray-200 rounded-lg">
-            <span className="animate-spin h-10 w-10 border-4 border-primary border-t-transparent rounded-full"></span>
-          </div>
-        )}
-        <img
-          src={`https://gen.pollinations.ai/image/${storyChapter?.imagePrompt}?model=nanobanana-pro&enhance=false&negative_prompt=worst+quality%2C+blurry&safe=false&seed=0&key=${process.env.NEXT_PUBLIC_POLLINATIONS_API_KEY}`}
-          alt=""
-          className={`w-full min-h-full object-cover rounded-lg transition-opacity duration-300 ${
-            imageLoaded ? "opacity-100" : "opacity-0"
-          }`}
-          onLoad={() => setImageLoaded(true)} // Set imageLoaded to true when image loads
-        />
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-100 rounded-lg border-2 border-dashed border-gray-400">
+          <svg className="h-12 w-12 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <p className="text-center text-gray-600 font-medium">Image currently unavailable</p>
+          <p className="text-center text-gray-500 text-sm mt-1">API updates in progress</p>
+        </div>
       </div>
       <div className="hsb2 max-h-52 overflow-y-scroll mt-2">
         <p className="text-xl text-black p-4 mt-3 rounded-lg bg-slate-100">
