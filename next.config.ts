@@ -15,7 +15,7 @@ const nextConfig: NextConfig = {
     ];
   },
   images: {
-    domains: ['image.pollinations.ai'],
+    domains: ['image.pollinations.ai', 'gen.pollinations.ai'],
   },
 };
 

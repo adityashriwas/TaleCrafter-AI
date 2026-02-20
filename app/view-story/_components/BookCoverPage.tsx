@@ -22,7 +22,7 @@ const BookCoverPage = ({ imageUrl }: any) => {
         width={500}
         height={700}
         alt="cover"
-        onLoadingComplete={() => setImageLoaded(true)} // Image load handler
+        onLoad={() => setImageLoaded(true)}
       />
     </div>
   );
