@@ -1,5 +1,5 @@
 "use client";
-import React, { use, useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import StorySubjectInput from "./(component)/StorySubjectInput";
 import StoryType from "./(component)/StoryType";
 import AgeCategory from "./(component)/AgeCategory";
@@ -19,10 +19,10 @@ import { Users } from "@/config/schema";
 import { eq } from "drizzle-orm";
 import { chatSessionSuggestion } from "@/config/GeminiSuggestions";
 import UploadImage from "./(component)/UploadImage";
+import { motion } from "framer-motion";
+const MotionDiv: any = motion.div;
 
 const CREATE_STORY_PROMPT = process.env.NEXT_PUBLIC_CREATE_STORY_PROMPT;
-const GENERATE_SUGGESTION_PROMPT =
-  process.env.NEXT_PUBLIC_SUGGESTION_STORY_PROMPT;
 export interface feildData {
   fieldValue: string;
   fieldName: string;
@@ -35,7 +35,7 @@ export interface FormDataType {
   imageStyle: string;
 }
 
-const CreateStory = ({ passData }: any) => {
+const CreateStory = () => {
   const router = useRouter();
   const [Suggestion, setSuggestion] = useState<string>("");
   const [formData, setFormData] = useState<FormDataType>();
@@ -43,18 +43,12 @@ const CreateStory = ({ passData }: any) => {
   const { user } = useUser();
   const notify = (msg: string) => toast(msg);
   const notifyError = (msg: string) => toast.error(msg);
-  const { userDetail, setUserDetail } = useContext(UserDetailContext);
+  const { userDetail } = useContext(UserDetailContext);
   const [storySubject, setStorySubject] = useState("");
-
-  // use to add data to the form
-  // @param data
 
   useEffect(() => {
     GenerateSuggestion();
-  }, []);  
-
-  let data;
-  let suggestion;
+  }, []);
 
   const GenerateSuggestion = async () => {
     try {
@@ -84,7 +78,7 @@ const CreateStory = ({ passData }: any) => {
     if (!user) {
       router.push("/sign-up?redirect_url=/create-story");
       return;
-    }    
+    }
 
     if (!userDetail || userDetail.credit === undefined) {
       notifyError("User details not loaded yet. Please try again.");
@@ -118,7 +112,7 @@ const CreateStory = ({ passData }: any) => {
     try {
       const result = await chatSession.sendMessage(FINAL_PROMPT);
       const story = JSON.parse(result?.response.text());
-      let prompt = `Add-title-"${story?.title?.replace(
+      const prompt = `Add-title-"${story?.title?.replace(
         /\s+/g,
         "-"
       )}"-in-bold-text-for-book-cover-image,-${story?.coverImagePrompt?.replace(
@@ -173,7 +167,7 @@ const CreateStory = ({ passData }: any) => {
   };
 
   const UpdateUserCredits = async () => {
-    const result = await db
+    await db
       .update(Users)
       .set({
         credit: Number(userDetail?.credit - 1),
@@ -181,41 +175,112 @@ const CreateStory = ({ passData }: any) => {
       .where(eq(Users.userEmail, user?.primaryEmailAddress?.emailAddress ?? ""))
       .returning({ id: Users.id });
   };
+  const fadeUp = {
+    hidden: { opacity: 0, y: 24 },
+    show: { opacity: 1, y: 0 },
+  };
 
   return (
-    <div className="px-7 md:px-20 pb-10 lg:px-40 bg-gradient-to-br from-black via-[#0a0f25] to-[#071340]">
-      <h1 className="text-3xl mt-4 sm:text-4xl md:text-5xl lg:text-6xl xl:text-6xl block w-full bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent text-center">
-        Create Story
-      </h1>
-      <div className="">
-        {/* story subject and suggestions*/}
+    <div className="relative min-h-screen overflow-hidden bg-[#020b1f] px-5 pb-12 md:px-16 lg:px-28 xl:px-40">
+      <div className="tc-hero-grid absolute inset-0 opacity-35" />
+      <div className="tc-hero-orb tc-hero-orb-one" />
+      <div className="tc-hero-orb tc-hero-orb-two" />
 
-        <div className="flex flex-col justify-between mt-10 gap-5">
-          <StorySubjectInput userSelection={onHandleUserSelection} />
-          <Suggestions Suggestion={Suggestion} text={storySubject} />
-        </div>
-        <UploadImage setImageSubject={setStorySubject} />
-
-        {/* story type */}
-        <StoryType userSelection={onHandleUserSelection} />
-
-        {/* story image */}
-        <ImageStyle userSelection={onHandleUserSelection} />
-
-        {/* age category */}
-        <AgeCategory userSelection={onHandleUserSelection} />
-      </div>
-      <div className="flex justify-end ">
-        <Button
-          disabled={loading}
-          className="mt-5 text-xl p-2 sm:size-full bg-gray-800 text-white shadow-md hover:bg-gray-700 transition"
-          color="primary"
-          onClick={GenerateStory}
+      <div className="relative">
+        <MotionDiv
+          initial="hidden"
+          animate="show"
+          variants={fadeUp}
+          transition={{ duration: 0.6 }}
+          className="mt-6 rounded-2xl border border-blue-300/20 bg-white/[0.04] px-5 py-7 shadow-[0_16px_45px_rgba(0,0,0,0.35)] backdrop-blur-md md:px-8"
         >
-          {
-            user ? "Create Story" : "Login to Create Story"
-          }
-        </Button>
+          <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
+            <div>
+              <h1 className="bg-gradient-to-b from-white via-blue-100 to-blue-300 bg-clip-text text-3xl font-extrabold text-transparent sm:text-4xl md:text-5xl">
+                Create Story
+              </h1>
+              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-blue-100/75 md:text-base">
+                Configure your story prompt, visual style, and target audience.
+                TaleCrafter AI will generate a complete illustrated storybook.
+              </p>
+            </div>
+            <div className="inline-flex items-center rounded-xl border border-blue-300/20 bg-blue-500/10 px-4 py-3 text-blue-100/90">
+              <span className="text-sm font-medium">Credits left:</span>
+              <span className="ml-2 text-xl font-bold text-white">
+                {userDetail?.credit ?? "-"}
+              </span>
+            </div>
+          </div>
+        </MotionDiv>
+
+        <MotionDiv
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.1 }}
+          variants={fadeUp}
+          transition={{ delay: 0.1, duration: 0.5 }}
+          className="mt-8 rounded-2xl border border-blue-300/20 bg-white/[0.04] p-5 backdrop-blur-sm md:p-7"
+        >
+          <div className="flex flex-col justify-between gap-5">
+            <StorySubjectInput userSelection={onHandleUserSelection} />
+            <Suggestions Suggestion={Suggestion} text={storySubject} />
+          </div>
+        </MotionDiv>
+
+        <MotionDiv
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.1 }}
+          variants={fadeUp}
+          transition={{ delay: 0.12, duration: 0.5 }}
+          className="mt-7 rounded-2xl border border-blue-300/20 bg-white/[0.04] p-5 backdrop-blur-sm md:p-7"
+        >
+          <UploadImage setImageSubject={setStorySubject} />
+        </MotionDiv>
+
+        <MotionDiv
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.1 }}
+          variants={fadeUp}
+          transition={{ delay: 0.14, duration: 0.5 }}
+          className="mt-7 rounded-2xl border border-blue-300/20 bg-white/[0.04] p-5 backdrop-blur-sm md:p-7"
+        >
+          <StoryType userSelection={onHandleUserSelection} />
+        </MotionDiv>
+
+        <MotionDiv
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.1 }}
+          variants={fadeUp}
+          transition={{ delay: 0.16, duration: 0.5 }}
+          className="mt-7 rounded-2xl border border-blue-300/20 bg-white/[0.04] p-5 backdrop-blur-sm md:p-7"
+        >
+          <ImageStyle userSelection={onHandleUserSelection} />
+        </MotionDiv>
+
+        <MotionDiv
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.1 }}
+          variants={fadeUp}
+          transition={{ delay: 0.18, duration: 0.5 }}
+          className="mt-7 rounded-2xl border border-blue-300/20 bg-white/[0.04] p-5 backdrop-blur-sm md:p-7"
+        >
+          <AgeCategory userSelection={onHandleUserSelection} />
+        </MotionDiv>
+
+        <div className="mt-8 flex justify-end">
+          <Button
+            disabled={loading}
+            className="rounded-xl border border-blue-300/30 bg-gradient-to-r from-blue-500 to-cyan-400 px-8 py-6 text-base font-semibold text-white shadow-[0_0_30px_rgba(29,141,255,0.3)] transition hover:scale-[1.02] hover:from-blue-400 hover:to-cyan-300 disabled:cursor-not-allowed disabled:opacity-70"
+            color="primary"
+            onClick={GenerateStory}
+          >
+            {user ? "Create Story" : "Login to Create Story"}
+          </Button>
+        </div>
       </div>
       <CustomLoader isLoading={loading} />
     </div>

@@ -1,29 +1,34 @@
-import Image from "next/image";
 import React, { useState } from "react";
 
 const BookCoverPage = ({ imageUrl }: any) => {
   const [imageLoaded, setImageLoaded] = useState(false); // Track image loading
+  const [hasError, setHasError] = useState(false);
 
   return (
     <div className="relative w-full h-full">
       {/* Loader (Spinner) */}
-      {!imageLoaded && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-200 rounded-lg">
-          <span className="animate-spin h-10 w-10 border-4 border-primary border-t-transparent rounded-full"></span>
+      {!imageLoaded && !hasError && (
+        <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-blue-50">
+          <span className="h-10 w-10 animate-spin rounded-full border-4 border-blue-500 border-t-transparent"></span>
         </div>
       )}
 
-      {/* Image with Fade-in Effect */}
-      <Image
-        src={imageUrl}
-        className={`object-cover w-full h-full transition-opacity duration-300 ${
-          imageLoaded ? "opacity-100" : "opacity-0"
-        }`}
-        width={500}
-        height={700}
-        alt="cover"
-        onLoad={() => setImageLoaded(true)}
-      />
+      {hasError ? (
+        <div className="flex h-full w-full items-center justify-center rounded-lg bg-blue-50 p-4 text-center text-sm text-slate-600">
+          Cover image is taking too long to load. Please refresh to retry.
+        </div>
+      ) : (
+        <img
+          src={imageUrl}
+          className={`h-full w-full object-cover transition-opacity duration-300 ${
+            imageLoaded ? "opacity-100" : "opacity-0"
+          }`}
+          alt="cover"
+          loading="eager"
+          onLoad={() => setImageLoaded(true)}
+          onError={() => setHasError(true)}
+        />
+      )}
     </div>
   );
 };

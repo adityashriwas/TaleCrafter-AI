@@ -9,14 +9,17 @@ import HTMLFlipBook from "react-pageflip";
 import { IoIosArrowDroprightCircle } from "react-icons/io";
 import { IoIosArrowDropleftCircle } from "react-icons/io";
 import { use } from "react";
+import { toast } from "react-toastify";
 
 function ViewStory({ params }: { params: Promise<{ id: any }> }) {
   const { id } = use(params);
   const bookRef = useRef<typeof HTMLFlipBook | null>(null);
   const [story, setStory] = useState<any>();
   const [count, setCount] = useState(0);
+  const chapters = story?.output?.chapters ?? [];
+  const [copied, setCopied] = useState(false);
+
   useEffect(() => {
-    // console.log(params.id);
     getStory();
   }, []);
 
@@ -25,71 +28,110 @@ function ViewStory({ params }: { params: Promise<{ id: any }> }) {
       .select()
       .from(StoryData)
       .where(eq(StoryData.storyId, id));
-    // console.log(result[0]);
     setStory(result[0]);
   };
 
-  // share story
-  // const storyUrl = typeof window !== "undefined" ? window.location.href : "";
+  const onShareStory = async () => {
+    const storyUrl = typeof window !== "undefined" ? window.location.href : "";
+    const storyTitle = story?.output?.title || "TaleCrafter Story";
+
+    if (!storyUrl) return;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: storyTitle,
+          text: `Check out this story: ${storyTitle}`,
+          url: storyUrl,
+        });
+      } catch {
+        // user cancelled share flow
+      }
+      return;
+    }
+
+    await navigator.clipboard.writeText(storyUrl);
+    setCopied(true);
+    toast("Story link copied!");
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
-    <div className="min-h-screen p-10 md:px-20 lg:px-40 flex items-center bg-gradient-to-br from-black via-[#0a0f25] to-[#071340] justify-evenly flex-col overflow-hidden">
-      <h2 className="text-3xl sm:text-4xl text-center py-4 min-w-full rounded-2xl border border-neutral-800 bg-neutral-900/50 p-8 shadow block bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent">
-        {story?.output?.title}
-      </h2>
-      {/* @ts-ignore */}
-      <HTMLFlipBook
-        className="mt-10 max-w-[80vw] sm:max-w-[80vw] md:max-w-[60vw] lg:max-w-[50vw]"
-        width={330}
-        height={620}
-        showCover={true}
-        useMouseEvents={false}
-        ref={bookRef}
-        style={{ height: "auto", maxHeight: "auto" }}
-      >
-        <div>
-          <BookCoverPage imageUrl={story?.coverImage} />
+    <div className="relative min-h-screen overflow-hidden bg-[#020b1f] px-5 py-8 md:px-16 lg:px-28 xl:px-40">
+      <div className="tc-hero-grid absolute inset-0 opacity-35" />
+      <div className="tc-hero-orb tc-hero-orb-one" />
+      <div className="tc-hero-orb tc-hero-orb-two" />
+
+      <div className="relative">
+        <div className="rounded-2xl border border-blue-300/20 bg-white/[0.04] px-5 py-6 text-center shadow-[0_16px_45px_rgba(0,0,0,0.35)] backdrop-blur-md md:px-8">
+          <h2 className="bg-gradient-to-b from-white via-blue-100 to-blue-300 bg-clip-text text-3xl font-extrabold text-transparent sm:text-4xl md:text-5xl">
+            {story?.output?.title ?? "Loading story..."}
+          </h2>
+          <p className="mt-2 text-sm text-blue-100/75 md:text-base">
+            Flip through chapters and listen with narration controls.
+          </p>
         </div>
-        {[...Array(story?.output?.chapters?.length)].map((item, index) => (
-          <div key={index} className="bg-white p-4 md:p-5 border">
-            <StoryPages
-              storyChapter={story?.output?.chapters[index]}
-              imagePrompt={story?.output.chapters[index].imagePrompt?.replace(
-                /\s+/g,
-                "-"
-              )}
-            />
-          </div>
-        ))}
-      </HTMLFlipBook>
 
-      <div className="w-full flex justify-between items-center sm:mt-2 sm:px-40">
-        {count != 0 && (
-          <div
-            className=""
-            onClick={() => {
-              // @ts-ignore
-              bookRef.current.pageFlip().flipPrev();
-              setCount(count - 1);
-            }}
+        <div className="mt-8 flex flex-col items-center">
+          {/* @ts-ignore */}
+          <HTMLFlipBook
+            className="max-w-[84vw] md:max-w-[62vw] lg:max-w-[48vw]"
+            width={330}
+            height={620}
+            showCover={true}
+            useMouseEvents={false}
+            ref={bookRef}
+            style={{ height: "auto", maxHeight: "auto" }}
           >
-            <IoIosArrowDropleftCircle className="text-4xl cursor-pointer text-gray-300" />
-          </div>
-        )}
-        {/* <ShareButton storyTitle={story?.output?.title} storyUrl={storyUrl} /> */}
+            <div className="p-0">
+              <BookCoverPage imageUrl={story?.coverImage} />
+            </div>
+            {chapters.map((chapter: any, index: number) => (
+              <div key={index} className="bg-white p-4 md:p-5">
+                <StoryPages storyChapter={chapter} />
+              </div>
+            ))}
+          </HTMLFlipBook>
+        </div>
 
-        {count != story?.output.chapters?.length - 1 && (
-          <div
-            className=""
+        <div className="mt-7 flex w-full items-center justify-between">
+          <button
+            className={`rounded-xl border border-blue-300/20 bg-white/10 p-2 text-blue-100 transition hover:bg-white/20 ${
+              count <= 0 ? "pointer-events-none opacity-40" : ""
+            }`}
             onClick={() => {
+              if (count <= 0) return;
               // @ts-ignore
-              bookRef.current.pageFlip().flipNext();
-              setCount(count + 1);
+              bookRef.current?.pageFlip().flipPrev();
+              setCount((prev) => prev - 1);
             }}
+            aria-label="Previous page"
           >
-            <IoIosArrowDroprightCircle className="text-4xl cursor-pointer text-gray-300" />
-          </div>
-        )}
+            <IoIosArrowDropleftCircle className="text-4xl" />
+          </button>
+
+          <button
+            onClick={onShareStory}
+            className="rounded-xl border border-blue-300/30 bg-gradient-to-r from-blue-500 to-cyan-400 px-5 py-2 text-sm font-semibold text-white transition hover:from-blue-400 hover:to-cyan-300"
+          >
+            {copied ? "Link Copied!" : "Share Story"}
+          </button>
+
+          <button
+            className={`rounded-xl border border-blue-300/20 bg-white/10 p-2 text-blue-100 transition hover:bg-white/20 ${
+              count >= chapters.length ? "pointer-events-none opacity-40" : ""
+            }`}
+            onClick={() => {
+              if (count >= chapters.length) return;
+              // @ts-ignore
+              bookRef.current?.pageFlip().flipNext();
+              setCount((prev) => prev + 1);
+            }}
+            aria-label="Next page"
+          >
+            <IoIosArrowDroprightCircle className="text-4xl" />
+          </button>
+        </div>
       </div>
     </div>
   );

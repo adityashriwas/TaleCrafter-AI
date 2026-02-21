@@ -83,3 +83,64 @@ html, body{
 .hsb2::-webkit-scrollbar-thumb:hover {
   background-color: #ffffff; 
 }
+
+@keyframes tcOrbFloatOne {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(20px, -25px, 0) scale(1.08); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes tcOrbFloatTwo {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-15px, 20px, 0) scale(1.05); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes tcOrbFloatThree {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(15px, 15px, 0) scale(1.06); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+
+.tc-hero-grid {
+  background-image:
+    linear-gradient(rgba(96, 165, 250, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(96, 165, 250, 0.09) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: radial-gradient(circle at center, black 35%, transparent 85%);
+}
+
+.tc-hero-orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(50px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.tc-hero-orb-one {
+  width: 220px;
+  height: 220px;
+  background: rgba(37, 99, 235, 0.35);
+  top: 120px;
+  left: 2%;
+  animation: tcOrbFloatOne 11s ease-in-out infinite;
+}
+
+.tc-hero-orb-two {
+  width: 270px;
+  height: 270px;
+  background: rgba(6, 182, 212, 0.24);
+  right: 8%;
+  top: 80px;
+  animation: tcOrbFloatTwo 13s ease-in-out infinite;
+}
+
+.tc-hero-orb-three {
+  width: 200px;
+  height: 200px;
+  background: rgba(59, 130, 246, 0.28);
+  bottom: 200px;
+  left: 30%;
+  animation: tcOrbFloatThree 10s ease-in-out infinite;
+}

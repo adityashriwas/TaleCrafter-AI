@@ -8,6 +8,8 @@ import { Users } from "@/config/schema";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { AiOutlineCheck } from "react-icons/ai";
+import { motion } from "framer-motion";
+const MotionDiv: any = motion.div;
 
 function PricingOptions() {
   const plans = [
@@ -56,18 +58,25 @@ function PricingOptions() {
   }, [selectedPlan]);
 
   const handlePaymentSuccess = async () => {
+    if (selectedPlan === null || !userDetail?.userEmail) {
+      notifyError("Unable to verify user details. Please try again.");
+      return;
+    }
+
     const selectedCredits = plans[selectedPlan!].credits;
+    const currentCredits = Number(userDetail?.credit ?? 0);
+    const updatedCredits = selectedCredits + currentCredits;
 
     const result = await db
       .update(Users)
-      .set({ credit: selectedCredits + userDetail?.credits })
+      .set({ credit: updatedCredits })
       .where(eq(Users.userEmail, userDetail.userEmail));
 
     if (result) {
       notify("Payment Successful, credits have been added!");
       setUserDetail((prev: any) => ({
         ...prev,
-        credit: selectedCredits + userDetail?.credits,
+        credit: updatedCredits,
       }));
       router.replace("/dashboard");
     } else {
@@ -75,72 +84,121 @@ function PricingOptions() {
     }
   };
 
+  const fadeUp = {
+    hidden: { opacity: 0, y: 22 },
+    show: { opacity: 1, y: 0 },
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-[#0a0f25] to-[#071340] text-center p-10 md:px-20 lg:px-40 ">
-      <h2 className="text-4xl font-bold mb-6 block bg-gradient-to-b from-white to-gray-400 bg-clip-text text-transparent">
-        Choose Your Plan
-      </h2>
+    <div className="relative min-h-screen overflow-hidden bg-[#020b1f] px-5 py-8 md:px-16 lg:px-28 xl:px-40">
+      <div className="tc-hero-grid absolute inset-0 opacity-35" />
+      <div className="tc-hero-orb tc-hero-orb-one" />
+      <div className="tc-hero-orb tc-hero-orb-two" />
 
-      <div className="flex justify-center items-center space-x-4 flex-wrap text-gray-300">
-        {plans.map((plan, index) => (
-          <div
-            key={index}
-            className={`cursor-pointer flex-1 max-w-sm bg-[#224] p-6 m-4 rounded-lg w-64 text-center shadow-lg border border-neutral-800 bg-neutral-900/50 transition-all duration-200 
-                        ${
-                          selectedPlan === index
-                            ? "border-4 border-orange-500"
-                            : ""
-                        }
-                        ${selectedPlan === index ? "bg-black" : ""}`}
-            onClick={() => setSelectedPlan(index)}
-          >
-            <h3 className="text-lg font-bold">{plan.title}</h3>
-            <p className="text-2xl my-2">${plan.price}</p>
-            <ul className="text-sm">
-              <li className="flex items-center">
-                <AiOutlineCheck className="mr-2 text-green-400" /> Get{" "}
-                {plan.credits} Credits
-              </li>
-            </ul>
-            <button
-              className={`mt-4 w-full ${
-                plan.highlighted
-                  ? "bg-yellow-500 hover:bg-yellow-600"
-                  : "bg-blue-500 hover:bg-blue-600"
-              } 
-                          text-white font-bold py-2 px-4 rounded`}
-            >
-              Select Plan
-            </button>
+      <div className="relative">
+        <MotionDiv
+          initial="hidden"
+          animate="show"
+          variants={fadeUp}
+          transition={{ duration: 0.55 }}
+          className="rounded-2xl border border-blue-300/20 bg-white/[0.04] px-5 py-7 text-center shadow-[0_16px_45px_rgba(0,0,0,0.35)] backdrop-blur-md md:px-8"
+        >
+          <h2 className="bg-gradient-to-b from-white via-blue-100 to-blue-300 bg-clip-text text-3xl font-extrabold text-transparent sm:text-4xl md:text-5xl">
+            Choose Your Plan
+          </h2>
+          <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-blue-100/75 md:text-base">
+            Add credits instantly and keep generating premium storybooks.
+          </p>
+          <div className="mt-4 inline-flex rounded-xl border border-blue-300/20 bg-blue-500/10 px-4 py-2 text-sm text-blue-100/90">
+            Current credits:
+            <span className="ml-2 font-bold text-white">
+              {userDetail?.credit ?? "-"}
+            </span>
           </div>
-        ))}
-      </div>
+        </MotionDiv>
 
-      {/* <p><strong>Having payment issues?</strong> Request credits via the feedback form. Make sure to mention your registered email to help us process your request.</p> */}
+        <MotionDiv
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.1 }}
+          variants={fadeUp}
+          transition={{ delay: 0.08, duration: 0.5 }}
+          className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4"
+        >
+          {plans.map((plan, index) => (
+            <div
+              key={index}
+              className={`cursor-pointer rounded-2xl border p-6 text-left shadow-xl backdrop-blur-sm transition-all duration-200 ${
+                selectedPlan === index
+                  ? "border-blue-300/50 bg-blue-500/20 shadow-[0_0_30px_rgba(59,130,246,0.2)]"
+                  : "border-blue-300/20 bg-white/[0.04] hover:-translate-y-1 hover:border-blue-300/35"
+              }`}
+              onClick={() => setSelectedPlan(index)}
+            >
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-bold text-white">{plan.title}</h3>
+                {plan.highlighted && (
+                  <span className="rounded-full border border-cyan-200/40 bg-cyan-400/15 px-2.5 py-1 text-xs font-semibold text-cyan-100">
+                    Popular
+                  </span>
+                )}
+              </div>
+              <p className="mt-3 text-3xl font-extrabold text-white">
+                ${plan.price}
+              </p>
+              <ul className="mt-4 text-sm text-blue-100/80">
+                <li className="flex items-center">
+                  <AiOutlineCheck className="mr-2 text-green-300" />
+                  Get {plan.credits} Credits
+                </li>
+              </ul>
+              <button
+                className={`mt-5 w-full rounded-xl border px-4 py-2.5 text-sm font-semibold text-white transition ${
+                  selectedPlan === index
+                    ? "border-blue-200/50 bg-gradient-to-r from-blue-500 via-sky-500 to-cyan-400"
+                    : "border-blue-300/30 bg-white/10 hover:bg-white/15"
+                }`}
+              >
+                {selectedPlan === index ? "Selected" : "Select Plan"}
+              </button>
+            </div>
+          ))}
+        </MotionDiv>
 
-      {selectedPlan !== null && selectedPrice > 0 && (
-        <div className="mt-8">
-          <PayPalButtons
-            style={{ layout: "vertical" }}
-            disabled={selectedPlan === null}
-            onApprove={() => handlePaymentSuccess()}
-            onCancel={() => notifyError("Payment Cancelled")}
-            createOrder={(data, actions) => {
-              return actions.order.create({
-                purchase_units: [
-                  {
-                    amount: {
-                      value: selectedPrice.toFixed(2),
-                      currency_code: "USD",
+        {selectedPlan !== null && selectedPrice > 0 && (
+          <MotionDiv
+            initial="hidden"
+            animate="show"
+            variants={fadeUp}
+            transition={{ delay: 0.1, duration: 0.45 }}
+            className="mx-auto mt-8 max-w-2xl rounded-2xl border border-blue-300/20 bg-white/[0.04] p-4 backdrop-blur-md"
+          >
+            <p className="mb-4 text-sm text-blue-100/80">
+              Complete secure payment for{" "}
+              <span className="font-bold text-white">${selectedPrice.toFixed(2)}</span>
+            </p>
+            <PayPalButtons
+              style={{ layout: "vertical" }}
+              disabled={selectedPlan === null}
+              onApprove={() => handlePaymentSuccess()}
+              onCancel={() => notifyError("Payment Cancelled")}
+              createOrder={(data, actions) => {
+                return actions.order.create({
+                  purchase_units: [
+                    {
+                      amount: {
+                        value: selectedPrice.toFixed(2),
+                        currency_code: "USD",
+                      },
                     },
-                  },
-                ],
-                intent: "CAPTURE",
-              });
-            }}
-          />
-        </div>
-      )}
+                  ],
+                  intent: "CAPTURE",
+                });
+              }}
+            />
+          </MotionDiv>
+        )}
+      </div>
     </div>
   );
 }

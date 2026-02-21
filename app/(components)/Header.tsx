@@ -9,7 +9,7 @@ import { UserButton, useUser } from "@clerk/nextjs";
 function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname(); // Get current route
-  const { user, isSignedIn } = useUser();
+  const { user } = useUser();
   const toggleOpen = () => setIsOpen(!isOpen);
   const closeNavbar = () => setIsOpen(false);
 
@@ -39,20 +39,19 @@ function Header() {
   return (
     <>
       {/* Top Navbar */}
-      <nav className="sticky top-0 w-full px-2 py-1 bg-[#0f031b] backdrop-blur-md shadow-md flex justify-between items-center z-50">
+      <nav className="sticky top-0 z-50 flex w-full items-center justify-between border-b border-blue-300/15 bg-[#010715]/95 px-3 py-1.5 backdrop-blur-xl shadow-[0_10px_35px_rgba(0,0,0,0.45)]">
         <div className="text-xl flex items-center py-1">
-          <a href="/"
-            className="flex items-center">
+          <a href="/" className="flex items-center">
             <Image
               src="/app_logo.png"
               alt="Logo"
-              width={70}
-              height={70}
-              className=""
+              width={58}
+              height={58}
+              className="object-contain"
             />
-          <h2 className="sm:block hidden w-full bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent text-xl sm:text-2xl ml-1">
-            TaleCrafterAI
-          </h2>
+            <h2 className="ml-1 hidden w-full bg-gradient-to-b from-white via-blue-100 to-blue-300 bg-clip-text text-xl font-bold text-transparent sm:block sm:text-2xl">
+              TaleCrafterAI
+            </h2>
           </a>
         </div>
 
@@ -60,21 +59,21 @@ function Header() {
           {/* Hamburger Menu Button */}
           <button
             onClick={toggleOpen}
-            className="flex flex-col space-y-1 p-2 rounded focus:outline-none"
+            className="flex flex-col space-y-1 rounded-lg border border-blue-300/30 bg-white/5 p-2 transition hover:bg-white/10 focus:outline-none"
             aria-label="Toggle Navigation Menu"
           >
             <div
-              className={`w-6 h-0.5 bg-gradient-to-b from-white to-gray-400 transition ${
+              className={`h-0.5 w-6 bg-gradient-to-r from-blue-100 to-cyan-300 transition ${
                 isOpen ? "-rotate-45 translate-x-[-6px] translate-y-[6px] " : ""
               }`}
             ></div>
             <div
-              className={`w-6 h-0.5 bg-gradient-to-b from-white to-gray-400 transition ${
+              className={`h-0.5 w-6 bg-gradient-to-r from-blue-100 to-cyan-300 transition ${
                 isOpen ? "opacity-0" : ""
               }`}
             ></div>
             <div
-              className={`w-6 h-0.5 bg-gradient-to-b from-white to-gray-400 transition ${
+              className={`h-0.5 w-6 bg-gradient-to-r from-blue-100 to-cyan-300 transition ${
                 isOpen ? "rotate-45 translate-x-[-6px] translate-y-[-6px]" : ""
               }`}
             ></div>
@@ -84,7 +83,7 @@ function Header() {
 
       {/* Sidebar Menu */}
       <div
-        className={`fixed top-0 right-0 w-[250px] h-full bg-[#17031b64] backdrop-blur-3xl transform transition-transform duration-300 ease-in-out z-40 pt-[100px] ${
+        className={`fixed right-0 top-0 z-40 h-full w-[270px] border-l border-blue-300/20 bg-[#03122e]/70 pt-[100px] backdrop-blur-3xl transform transition-transform duration-300 ease-in-out ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -92,10 +91,10 @@ function Header() {
           <Link
             key={index}
             href={item.path}
-            className={`block font-bold px-5 py-2.5 text-[20px] no-underline transition-colors duration-300 hover:bg-[#8e8f916a] ${
+            className={`mx-3 my-1 block rounded-xl px-5 py-3 text-[19px] font-bold no-underline transition-colors duration-300 ${
               pathname === item.path
-                ? "bg-[#1D1D2F] text-white font-bold"
-                : "block w-full bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent"
+                ? "border border-blue-300/20 bg-blue-500/20 text-white"
+                : "w-full bg-gradient-to-b from-white via-blue-100 to-blue-300 bg-clip-text text-transparent hover:bg-white/10"
             }`}
             onClick={closeNavbar}
           >
@@ -103,9 +102,9 @@ function Header() {
           </Link>
         ))}
 
-        <div className="fixed flex items-center justify-center gap-4 bottom-0 w-full p-5 bg-[#0f031b] backdrop-blur-md shadow-md">
+        <div className="fixed bottom-0 flex w-full items-center justify-center gap-4 border-t border-blue-300/15 bg-[#010715]/95 p-5 backdrop-blur-xl shadow-inner">
           <UserButton />
-          <h2 className="font-bold text-xl text-gray-300">
+          <h2 className="bg-gradient-to-b from-white via-blue-100 to-blue-300 bg-clip-text text-xl font-bold text-transparent">
             {user ? user.fullName : "Guest User"}
           </h2>
         </div>

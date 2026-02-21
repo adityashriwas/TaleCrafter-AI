@@ -3,13 +3,9 @@ import { IoPlayCircle, IoPauseCircle } from "react-icons/io5";
 
 const StoryPages = ({ storyChapter }: any) => {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [pausedPosition, setPausedPosition] = useState(0);
   const [imageLoaded, setImageLoaded] = useState(false); // Track image loading state
   const synth = window.speechSynthesis; // Get speech synthesis instance
   let utterance = new SpeechSynthesisUtterance(storyChapter?.textPrompt); // New instance per page
-  const formattedImagePrompt = encodeURIComponent(
-    storyChapter?.imagePrompt ?? ""
-  );
 
   // Function to toggle speech
   const toggleSpeech = () => {
@@ -17,7 +13,6 @@ const StoryPages = ({ storyChapter }: any) => {
 
     if (isPlaying) {
       synth.cancel(); // Stop speech completely
-      setPausedPosition(0); // Reset paused position
     } else {
       utterance = new SpeechSynthesisUtterance(storyChapter?.textPrompt); // New instance per play
       synth.speak(utterance);
@@ -29,7 +24,6 @@ const StoryPages = ({ storyChapter }: any) => {
   // Handle speech completion
   utterance.onend = () => {
     setIsPlaying(false);
-    setPausedPosition(0);
   };
 
   // Cleanup when unmounting
@@ -39,16 +33,20 @@ const StoryPages = ({ storyChapter }: any) => {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-primary flex justify-between">
-        {storyChapter?.title}
-        <span className="text-3xl cursor-pointer" onClick={toggleSpeech}>
+      <h2 className="flex items-center justify-between text-2xl font-bold text-blue-700">
+        <span className="pr-3">{storyChapter?.title}</span>
+        <button
+          className="rounded-full bg-blue-100 p-1 text-3xl text-blue-700 transition hover:bg-blue-200"
+          onClick={toggleSpeech}
+          aria-label={isPlaying ? "Pause narration" : "Play narration"}
+        >
           {isPlaying ? <IoPauseCircle /> : <IoPlayCircle />}
-        </span>
+        </button>
       </h2>
       <div className="relative w-full min-h-[300px] mt-2">
         {!imageLoaded && (
-          <div className="absolute inset-0 flex items-center justify-center bg-gray-200 rounded-lg">
-            <span className="animate-spin h-10 w-10 border-4 border-primary border-t-transparent rounded-full"></span>
+          <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-blue-50">
+            <span className="h-10 w-10 animate-spin rounded-full border-4 border-blue-500 border-t-transparent"></span>
           </div>
         )}
         <img
@@ -61,7 +59,7 @@ const StoryPages = ({ storyChapter }: any) => {
         />
       </div>
       <div className="hsb2 max-h-52 overflow-y-scroll mt-2">
-        <p className="text-xl text-black p-4 mt-3 rounded-lg bg-slate-100">
+        <p className="mt-3 rounded-lg bg-blue-50 p-4 text-lg text-slate-800 md:text-xl">
           {storyChapter?.textPrompt
             ?.split(storyChapter?.imagePrompt?.substring(0, 20) || "")[0]
             ?.replace(/\{[^}]*\}/g, "")

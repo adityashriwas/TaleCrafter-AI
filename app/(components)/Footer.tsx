@@ -6,52 +6,49 @@ import Link from "next/link";
 
 const Footer = () => {
   return (
-    <footer className="bg-[#0f031b] backdrop-blur-md shadow-md text-gray-400">
-      <div className="w-full max-w-screen-xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-6">
-        {/* Logo and Name */}
+    <footer className="border-t border-blue-300/15 bg-[#010715]/95 text-blue-100/80 backdrop-blur-xl shadow-[0_-12px_30px_rgba(0,0,0,0.4)]">
+      <div className="mx-auto flex w-full max-w-screen-xl flex-col items-center justify-between gap-6 px-4 py-5 md:flex-row">
         <a href="/" className="flex items-center gap-3">
           <Image
             src="/app_logo.png"
             alt="TaleCrafter AI"
-            width={60}
-            height={60}
+            width={52}
+            height={52}
+            className="object-contain"
           />
-          <span className="block w-full bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent text-xl sm:text-2xl ml-1">
+          <span className="block bg-gradient-to-b from-white via-blue-100 to-blue-300 bg-clip-text text-xl font-bold text-transparent sm:text-2xl">
             TaleCrafter AI
           </span>
         </a>
 
-        {/* Navigation Links */}
-        <div className="flex flex-wrap gap-4 justify-center text-sm md:text-base">
+        <div className="flex flex-wrap justify-center gap-4 text-sm md:text-base">
           <Link
             href="/"
-            className="hover:text-white transition duration-300"
+            className="rounded-lg px-3 py-1 transition duration-300 hover:bg-white/10 hover:text-white"
           >
             Home
           </Link>
           <Link
             href="/about"
-            className="hover:text-white transition duration-300"
+            className="rounded-lg px-3 py-1 transition duration-300 hover:bg-white/10 hover:text-white"
           >
             About
           </Link>
           <a
-            className="hover:text-white transition duration-300"
+            className="rounded-lg px-3 py-1 transition duration-300 hover:bg-white/10 hover:text-white"
             href="mailto:adityashriwas08@gmail.com"
           >
             Contact
           </a>
         </div>
 
-        {/* Feedback Component */}
         <div className="flex-shrink-0">
           <Feedback />
         </div>
       </div>
 
-      {/* Bottom copyright */}
-      <div className="text-center text-sm text-gray-500 py-2">
-        © {new Date().getFullYear()} TaleCrafter AI™. All rights reserved.
+      <div className="border-t border-blue-300/15 py-2 text-center text-sm text-blue-100/60">
+        (c) {new Date().getFullYear()} TaleCrafter AI. All rights reserved.
       </div>
     </footer>
   );
