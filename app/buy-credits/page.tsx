@@ -19,34 +19,32 @@ function PricingOptions() {
       price: 1.99,
       credits: 10,
       highlighted: false,
+      subtitle: "Great for getting started",
     },
     {
       id: 2,
-      title: "Standard",
-      price: 2.99,
-      credits: 30,
-      highlighted: false,
-    },
-    {
-      id: 3,
       title: "Premium",
       price: 3.99,
       credits: 75,
       highlighted: true,
+      subtitle: "Most popular for regular creators",
     },
     {
-      id: 4,
+      id: 3,
       title: "Ultimate",
       price: 5.99,
       credits: 150,
       highlighted: true,
+      subtitle: "Best value for high-volume usage",
     },
   ];
 
   const [selectedPlan, setSelectedPlan] = useState<number | null>(null);
   const [selectedPrice, setSelectedPrice] = useState<number>(0);
+  const [shouldScrollToPayment, setShouldScrollToPayment] = useState(false);
   const { userDetail, setUserDetail } = useContext(UserDetailContext);
   const router = useRouter();
+  const paymentSectionRef = React.useRef<HTMLDivElement | null>(null);
 
   const notify = (message: string) => toast(message);
   const notifyError = (message: string) => toast.error(message);
@@ -54,8 +52,22 @@ function PricingOptions() {
   useEffect(() => {
     if (selectedPlan !== null) {
       setSelectedPrice(plans[selectedPlan]?.price);
+      setShouldScrollToPayment(true);
     }
   }, [selectedPlan]);
+
+  useEffect(() => {
+    if (!shouldScrollToPayment || selectedPlan === null || selectedPrice <= 0) return;
+    const timer = setTimeout(() => {
+      paymentSectionRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+      setShouldScrollToPayment(false);
+    }, 150);
+
+    return () => clearTimeout(timer);
+  }, [shouldScrollToPayment, selectedPlan, selectedPrice]);
 
   const handlePaymentSuccess = async () => {
     if (selectedPlan === null || !userDetail?.userEmail) {
@@ -123,37 +135,44 @@ function PricingOptions() {
           viewport={{ once: true, amount: 0.1 }}
           variants={fadeUp}
           transition={{ delay: 0.08, duration: 0.5 }}
-          className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4"
+          className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3"
         >
           {plans.map((plan, index) => (
             <div
               key={index}
-              className={`cursor-pointer rounded-2xl border p-6 text-left shadow-xl backdrop-blur-sm transition-all duration-200 ${
+              className={`flex min-h-[360px] cursor-pointer flex-col justify-between rounded-2xl border p-6 text-left shadow-xl backdrop-blur-sm transition-all duration-200 ${
                 selectedPlan === index
                   ? "border-blue-300/50 bg-blue-500/20 shadow-[0_0_30px_rgba(59,130,246,0.2)]"
                   : "border-blue-300/20 bg-white/[0.04] hover:-translate-y-1 hover:border-blue-300/35"
               }`}
               onClick={() => setSelectedPlan(index)}
             >
-              <div className="flex items-center justify-between">
-                <h3 className="text-xl font-bold text-white">{plan.title}</h3>
-                {plan.highlighted && (
-                  <span className="rounded-full border border-cyan-200/40 bg-cyan-400/15 px-2.5 py-1 text-xs font-semibold text-cyan-100">
-                    Popular
-                  </span>
-                )}
+              <div>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-bold text-white">{plan.title}</h3>
+                  {plan.highlighted && (
+                    <span className="rounded-full border border-cyan-200/40 bg-cyan-400/15 px-2.5 py-1 text-xs font-semibold text-cyan-100">
+                      Popular
+                    </span>
+                  )}
+                </div>
+                <p className="mt-1 text-sm text-blue-100/70">{plan.subtitle}</p>
+                <p className="mt-3 text-4xl font-extrabold text-white">
+                  ${plan.price}
+                </p>
+                <ul className="mt-4 space-y-2 text-sm text-blue-100/80">
+                  <li className="flex items-center">
+                    <AiOutlineCheck className="mr-2 text-green-300" />
+                    Get {plan.credits} Credits
+                  </li>
+                  <li className="flex items-center">
+                    <AiOutlineCheck className="mr-2 text-green-300" />
+                    No subscription lock-in
+                  </li>
+                </ul>
               </div>
-              <p className="mt-3 text-3xl font-extrabold text-white">
-                ${plan.price}
-              </p>
-              <ul className="mt-4 text-sm text-blue-100/80">
-                <li className="flex items-center">
-                  <AiOutlineCheck className="mr-2 text-green-300" />
-                  Get {plan.credits} Credits
-                </li>
-              </ul>
               <button
-                className={`mt-5 w-full rounded-xl border px-4 py-2.5 text-sm font-semibold text-white transition ${
+                className={`mt-6 w-full rounded-xl border px-4 py-2.5 text-sm font-semibold text-white transition ${
                   selectedPlan === index
                     ? "border-blue-200/50 bg-gradient-to-r from-blue-500 via-sky-500 to-cyan-400"
                     : "border-blue-300/30 bg-white/10 hover:bg-white/15"
@@ -171,6 +190,7 @@ function PricingOptions() {
             animate="show"
             variants={fadeUp}
             transition={{ delay: 0.1, duration: 0.45 }}
+            ref={paymentSectionRef}
             className="mx-auto mt-8 max-w-2xl rounded-2xl border border-blue-300/20 bg-white/[0.04] p-4 backdrop-blur-md"
           >
             <p className="mb-4 text-sm text-blue-100/80">

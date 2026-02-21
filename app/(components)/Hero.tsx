@@ -13,10 +13,24 @@ const Hero = () => {
     "https://github.com/pollinations/pollinations/issues/7357";
 
   const pricingPlans = [
-    { name: "Basic", price: "$1.99", credits: "10" },
-    { name: "Standard", price: "$2.99", credits: "30" },
-    { name: "Premium", price: "$3.99", credits: "75" },
-    { name: "Ultimate", price: "$5.99", credits: "150" },
+    {
+      name: "Basic",
+      price: "$1.99",
+      credits: "10",
+      subtitle: "Great for getting started",
+    },
+    {
+      name: "Premium",
+      price: "$3.99",
+      credits: "75",
+      subtitle: "Most popular for regular creators",
+    },
+    {
+      name: "Ultimate",
+      price: "$5.99",
+      credits: "150",
+      subtitle: "Best value for power users",
+    },
   ];
 
   const { isSignedIn } = useUser();
@@ -284,22 +298,25 @@ const Hero = () => {
             <p className="mt-3 text-blue-100/70">
               Pick a plan and scale story generation as your usage grows.
             </p>
-            <div className="mt-6 flex flex-wrap justify-center gap-6 p-2 text-white">
+            <div className="mt-8 flex flex-wrap justify-center gap-6 p-2 text-white">
               {pricingPlans.map((plan, index) => (
                 <div
                   key={index}
-                  className="w-full rounded-2xl border border-blue-300/20 bg-white/[0.04] p-6 text-center shadow-xl backdrop-blur-sm sm:w-64"
+                  className="flex min-h-[260px] w-full flex-col justify-between rounded-2xl border border-blue-300/20 bg-white/[0.04] p-7 text-left shadow-xl backdrop-blur-sm md:w-[320px]"
                 >
-                  <h3 className="text-lg font-semibold text-blue-100">
-                    {plan.name}
-                  </h3>
-                  <p className="my-2 text-3xl font-extrabold text-white">
-                    {plan.price}
-                  </p>
-                  <p className="text-blue-100/85">Get {plan.credits} Credits</p>
+                  <div>
+                    <h3 className="text-xl font-semibold text-blue-100">
+                      {plan.name}
+                    </h3>
+                    <p className="mt-1 text-sm text-blue-100/70">{plan.subtitle}</p>
+                    <p className="my-3 text-4xl font-extrabold text-white">
+                      {plan.price}
+                    </p>
+                    <p className="text-blue-100/85">Get {plan.credits} Credits</p>
+                  </div>
 
                   <Link href="/buy-credits">
-                    <Button className="mt-4 rounded-xl border border-blue-300/30 bg-blue-500/80 px-6 py-5 text-sm font-semibold text-white transition hover:bg-blue-400">
+                    <Button className="mt-5 w-full rounded-xl border border-blue-300/30 bg-blue-500/80 px-6 py-5 text-sm font-semibold text-white transition hover:bg-blue-400">
                       Select Plan
                     </Button>
                   </Link>

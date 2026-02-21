@@ -10,6 +10,10 @@ function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname(); // Get current route
   const { user } = useUser();
+  const adminEmail = (process.env.NEXT_PUBLIC_ADMIN_EMAIL ?? "").toLowerCase();
+  const currentUserEmail =
+    user?.primaryEmailAddress?.emailAddress?.toLowerCase() ?? "";
+  const isAdmin = adminEmail !== "" && currentUserEmail === adminEmail;
   const toggleOpen = () => setIsOpen(!isOpen);
   const closeNavbar = () => setIsOpen(false);
 
@@ -35,6 +39,13 @@ function Header() {
       path: "/dashboard",
     },
   ];
+
+  if (isAdmin) {
+    MenuList.push({
+      name: "Admin Panel",
+      path: "/admin",
+    });
+  }
 
   return (
     <>

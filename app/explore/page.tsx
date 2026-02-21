@@ -122,17 +122,20 @@ const ExploreMore = () => {
     let restored = false;
     try {
       const raw = sessionStorage.getItem(CACHE_KEY);
-      if (raw) {
-        const parsed: ExploreCache = JSON.parse(raw);
-        if (Array.isArray(parsed.storyList) && parsed.storyList.length > 0) {
-          restored = true;
-          setStoryList(parsed.storyList);
-          setOffset(parsed.offset ?? 0);
-          setHasMoreStories(parsed.hasMoreStories ?? true);
-          requestAnimationFrame(() => {
-            window.scrollTo({ top: parsed.scrollY ?? 0, behavior: "auto" });
-          });
-        }
+        if (raw) {
+          const parsed: ExploreCache = JSON.parse(raw);
+          if (Array.isArray(parsed.storyList) && parsed.storyList.length > 0) {
+            restored = true;
+            setStoryList(parsed.storyList);
+            setOffset(parsed.offset ?? 0);
+            const inferredHasMore =
+              parsed.hasMoreStories ??
+              (parsed.storyList.length % PAGE_SIZE === 0);
+            setHasMoreStories(inferredHasMore);
+            requestAnimationFrame(() => {
+              window.scrollTo({ top: parsed.scrollY ?? 0, behavior: "auto" });
+            });
+          }
       }
     } catch {
       // ignore invalid cache
@@ -169,6 +172,34 @@ const ExploreMore = () => {
     observer.observe(trigger);
     return () => observer.disconnect();
   }, [GetAllStories, isRestored]);
+
+  useEffect(() => {
+    if (!isRestored) return;
+
+    const onScroll = () => {
+      if (loadingRef.current || !hasMoreRef.current) return;
+      const nearBottom =
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 320;
+      if (nearBottom) {
+        GetAllStories(offsetRef.current + PAGE_SIZE);
+      }
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [GetAllStories, isRestored]);
+
+  useEffect(() => {
+    if (!isRestored || loading || !hasMoreStories) return;
+    const nearBottom =
+      window.innerHeight + window.scrollY >=
+      document.documentElement.scrollHeight - 320;
+    if (nearBottom) {
+      GetAllStories(offsetRef.current + PAGE_SIZE);
+    }
+  }, [GetAllStories, hasMoreStories, isRestored, loading, storyList.length]);
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#020b1f] px-5 py-8 md:px-16 lg:px-28 xl:px-40">
