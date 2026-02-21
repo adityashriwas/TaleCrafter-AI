@@ -108,6 +108,7 @@ html, body{
     linear-gradient(90deg, rgba(96, 165, 250, 0.09) 1px, transparent 1px);
   background-size: 28px 28px;
   mask-image: radial-gradient(circle at center, black 35%, transparent 85%);
+  pointer-events: none;
 }
 
 .tc-hero-orb {
