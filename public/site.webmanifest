@@ -1,0 +1,21 @@
+{
+  "name": "TaleCrafter AI",
+  "short_name": "TaleCrafter",
+  "description": "AI story generator for creating illustrated digital storybooks.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020b1f",
+  "theme_color": "#020b1f",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "16x16 32x32 48x48",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

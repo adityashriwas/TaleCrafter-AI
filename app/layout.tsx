@@ -5,49 +5,69 @@ import Header from "./(components)/Header";
 import { Nunito } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import Footer from "./(components)/Footer";
-import { SpeedInsights } from "@vercel/speed-insights/next"
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const myAppFont = Nunito({ subsets: ["latin"] });
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.talecrafter.tech";
+const ogImage = "/logo.png";
 
 export const metadata: Metadata = {
-  title: "TaleCrafter AI - AI Storyteller and Generator | Create Engaging Stories with AI",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "TaleCrafter AI | AI Story Generator for Digital Storybooks",
+    template: "%s | TaleCrafter AI",
+  },
   description:
-    "TaleCrafter AI is an AI-powered storytelling platform that lets you create unique, engaging stories with text-to-speech, animated visuals, and recommendations. Perfect for writers, educators, and storytellers!",
+    "Create illustrated storybooks with AI. TaleCrafter AI turns your prompts into engaging stories with visuals, narration support, and a smooth creation workflow.",
+  applicationName: "TaleCrafter AI",
   keywords: [
     "AI story generator",
-    "AI-powered storytelling",
-    "Create stories with AI",
-    "Animated storybook",
-    "Text-to-speech story generator",
-    "AI writing tool",
+    "digital storybook creator",
+    "AI storytelling app",
+    "children story generator",
+    "illustrated stories with AI",
+    "text to story AI",
+    "TaleCrafter AI",
   ],
+  alternates: {
+    canonical: "/",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   openGraph: {
-    title: "TaleCrafter AI - AI Story Generator",
+    title: "TaleCrafter AI | AI Story Generator for Digital Storybooks",
     description:
-      "Generate AI-written stories with stunning visuals and immersive text-to-speech narration. Bring your imagination to life with TaleCrafter AI!",
-    url: "https://www.talecrafter.tech/",
+      "Turn prompts into illustrated storybooks with TaleCrafter AI. Generate stories, covers, and chapter content in minutes.",
+    url: "/",
     siteName: "TaleCrafter AI",
     images: [
       {
-        url: "/https://github.com/adityashriwas/TaleCrafter-AI/blob/main/Screenshot.png",
-        alt: "TaleCrafter AI - AI Story Generator",
+        url: ogImage,
+        width: 1200,
+        height: 630,
+        alt: "TaleCrafter AI",
       },
     ],
     type: "website",
+    locale: "en_US",
   },
-  twitter:{
-    title: "TaleCrafter AI - AI Story Generator",
-    description:
-      "Generate AI-written stories with stunning visuals and immersive text-to-speech narration. Bring your imagination to life with TaleCrafter AI!",
+  twitter: {
     card: "summary_large_image",
-    images: [
-      {
-        url: "/https://github.com/adityashriwas/TaleCrafter-AI/blob/main/Screenshot.png",
-        alt: "TaleCrafter AI - AI Storyteller and Generator",
-      },
-    ],
-    creator: "Aditya Shriwas",
-  }
+    title: "TaleCrafter AI | AI Story Generator for Digital Storybooks",
+    description:
+      "Create illustrated stories from prompts with TaleCrafter AI and publish engaging digital storybooks faster.",
+    images: [ogImage],
+  },
+  manifest: "/site.webmanifest",
 };
 
 export default function RootLayout({
@@ -58,9 +78,12 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-      <head>
+        <head>
           {/* Google Analytics script */}
-          <script async src="https://www.googletagmanager.com/gtag/js?id=G-59BYFVQQML"></script>
+          <script
+            async
+            src="https://www.googletagmanager.com/gtag/js?id=G-59BYFVQQML"
+          ></script>
           <script>
             {`
               window.dataLayer = window.dataLayer || [];
