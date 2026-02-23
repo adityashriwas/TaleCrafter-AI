@@ -1,35 +1,53 @@
 import React, { useState, useEffect } from "react";
 import { IoPlayCircle, IoPauseCircle } from "react-icons/io5";
 
-const StoryPages = ({ storyChapter }: any) => {
+const StoryPages = ({
+  storyChapter,
+  chapterKey,
+  activeNarrationKey,
+  onStartNarration,
+  onStopNarration,
+}: any) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false); // Track image loading state
-  const synth = window.speechSynthesis; // Get speech synthesis instance
-  let utterance = new SpeechSynthesisUtterance(storyChapter?.textPrompt); // New instance per page
 
   // Function to toggle speech
   const toggleSpeech = () => {
+    if (typeof window === "undefined") return;
+    const synth = window.speechSynthesis; // Get speech synthesis instance
     if (!synth) return;
 
     if (isPlaying) {
       synth.cancel(); // Stop speech completely
+      onStopNarration?.(chapterKey);
+      setIsPlaying(false);
     } else {
-      utterance = new SpeechSynthesisUtterance(storyChapter?.textPrompt); // New instance per play
+      synth.cancel();
+      const utterance = new SpeechSynthesisUtterance(storyChapter?.textPrompt); // New instance per play
+      utterance.onend = () => {
+        setIsPlaying(false);
+        onStopNarration?.(chapterKey);
+      };
+      onStartNarration?.(chapterKey);
       synth.speak(utterance);
+      setIsPlaying(true);
     }
-
-    setIsPlaying(!isPlaying);
-  };
-
-  // Handle speech completion
-  utterance.onend = () => {
-    setIsPlaying(false);
   };
 
   // Cleanup when unmounting
   useEffect(() => {
+    if (typeof window === "undefined") return;
+    const synth = window.speechSynthesis;
     return () => synth.cancel();
   }, []);
+
+  useEffect(() => {
+    if (activeNarrationKey === chapterKey || !isPlaying) return;
+    if (typeof window !== "undefined") {
+      window.speechSynthesis.cancel();
+    }
+    setIsPlaying(false);
+  }, [activeNarrationKey, chapterKey, isPlaying]);
 
   return (
     <div>
@@ -52,7 +70,7 @@ const StoryPages = ({ storyChapter }: any) => {
         <img
           src={`https://gen.pollinations.ai/image/${storyChapter?.imagePrompt}?model=${process.env.NEXT_PUBLIC_POLLINATIONS_AI_MODEL}&enhance=false&negative_prompt=worst+quality%2C+blurry&safe=false&seed=0&key=${process.env.NEXT_PUBLIC_POLLINATIONS_API_KEY}`}
           alt=""
-          className={`w-full min-h-full object-cover rounded-lg transition-opacity duration-300 ${
+          className={`h-auto w-full rounded-lg bg-slate-100 object-contain transition-opacity duration-300 ${
             imageLoaded ? "opacity-100" : "opacity-0"
           }`}
           onLoad={() => setImageLoaded(true)} // Set imageLoaded to true when image loads

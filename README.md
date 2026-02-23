@@ -36,13 +36,19 @@ Experience TaleCrafter AI in action:
 
 ### 🎨 Interactive Experience
 - **Animated Book Interface**: Immersive page-flip animation for authentic reading experience
+- **Dual Reading Modes**: Switch between Flipbook mode and Story mode for different reading flows
 - **Multiple Art Styles**: Professional illustration styles including Oil Painting, Watercolor, Comic, Anime, 3D, and more
 - **Age-Appropriate Content**: Tailored stories for Toddlers, Kids, Pre-teens, Teens, and Adults
 
 ### 🔊 Accessibility Features
 - **Text-to-Speech (TTS)**: Full audio narration of generated stories for immersive listening
-- **Professional Narration**: High-quality voice synthesis for enhanced engagement
+- **Smart Narration Control**: Starting narration on a new chapter automatically stops previous playback
 - **Responsive Design**: Optimized for mobile, tablet, and desktop experiences
+
+### ðŸ“„ Export & Sharing
+- **Image-First PDF Export**: Download chapter-formatted PDFs with generated visuals and text
+- **Story-Mode Download Flow**: PDF export appears in Story mode for focused reading/export UX
+- **Quick Story Sharing**: Share story links using native share or copy-to-clipboard
 
 ### 💰 Flexible Monetization
 - **Credit-Based System**: Pay-as-you-go model for story generation
@@ -92,7 +98,7 @@ Experience TaleCrafter AI in action:
 - **Axios** - HTTP client for API requests
 - **React Toastify** - User notifications
 - **React Icons** - Comprehensive icon library
-- **html2pdf** - PDF generation for story exports
+- **jsPDF + html2canvas** - PDF generation for story exports
 
 ---
 
@@ -120,14 +126,14 @@ Experience TaleCrafter AI in action:
    - AI will process your preferences and generate a complete narrative
 
 5. **Experience Your Story**
-   - View the beautifully illustrated story in animated book format
-   - Use the page-flip controls to navigate through the story
-   - Enable text-to-speech for audio narration
+   - Read in animated **Flipbook** mode for page-turn interactions
+   - Toggle to **Story** mode for chapter cards and export-ready layout
+   - Use narration controls with automatic stop when another chapter starts
 
 6. **Manage Your Stories**
    - Access your story library from the dashboard
    - Share stories with others using built-in sharing features
-   - Download stories as PDF for offline reading
+   - Download stories as image-rich PDF files for offline reading
 
 ### Credit System
 

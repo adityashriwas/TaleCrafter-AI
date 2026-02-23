@@ -20,7 +20,7 @@ const About = () => {
     {
       title: "Narrated Reading",
       description:
-        "Turn every generated story into an immersive read-and-listen experience with integrated text-to-speech support.",
+        "Use one-tap chapter narration with automatic stop of previous playback for a cleaner listening experience.",
     },
   ];
 
@@ -77,7 +77,9 @@ const About = () => {
             <ul className="mt-5 space-y-3 text-sm leading-relaxed text-blue-100/80 md:text-base">
               <li>Generate complete storybooks from short prompts or uploaded images.</li>
               <li>Match output to audience age, genre, and visual style instantly.</li>
-              <li>Use narration-ready pages for classrooms and creator workflows.</li>
+              <li>Switch between Flipbook mode and Story mode based on reading style.</li>
+              <li>Use narration-ready pages with smart single-active playback control.</li>
+              <li>Export image-rich PDFs from Story mode for offline sharing.</li>
               <li>Access stories through a clean dashboard and interactive book reader.</li>
               <li>Explore community stories for faster ideation and inspiration.</li>
             </ul>

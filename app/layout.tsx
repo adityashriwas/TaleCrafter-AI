@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     template: "%s | TaleCrafter AI",
   },
   description:
-    "Create illustrated storybooks with AI. TaleCrafter AI turns your prompts into engaging stories with visuals, narration support, and a smooth creation workflow.",
+    "Create illustrated storybooks with AI. TaleCrafter AI turns prompts into engaging stories with visuals, flipbook/story reading modes, smart narration control, and image-rich PDF export.",
   applicationName: "TaleCrafter AI",
   keywords: [
     "AI story generator",
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "TaleCrafter AI | AI Story Generator for Digital Storybooks",
     description:
-      "Turn prompts into illustrated storybooks with TaleCrafter AI. Generate stories, covers, and chapter content in minutes.",
+      "Turn prompts into illustrated storybooks with TaleCrafter AI. Generate stories, switch reading modes, and export image-rich PDFs in minutes.",
     url: "/",
     siteName: "TaleCrafter AI",
     images: [
@@ -64,7 +64,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "TaleCrafter AI | AI Story Generator for Digital Storybooks",
     description:
-      "Create illustrated stories from prompts with TaleCrafter AI and publish engaging digital storybooks faster.",
+      "Create illustrated stories from prompts with TaleCrafter AI, read with smart narration controls, and export polished PDFs faster.",
     images: [ogImage],
   },
   manifest: "/site.webmanifest",

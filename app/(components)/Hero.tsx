@@ -57,7 +57,7 @@ const Hero = () => {
     {
       title: "Narrated Reading",
       description:
-        "Play your story aloud with integrated text-to-speech for a more immersive reading experience.",
+        "Play chapter narration with smart controls that automatically stop previous audio when a new page starts.",
       icon: "04",
     },
     {
@@ -69,7 +69,7 @@ const Hero = () => {
     {
       title: "Interactive Book Experience",
       description:
-        "Read inside a page-flip interface that makes generated stories feel like real digital books.",
+        "Switch between Flipbook and Story modes, then export image-rich PDFs directly from Story mode.",
       icon: "06",
     },
   ];
