@@ -145,3 +145,88 @@ html, body{
   left: 30%;
   animation: tcOrbFloatThree 10s ease-in-out infinite;
 }
+
+.tc-glass-panel {
+  border: 1px solid rgba(147, 197, 253, 0.2);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+}
+
+.tc-glass-panel-soft {
+  border: 1px solid rgba(147, 197, 253, 0.2);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(4px);
+}
+
+.tc-title-gradient {
+  background-image: linear-gradient(to bottom, #ffffff, #dbeafe, #93c5fd);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.tc-btn-primary {
+  border: 1px solid rgba(147, 197, 253, 0.3);
+  border-radius: 0.75rem;
+  background-image: linear-gradient(to right, #3b82f6, #22d3ee);
+  color: #ffffff;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.tc-btn-primary:hover {
+  background-image: linear-gradient(to right, #60a5fa, #67e8f9);
+}
+
+.tc-btn-ghost {
+  border: 1px solid rgba(147, 197, 253, 0.3);
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.1);
+  color: #dbeafe;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.tc-btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.tc-icon-btn {
+  border: 1px solid rgba(147, 197, 253, 0.2);
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.1);
+  color: #dbeafe;
+  transition: all 0.2s ease;
+}
+
+.tc-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.tc-toggle-wrap {
+  display: inline-flex;
+  border: 1px solid rgba(147, 197, 253, 0.2);
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.25rem;
+}
+
+.tc-toggle-btn {
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #dbeafe;
+  transition: all 0.2s ease;
+}
+
+.tc-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.tc-toggle-btn-active {
+  background-image: linear-gradient(to right, #3b82f6, #22d3ee);
+  color: #ffffff;
+}

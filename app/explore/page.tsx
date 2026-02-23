@@ -213,9 +213,9 @@ const ExploreMore = () => {
           animate="show"
           variants={fadeUp}
           transition={{ duration: 0.55 }}
-          className="rounded-2xl border border-blue-300/20 bg-white/[0.04] px-5 py-7 text-center shadow-[0_16px_45px_rgba(0,0,0,0.35)] backdrop-blur-md md:px-8"
+          className="tc-glass-panel px-5 py-7 text-center shadow-[0_16px_45px_rgba(0,0,0,0.35)] md:px-8"
         >
-          <h2 className="bg-gradient-to-b from-white via-blue-100 to-blue-300 bg-clip-text text-3xl font-extrabold text-transparent sm:text-4xl md:text-5xl">
+          <h2 className="tc-title-gradient text-3xl font-extrabold sm:text-4xl md:text-5xl">
             Explore Stories
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-blue-100/75 md:text-base">
@@ -230,7 +230,7 @@ const ExploreMore = () => {
           viewport={{ once: true, amount: 0.1 }}
           variants={fadeUp}
           transition={{ delay: 0.08, duration: 0.5 }}
-          className="mt-8 rounded-2xl border border-blue-300/20 bg-white/[0.04] p-5 backdrop-blur-sm md:p-7"
+          className="tc-glass-panel-soft mt-8 p-5 md:p-7"
         >
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {storyList?.map((item: StoryItemType) => (

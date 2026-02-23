@@ -41,9 +41,9 @@ const About = () => {
           animate="show"
           variants={fadeUp}
           transition={{ duration: 0.6 }}
-          className="rounded-2xl border border-blue-300/20 bg-white/[0.04] p-6 text-center shadow-[0_15px_45px_rgba(0,0,0,0.35)] backdrop-blur-md md:p-10"
+          className="tc-glass-panel p-6 text-center shadow-[0_15px_45px_rgba(0,0,0,0.35)] md:p-10"
         >
-          <h1 className="bg-gradient-to-b from-white via-blue-100 to-blue-300 bg-clip-text text-3xl font-extrabold text-transparent md:text-5xl">
+          <h1 className="tc-title-gradient text-3xl font-extrabold md:text-5xl">
             About TaleCrafter AI
           </h1>
           <p className="mx-auto mt-5 max-w-3xl text-base leading-relaxed text-blue-100/75 md:text-lg">
@@ -59,7 +59,7 @@ const About = () => {
           viewport={{ once: true, amount: 0.2 }}
           variants={fadeUp}
           transition={{ delay: 0.1, duration: 0.6 }}
-          className="mt-10 grid items-center gap-8 rounded-2xl border border-blue-300/20 bg-white/[0.03] p-5 shadow-xl backdrop-blur-sm md:grid-cols-2 md:p-8"
+          className="tc-glass-panel-soft mt-10 grid items-center gap-8 p-5 shadow-xl md:grid-cols-2 md:p-8"
         >
           <div className="overflow-hidden rounded-xl border border-blue-300/20">
             <Image
@@ -71,7 +71,7 @@ const About = () => {
             />
           </div>
           <div>
-            <h2 className="bg-gradient-to-b from-white to-blue-300 bg-clip-text text-2xl font-bold text-transparent md:text-3xl">
+            <h2 className="tc-title-gradient text-2xl font-bold md:text-3xl">
               Why teams choose TaleCrafter
             </h2>
             <ul className="mt-5 space-y-3 text-sm leading-relaxed text-blue-100/80 md:text-base">
@@ -98,7 +98,7 @@ const About = () => {
               key={item.title}
               variants={fadeUp}
               transition={{ duration: 0.5 }}
-              className="rounded-2xl border border-blue-300/20 bg-blue-500/10 p-6 backdrop-blur-sm"
+              className="tc-glass-panel-soft bg-blue-500/10 p-6"
             >
               <h3 className="text-xl font-semibold text-white">{item.title}</h3>
               <p className="mt-3 text-sm leading-relaxed text-blue-100/80 md:text-base">
@@ -125,7 +125,7 @@ const About = () => {
           </p>
           <Link
             href="/create-story"
-            className="mt-6 inline-block rounded-xl border border-blue-300/30 bg-gradient-to-r from-blue-500 to-cyan-400 px-6 py-3 font-semibold text-white transition hover:scale-[1.03] hover:from-blue-400 hover:to-cyan-300"
+            className="tc-btn-primary mt-6 inline-block px-6 py-3 hover:scale-[1.03]"
           >
             Start Creating
           </Link>

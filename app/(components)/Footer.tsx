@@ -16,7 +16,7 @@ const Footer = () => {
             height={52}
             className="object-contain"
           />
-          <span className="block bg-gradient-to-b from-white via-blue-100 to-blue-300 bg-clip-text text-xl font-bold text-transparent sm:text-2xl">
+          <span className="tc-title-gradient block text-xl font-bold sm:text-2xl">
             TaleCrafter AI
           </span>
         </a>

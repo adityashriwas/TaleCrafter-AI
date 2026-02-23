@@ -60,7 +60,7 @@ function Header() {
               height={58}
               className="object-contain"
             />
-            <h2 className="ml-1 hidden w-full bg-gradient-to-b from-white via-blue-100 to-blue-300 bg-clip-text text-xl font-bold text-transparent sm:block sm:text-2xl">
+            <h2 className="tc-title-gradient ml-1 hidden w-full text-xl font-bold sm:block sm:text-2xl">
               TaleCrafterAI
             </h2>
           </a>
@@ -105,7 +105,7 @@ function Header() {
             className={`mx-3 my-1 block rounded-xl px-5 py-3 text-[19px] font-bold no-underline transition-colors duration-300 ${
               pathname === item.path
                 ? "border border-blue-300/20 bg-blue-500/20 text-white"
-                : "w-full bg-gradient-to-b from-white via-blue-100 to-blue-300 bg-clip-text text-transparent hover:bg-white/10"
+                : "tc-title-gradient w-full hover:bg-white/10"
             }`}
             onClick={closeNavbar}
           >
@@ -115,7 +115,7 @@ function Header() {
 
         <div className="fixed bottom-0 flex w-full items-center justify-center gap-4 border-t border-blue-300/15 bg-[#010715]/95 p-5 backdrop-blur-xl shadow-inner">
           <UserButton />
-          <h2 className="bg-gradient-to-b from-white via-blue-100 to-blue-300 bg-clip-text text-xl font-bold text-transparent">
+          <h2 className="tc-title-gradient text-xl font-bold">
             {user ? user.fullName : "Guest User"}
           </h2>
         </div>

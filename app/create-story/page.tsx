@@ -192,11 +192,11 @@ const CreateStory = () => {
           animate="show"
           variants={fadeUp}
           transition={{ duration: 0.6 }}
-          className="mt-6 rounded-2xl border border-blue-300/20 bg-white/[0.04] px-5 py-7 shadow-[0_16px_45px_rgba(0,0,0,0.35)] backdrop-blur-md md:px-8"
+          className="tc-glass-panel mt-6 px-5 py-7 shadow-[0_16px_45px_rgba(0,0,0,0.35)] md:px-8"
         >
           <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
             <div>
-              <h1 className="bg-gradient-to-b from-white via-blue-100 to-blue-300 bg-clip-text text-3xl font-extrabold text-transparent sm:text-4xl md:text-5xl">
+              <h1 className="tc-title-gradient text-3xl font-extrabold sm:text-4xl md:text-5xl">
                 Create Story
               </h1>
               <p className="mt-3 max-w-2xl text-sm leading-relaxed text-blue-100/75 md:text-base">
@@ -219,7 +219,7 @@ const CreateStory = () => {
           viewport={{ once: true, amount: 0.1 }}
           variants={fadeUp}
           transition={{ delay: 0.1, duration: 0.5 }}
-          className="mt-8 rounded-2xl border border-blue-300/20 bg-white/[0.04] p-5 backdrop-blur-sm md:p-7"
+          className="tc-glass-panel-soft mt-8 p-5 md:p-7"
         >
           <div className="flex flex-col justify-between gap-5">
             <StorySubjectInput userSelection={onHandleUserSelection} />
@@ -233,7 +233,7 @@ const CreateStory = () => {
           viewport={{ once: true, amount: 0.1 }}
           variants={fadeUp}
           transition={{ delay: 0.12, duration: 0.5 }}
-          className="mt-7 rounded-2xl border border-blue-300/20 bg-white/[0.04] p-5 backdrop-blur-sm md:p-7"
+          className="tc-glass-panel-soft mt-7 p-5 md:p-7"
         >
           <UploadImage setImageSubject={setStorySubject} />
         </MotionDiv>
@@ -244,7 +244,7 @@ const CreateStory = () => {
           viewport={{ once: true, amount: 0.1 }}
           variants={fadeUp}
           transition={{ delay: 0.14, duration: 0.5 }}
-          className="mt-7 rounded-2xl border border-blue-300/20 bg-white/[0.04] p-5 backdrop-blur-sm md:p-7"
+          className="tc-glass-panel-soft mt-7 p-5 md:p-7"
         >
           <StoryType userSelection={onHandleUserSelection} />
         </MotionDiv>
@@ -255,7 +255,7 @@ const CreateStory = () => {
           viewport={{ once: true, amount: 0.1 }}
           variants={fadeUp}
           transition={{ delay: 0.16, duration: 0.5 }}
-          className="mt-7 rounded-2xl border border-blue-300/20 bg-white/[0.04] p-5 backdrop-blur-sm md:p-7"
+          className="tc-glass-panel-soft mt-7 p-5 md:p-7"
         >
           <ImageStyle userSelection={onHandleUserSelection} />
         </MotionDiv>
@@ -266,7 +266,7 @@ const CreateStory = () => {
           viewport={{ once: true, amount: 0.1 }}
           variants={fadeUp}
           transition={{ delay: 0.18, duration: 0.5 }}
-          className="mt-7 rounded-2xl border border-blue-300/20 bg-white/[0.04] p-5 backdrop-blur-sm md:p-7"
+          className="tc-glass-panel-soft mt-7 p-5 md:p-7"
         >
           <AgeCategory userSelection={onHandleUserSelection} />
         </MotionDiv>
@@ -274,7 +274,7 @@ const CreateStory = () => {
         <div className="mt-8 flex justify-end">
           <Button
             disabled={loading}
-            className="rounded-xl border border-blue-300/30 bg-gradient-to-r from-blue-500 to-cyan-400 px-8 py-6 text-base font-semibold text-white shadow-[0_0_30px_rgba(29,141,255,0.3)] transition hover:scale-[1.02] hover:from-blue-400 hover:to-cyan-300 disabled:cursor-not-allowed disabled:opacity-70"
+            className="tc-btn-primary px-8 py-6 text-base shadow-[0_0_30px_rgba(29,141,255,0.3)] hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-70"
             color="primary"
             onClick={GenerateStory}
           >

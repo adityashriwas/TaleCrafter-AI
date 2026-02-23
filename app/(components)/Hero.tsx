@@ -99,7 +99,7 @@ const Hero = () => {
               Build cinematic storybooks with AI
             </span>
             
-            <h1 className="mt-7 bg-gradient-to-b from-white via-blue-100 to-blue-300 bg-clip-text text-4xl font-extrabold leading-tight text-transparent sm:text-5xl md:text-6xl lg:text-7xl">
+            <h1 className="tc-title-gradient mt-7 text-4xl font-extrabold leading-tight sm:text-5xl md:text-6xl lg:text-7xl">
               TaleCrafter AI
               <span className="block text-3xl sm:text-4xl md:text-5xl lg:text-6xl">
                 Product-grade story creation platform
@@ -120,12 +120,12 @@ const Hero = () => {
             className="mt-10 flex flex-wrap items-center justify-center gap-4"
           >
             <Link href="/create-story">
-              <Button className="rounded-xl border border-blue-300/30 bg-gradient-to-r from-blue-500 to-cyan-400 px-7 py-6 text-base font-semibold text-white shadow-[0_0_30px_rgba(29,141,255,0.3)] transition hover:scale-[1.03] hover:from-blue-400 hover:to-cyan-300">
+              <Button className="tc-btn-primary px-7 py-6 text-base shadow-[0_0_30px_rgba(29,141,255,0.3)] hover:scale-[1.03]">
                 Create Story
               </Button>
             </Link>
             <Link href="/dashboard">
-              <Button className="rounded-xl border border-blue-200/30 bg-white/10 px-7 py-6 text-base font-semibold text-blue-100 backdrop-blur-sm transition hover:scale-[1.03] hover:bg-white/20">
+              <Button className="tc-btn-ghost px-7 py-6 text-base backdrop-blur-sm hover:scale-[1.03]">
                 {isSignedIn ? "Dashboard" : "Get Started"}
               </Button>
             </Link>
@@ -136,7 +136,7 @@ const Hero = () => {
             animate="show"
             transition={{ delay: 0.3, duration: 0.6 }}
             variants={fadeUp}
-            className="mx-auto mt-20 grid max-w-5xl grid-cols-2 gap-3 rounded-2xl border border-blue-300/20 bg-white/[0.04] p-4 backdrop-blur-md sm:grid-cols-4"
+            className="tc-glass-panel mx-auto mt-20 grid max-w-5xl grid-cols-2 gap-3 p-4 sm:grid-cols-4"
           >
             <div className="rounded-xl bg-blue-400/10 p-4 text-center">
               <p className="text-2xl font-bold text-white">40+</p>
@@ -170,7 +170,7 @@ const Hero = () => {
               animate="show"
               transition={{ delay: 0.35, duration: 0.6 }}
               variants={fadeUp}
-              className="rounded-2xl border border-cyan-300/35 bg-cyan-400/[0.08] p-5 text-left shadow-[0_0_45px_rgba(34,211,238,0.12)] backdrop-blur-md"
+            className="rounded-2xl border border-cyan-300/35 bg-cyan-400/[0.08] p-5 text-left shadow-[0_0_45px_rgba(34,211,238,0.12)] backdrop-blur-md"
             >
               <div className="mb-3 inline-flex items-center rounded-full border border-cyan-300/35 bg-cyan-300/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-cyan-100">
                 New Recognition <strong className="text-xl">🌟</strong>
@@ -206,7 +206,7 @@ const Hero = () => {
               animate="show"
               transition={{ delay: 0.4, duration: 0.6 }}
               variants={fadeUp}
-              className="rounded-2xl border border-cyan-300/35 bg-cyan-400/[0.08] p-5 text-left shadow-[0_0_45px_rgba(34,211,238,0.12)] backdrop-blur-md"
+            className="rounded-2xl border border-cyan-300/35 bg-cyan-400/[0.08] p-5 text-left shadow-[0_0_45px_rgba(34,211,238,0.12)] backdrop-blur-md"
             >
               <h3 className="text-xl font-bold text-white sm:text-2xl">
                 Used Worldwide
@@ -249,7 +249,7 @@ const Hero = () => {
 
         <section className="relative px-4 pb-12 md:px-16 lg:px-32 xl:px-44">
           <div className="mx-auto max-w-5xl text-center">
-            <h2 className="bg-gradient-to-b from-white via-blue-100 to-blue-300 bg-clip-text text-3xl font-bold text-transparent sm:text-4xl">
+            <h2 className="tc-title-gradient text-3xl font-bold sm:text-4xl">
               Built for modern AI storytelling workflows
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-blue-100/70">
@@ -270,7 +270,7 @@ const Hero = () => {
                 key={item.title}
                 variants={fadeUp}
                 transition={{ duration: 0.5 }}
-                className="group rounded-2xl border border-blue-300/20 bg-white/[0.04] p-6 shadow-[0_10px_40px_rgba(3,10,30,0.45)] backdrop-blur-sm transition hover:-translate-y-1 hover:border-blue-300/40 hover:bg-blue-400/10"
+                className="tc-glass-panel-soft group p-6 shadow-[0_10px_40px_rgba(3,10,30,0.45)] transition hover:-translate-y-1 hover:border-blue-300/40 hover:bg-blue-400/10"
               >
                 <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-cyan-400 text-sm font-bold text-white">
                   {item.icon}
@@ -292,7 +292,7 @@ const Hero = () => {
 
         <section className="relative px-4 pb-20 md:px-16 lg:px-32 xl:px-44">
           <div className="text-center">
-            <h2 className="bg-gradient-to-b from-white via-blue-100 to-blue-300 bg-clip-text text-3xl font-bold text-transparent sm:text-4xl">
+            <h2 className="tc-title-gradient text-3xl font-bold sm:text-4xl">
               Simple pricing for rapid creation
             </h2>
             <p className="mt-3 text-blue-100/70">
@@ -302,7 +302,7 @@ const Hero = () => {
               {pricingPlans.map((plan, index) => (
                 <div
                   key={index}
-                  className="flex min-h-[260px] w-full flex-col justify-between rounded-2xl border border-blue-300/20 bg-white/[0.04] p-7 text-left shadow-xl backdrop-blur-sm md:w-[320px]"
+                  className="tc-glass-panel-soft flex min-h-[260px] w-full flex-col justify-between p-7 text-left shadow-xl md:w-[320px]"
                 >
                   <div>
                     <h3 className="text-xl font-semibold text-blue-100">
@@ -316,7 +316,7 @@ const Hero = () => {
                   </div>
 
                   <Link href="/buy-credits">
-                    <Button className="mt-5 w-full rounded-xl border border-blue-300/30 bg-blue-500/80 px-6 py-5 text-sm font-semibold text-white transition hover:bg-blue-400">
+                    <Button className="tc-btn-primary mt-5 w-full bg-blue-500/80 px-6 py-5 text-sm hover:bg-blue-400">
                       Select Plan
                     </Button>
                   </Link>

@@ -200,8 +200,8 @@ const UserStoryList = () => {
   }, [userEmail, isRestored, getUserStory]);
 
   return (
-    <div className="mt-8 rounded-2xl border border-blue-300/20 bg-white/[0.04] p-5 backdrop-blur-sm md:p-7">
-      <h3 className="bg-gradient-to-b from-white via-blue-100 to-blue-300 bg-clip-text text-2xl font-bold text-transparent">
+    <div className="tc-glass-panel-soft mt-8 p-5 md:p-7">
+      <h3 className="tc-title-gradient text-2xl font-bold">
         Your Library
       </h3>
       <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

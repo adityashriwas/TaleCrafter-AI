@@ -146,8 +146,8 @@ const AdminDashboard = () => {
       <div className="tc-hero-orb tc-hero-orb-two" />
 
       <div className="relative">
-        <div className="rounded-2xl border border-blue-300/20 bg-white/[0.04] p-6 backdrop-blur-md">
-          <h1 className="bg-gradient-to-b from-white via-blue-100 to-blue-300 bg-clip-text text-3xl font-extrabold text-transparent md:text-5xl">
+        <div className="tc-glass-panel p-6">
+          <h1 className="tc-title-gradient text-3xl font-extrabold md:text-5xl">
             Admin Panel
           </h1>
           <p className="mt-2 text-blue-100/75">
@@ -202,7 +202,7 @@ const AdminDashboard = () => {
         </div>
 
         {activeTab === "stories" && (
-          <div className="mt-4 rounded-2xl border border-blue-300/20 bg-white/[0.04] p-5 backdrop-blur-sm">
+          <div className="tc-glass-panel-soft mt-4 p-5">
             <div className="mb-4 flex flex-col gap-3 md:flex-row">
               <input
                 type="text"
@@ -266,7 +266,7 @@ const AdminDashboard = () => {
         )}
 
         {activeTab === "users" && (
-          <div className="mt-4 rounded-2xl border border-blue-300/20 bg-white/[0.04] p-5 backdrop-blur-sm">
+          <div className="tc-glass-panel-soft mt-4 p-5">
             <div className="mb-4">
               <input
                 type="text"

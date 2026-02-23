@@ -244,8 +244,8 @@ function ViewStory({ params }: { params: Promise<{ id: any }> }) {
       <div className="tc-hero-orb tc-hero-orb-two" />
 
       <div className="relative">
-        <div className="rounded-2xl border border-blue-300/20 bg-white/[0.04] px-5 py-6 text-center shadow-[0_16px_45px_rgba(0,0,0,0.35)] backdrop-blur-md md:px-8">
-          <h2 className="bg-gradient-to-b from-white via-blue-100 to-blue-300 bg-clip-text text-3xl font-extrabold text-transparent sm:text-4xl md:text-5xl">
+        <div className="tc-glass-panel px-5 py-6 text-center shadow-[0_16px_45px_rgba(0,0,0,0.35)] md:px-8">
+          <h2 className="tc-title-gradient text-3xl font-extrabold sm:text-4xl md:text-5xl">
             {story?.output?.title ?? "Loading story..."}
           </h2>
         </div>
@@ -284,7 +284,7 @@ function ViewStory({ params }: { params: Promise<{ id: any }> }) {
 
             <div className="mt-7 flex w-full items-center justify-between">
               <button
-                className={`rounded-xl border border-blue-300/20 bg-white/10 p-2 text-blue-100 transition hover:bg-white/20 ${
+                className={`tc-icon-btn p-2 ${
                   count <= 0 ? "pointer-events-none opacity-40" : ""
                 }`}
                 onClick={() => {
@@ -302,14 +302,14 @@ function ViewStory({ params }: { params: Promise<{ id: any }> }) {
               <div className="flex items-center gap-2">
                 <button
                   onClick={onShareStory}
-                  className="rounded-xl border border-blue-300/30 bg-gradient-to-r from-blue-500 to-cyan-400 px-5 py-2 text-sm font-semibold text-white transition hover:from-blue-400 hover:to-cyan-300"
+                  className="tc-btn-primary px-5 py-2 text-sm"
                 >
                   {copied ? "Link Copied!" : "Share Story"}
                 </button>
               </div>
 
               <button
-                className={`rounded-xl border border-blue-300/20 bg-white/10 p-2 text-blue-100 transition hover:bg-white/20 ${
+                className={`tc-icon-btn p-2 ${
                   count >= chapters.length ? "pointer-events-none opacity-40" : ""
                 }`}
                 onClick={() => {
@@ -328,7 +328,7 @@ function ViewStory({ params }: { params: Promise<{ id: any }> }) {
         )}
 
         {chapters.length > 0 && (
-          <div className="mt-10 rounded-2xl border border-blue-300/20 bg-white/[0.04] p-4 backdrop-blur-sm md:p-6">
+          <div className="tc-glass-panel-soft mt-10 p-4 md:p-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <h3 className="text-2xl font-bold text-white md:text-3xl">
@@ -343,21 +343,19 @@ function ViewStory({ params }: { params: Promise<{ id: any }> }) {
                   <button
                     onClick={onDownloadPdf}
                     disabled={downloadingPdf || !story}
-                    className="rounded-xl border border-blue-300/30 bg-white/10 px-5 py-2 text-sm font-semibold text-blue-100 transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="tc-btn-ghost px-5 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {downloadingPdf ? "Generating PDF..." : "Download PDF"}
                   </button>
                 )}
-                <div className="inline-flex rounded-xl border border-blue-300/20 bg-white/10 p-1">
+                <div className="tc-toggle-wrap">
                   <button
                     onClick={() => {
                       stopNarration();
                       setContentMode("flipbook");
                     }}
-                    className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${
-                      contentMode === "flipbook"
-                        ? "bg-gradient-to-r from-blue-500 to-cyan-400 text-white"
-                        : "text-blue-100 hover:bg-white/10"
+                    className={`tc-toggle-btn ${
+                      contentMode === "flipbook" ? "tc-toggle-btn-active" : ""
                     }`}
                   >
                     Flipbook
@@ -367,10 +365,8 @@ function ViewStory({ params }: { params: Promise<{ id: any }> }) {
                       stopNarration();
                       setContentMode("story");
                     }}
-                    className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${
-                      contentMode === "story"
-                        ? "bg-gradient-to-r from-blue-500 to-cyan-400 text-white"
-                        : "text-blue-100 hover:bg-white/10"
+                    className={`tc-toggle-btn ${
+                      contentMode === "story" ? "tc-toggle-btn-active" : ""
                     }`}
                   >
                     Story

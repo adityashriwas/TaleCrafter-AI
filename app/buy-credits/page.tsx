@@ -113,9 +113,9 @@ function PricingOptions() {
           animate="show"
           variants={fadeUp}
           transition={{ duration: 0.55 }}
-          className="rounded-2xl border border-blue-300/20 bg-white/[0.04] px-5 py-7 text-center shadow-[0_16px_45px_rgba(0,0,0,0.35)] backdrop-blur-md md:px-8"
+          className="tc-glass-panel px-5 py-7 text-center shadow-[0_16px_45px_rgba(0,0,0,0.35)] md:px-8"
         >
-          <h2 className="bg-gradient-to-b from-white via-blue-100 to-blue-300 bg-clip-text text-3xl font-extrabold text-transparent sm:text-4xl md:text-5xl">
+          <h2 className="tc-title-gradient text-3xl font-extrabold sm:text-4xl md:text-5xl">
             Choose Your Plan
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-blue-100/75 md:text-base">
@@ -191,7 +191,7 @@ function PricingOptions() {
             variants={fadeUp}
             transition={{ delay: 0.1, duration: 0.45 }}
             ref={paymentSectionRef}
-            className="mx-auto mt-8 max-w-2xl rounded-2xl border border-blue-300/20 bg-white/[0.04] p-4 backdrop-blur-md"
+            className="tc-glass-panel mx-auto mt-8 max-w-2xl p-4"
           >
             <p className="mb-4 text-sm text-blue-100/80">
               Complete secure payment for{" "}

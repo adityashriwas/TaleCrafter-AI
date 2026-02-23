@@ -19,8 +19,8 @@ const Video = () => {
   }, []);
 
   return (
-    <div className="rounded-2xl border border-blue-300/25 bg-white/[0.04] p-2 sm:p-8 text-center flex flex-col mt-10 mb-14 gap-4 backdrop-blur-sm shadow-[0_20px_60px_rgba(2,12,34,0.5)]">
-      <h2 className="text-center block w-full bg-gradient-to-b from-white via-blue-100 to-blue-300 bg-clip-text font-bold text-transparent text-2xl sm:text-4xl drop-shadow-lg">
+    <div className="tc-glass-panel-soft mt-10 mb-14 flex flex-col gap-4 p-2 text-center shadow-[0_20px_60px_rgba(2,12,34,0.5)] sm:p-8">
+      <h2 className="tc-title-gradient block w-full text-center text-2xl font-bold drop-shadow-lg sm:text-4xl">
         How to Use the App
       </h2>
       <div className="w-full">
