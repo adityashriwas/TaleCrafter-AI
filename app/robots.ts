@@ -18,6 +18,6 @@ export default function robots(): MetadataRoute.Robots {
         ],
       },
     ],
-    sitemap: 'https://www.talecrafter.tech/sitemap.xml',
+    sitemap: 'https://www.talecrafterai.tech/sitemap.xml',
   }
 }

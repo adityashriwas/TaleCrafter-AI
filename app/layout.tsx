@@ -8,7 +8,7 @@ import Footer from "./(components)/Footer";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const myAppFont = Nunito({ subsets: ["latin"] });
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.talecrafter.tech";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.talecrafterai.tech";
 const ogImage = "/logo.png";
 
 export const metadata: Metadata = {

@@ -1,7 +1,7 @@
 import Hero from "./(components)/Hero";
 import type { Metadata } from "next";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.talecrafter.tech";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.talecrafterai.tech";
 
 export const metadata: Metadata = {
   title: "AI Story Generator",
