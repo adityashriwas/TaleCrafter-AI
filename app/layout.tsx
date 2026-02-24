@@ -67,6 +67,9 @@ export const metadata: Metadata = {
       "Create illustrated stories from prompts with TaleCrafter AI, read with smart narration controls, and export polished PDFs faster.",
     images: [ogImage],
   },
+  verification: {
+    google: "TakfO_eWsWovc-6XhLw_0jxwFjgWgEBe9OMPyNE3ZEQ",
+  },
   manifest: "/site.webmanifest",
 };
 
