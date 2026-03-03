@@ -36,7 +36,7 @@ const Footer = () => {
           </Link>
           <a
             className="rounded-lg px-3 py-1 transition duration-300 hover:bg-white/10 hover:text-white"
-            href="mailto:adityashriwas08@gmail.com"
+            href="mailto:contact@talecrafterai.tech"
           >
             Contact
           </a>
