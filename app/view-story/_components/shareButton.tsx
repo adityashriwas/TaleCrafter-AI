@@ -17,8 +17,7 @@ const ShareButton = ({
           text: `Check out this amazing story: ${storyTitle}`,
           url: storyUrl,
         });
-      } catch (error) {
-        console.error("Error sharing:", error);
+      } catch {
       }
     } else {
       navigator.clipboard.writeText(storyUrl);

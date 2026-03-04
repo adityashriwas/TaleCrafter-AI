@@ -37,7 +37,6 @@ export default function UploadImage({
         imageParts,
       ]);
       const response = await result.response;
-      // console.log(response);
 
       const text = response
         .text()
@@ -49,9 +48,7 @@ export default function UploadImage({
         .replace(/\n\s*\n/g, "\n");
       setResult(text);
       setImageSubject(text);
-      console.log("Image analysis result:", text);
     } catch (error) {
-      console.error("Error identifying image:", error);
       if (error instanceof Error) {
         setResult(`Error identifying image: ${error.message}`);
       } else {
@@ -86,7 +83,7 @@ export default function UploadImage({
     <main className=" w-full mt-4">
       <div className="bg-gradient-to-br from-[#071340] via-[#0a0f25] to-[#071340] rounded-lg shadow-xl overflow-hidden ">
         <div className="p-8">
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent text-center">
+          <h2 className="tc-title-gradient text-2xl sm:text-3xl lg:text-4xl font-bold text-center">
             Pick an Image to generate a story
           </h2>
           <div className="mb-8 flex items-center justify-center">
@@ -120,7 +117,7 @@ export default function UploadImage({
 
         {result && (
           <div className="">
-            <h3 className="text-2xl font-bold bg-gradient-to-b from-white to-gray-400 bg-clip-text text-transparent text-center m-2">
+            <h3 className="tc-title-gradient text-2xl font-bold text-center m-2">
               Story Idea Description
             </h3>
             <div className="prose prose-blue max-w-none">
@@ -129,7 +126,7 @@ export default function UploadImage({
                   return (
                     <p
                       key={index}
-                      className="mb-1 text-gray-100 sm:text-xl p-4"
+                      className="tc-title-gradient mb-1 sm:text-xl p-4"
                     >
                       {line}
                     </p>

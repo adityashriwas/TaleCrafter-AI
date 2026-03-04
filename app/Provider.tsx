@@ -1,8 +1,7 @@
 "use client";
-import React, { useEffect } from "react";
-import { NextUIProvider, User } from "@nextui-org/react";
-import { ClerkProvider } from "@clerk/nextjs";
-import { ToastContainer, toast } from "react-toastify";
+import { useEffect } from "react";
+import { NextUIProvider } from "@nextui-org/react";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useState } from "react";
 import { useUser } from "@clerk/nextjs";
@@ -28,7 +27,6 @@ const Provider = ({ children }: { children: React.ReactNode }) => {
       .where(
         eq(Users.userEmail, user?.primaryEmailAddress?.emailAddress ?? "")
       );
-    // console.log("existing user", userResp);
 
     // if not will add new user to db
     if (!userResp[0]) {

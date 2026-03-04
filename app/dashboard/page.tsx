@@ -1,5 +1,4 @@
 "use client";
-import React from "react";
 import DashboardHeader from "./_components/DashboardHeader";
 import UserStoryList from "./_components/UserStoryList";
 import InteractiveStorySections from "./_components/InteractiveStorySections";

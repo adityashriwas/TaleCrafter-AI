@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 
 export interface OptionField {
@@ -69,7 +69,7 @@ const StoryType = ({ userSelection }: any) => {
 
   return (
     <div className="mt-10">
-      <label className="text-2xl sm:text-3xl lg:text-4xl block w-full bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent">
+      <label className="tc-title-gradient text-2xl sm:text-3xl lg:text-4xl block w-full font-bold">
         Story Genres
       </label>
       <div className="mt-5 hsb overflow-x-auto whitespace-nowrap">
@@ -90,7 +90,7 @@ const StoryType = ({ userSelection }: any) => {
               height={200}
               className="obejct-cover rounded-3xl h-[100px] w-[100px] sm:h-[200px] sm:w-[200px]"
             />
-            <h2 className="tracking-tighter font-semibold text-xl sm:text-2xl text-center block w-full bg-gradient-to-b from-white to-gray-400 bg-clip-text text-transparent">
+            <h2 className="tc-title-gradient tracking-tighter font-semibold text-xl sm:text-2xl text-center block w-full">
               {item.label}
             </h2>
           </div>

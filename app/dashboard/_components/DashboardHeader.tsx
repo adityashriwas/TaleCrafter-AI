@@ -3,7 +3,6 @@ import { UserDetailContext } from "@/app/_context/UserDetailContext";
 import { Button } from "@nextui-org/button";
 import { Link } from "@nextui-org/react";
 import Image from "next/image";
-import React from "react";
 import { useContext } from "react";
 import { HiSparkles } from "react-icons/hi2";
 

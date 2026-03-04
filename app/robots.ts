@@ -5,14 +5,13 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: '*',
-        allow: ['/','/about','/explore','/view-story/'],
+        allow: ['/','/about','/explore','/create-story','/view-story/'],
         disallow: [
           '/private/',
           '/admin',
           '/dashboard',
           '/users',
           '/buy-credits',
-          '/create-story',
           '/sign-in',
           '/sign-up',
         ],

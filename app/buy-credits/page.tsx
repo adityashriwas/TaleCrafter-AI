@@ -202,7 +202,7 @@ function PricingOptions() {
               disabled={selectedPlan === null}
               onApprove={() => handlePaymentSuccess()}
               onCancel={() => notifyError("Payment Cancelled")}
-              createOrder={(data, actions) => {
+              createOrder={(_, actions) => {
                 return actions.order.create({
                   purchase_units: [
                     {

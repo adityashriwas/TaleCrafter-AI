@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Create Story",
-  description: "Generate a new story in TaleCrafter AI.",
+  title: "Create Interactive Story",
+  description: "Generate branching interactive stories with choice-driven plot paths in TaleCrafter AI.",
   robots: {
-    index: false,
-    follow: false,
+    index: true,
+    follow: true,
   },
 };
 

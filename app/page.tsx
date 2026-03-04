@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.talecrafterai.tech";
 
 export const metadata: Metadata = {
-  title: "AI Story Generator",
+  title: "AI Story Generator | TaleCrafter AI",
   description:
     "Generate complete digital storybooks with AI. TaleCrafter AI helps creators, educators, and storytellers turn ideas into illustrated stories.",
   alternates: {

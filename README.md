@@ -34,6 +34,11 @@ Experience TaleCrafter AI in action:
 - **Customizable Parameters**: Choose story subject, target age group, genre, and artistic style
 - **Image-to-Story**: Generate stories directly from uploaded images for enhanced creativity
 
+### 🧭 Branching Plot Generation
+- **Interactive Story Paths**: Generate branching plotlines where readers choose what happens next
+- **Choice-Driven Chapters**: Build meaningful decision points that lead to different story outcomes
+- **Dynamic Continuations**: Expand each branch with consistent tone, pacing, and character context
+
 ### 🎨 Interactive Experience
 - **Animated Book Interface**: Immersive page-flip animation for authentic reading experience
 - **Dual Reading Modes**: Switch between Flipbook mode and Story mode for different reading flows
@@ -61,7 +66,6 @@ Experience TaleCrafter AI in action:
 - **Story Library**: Organize and access all generated stories in one place
 
 ### 🎯 Discovery & Inspiration
-- **AI-Powered Recommendations**: Smart suggestions for story ideas
 - **Explore Section**: Browse stories from the community
 - **Admin Dashboard**: Content management and platform oversight
 
@@ -122,7 +126,8 @@ Experience TaleCrafter AI in action:
    - **Art Style**: Pick your preferred visual style (Oil Painting, Watercolor, Comic, Anime, 3D, Sketch, Charcoal Drawing, Paper Cut)
 
 4. **Generate Story**
-   - Click "Generate" and let the AI create your unique story
+   - Use **Create Interactive Story** to generate branching plotlines with reader choices
+   - Use **Create Story** for a classic linear story format
    - AI will process your preferences and generate a complete narrative
 
 5. **Experience Your Story**

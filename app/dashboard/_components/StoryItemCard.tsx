@@ -1,5 +1,4 @@
 "use client";
-import React from "react";
 import { Card, CardFooter } from "@nextui-org/card";
 import { Button } from "@nextui-org/react";
 import { Image } from "@nextui-org/react";
@@ -36,7 +35,6 @@ const deleteStoryFromDB = async (storyId: string) => {
 
     return result;
   } catch (error) {
-    console.error("Error deleting story:", error);
     throw new Error("Failed to delete story.");
   }
 };

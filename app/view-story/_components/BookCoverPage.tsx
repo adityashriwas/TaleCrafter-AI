@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 const BookCoverPage = ({ imageUrl }: any) => {
   const [imageLoaded, setImageLoaded] = useState(false); // Track image loading

@@ -1,11 +1,10 @@
 "use client";
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import StorySubjectInput from "./(component)/StorySubjectInput";
 import StoryType from "./(component)/StoryType";
 import AgeCategory from "./(component)/AgeCategory";
 import ImageStyle from "./(component)/ImageStyle";
 import { Button } from "@nextui-org/button";
-import Suggestions from "./(component)/Suggestions";
 import { chatSession } from "@/config/GeminiAI";
 import { db } from "@/config/config";
 import { StoryData } from "@/config/schema";
@@ -17,7 +16,6 @@ import { useRouter } from "next/navigation";
 import { UserDetailContext } from "@/app/_context/UserDetailContext";
 import { Users } from "@/config/schema";
 import { eq } from "drizzle-orm";
-import { chatSessionSuggestion } from "@/config/GeminiSuggestions";
 import UploadImage from "./(component)/UploadImage";
 import { motion } from "framer-motion";
 import { dbV2 } from "@/config/configV2";
@@ -41,7 +39,6 @@ export interface FormDataType {
 
 const CreateStory = () => {
   const router = useRouter();
-  const [Suggestion, setSuggestion] = useState<string>("");
   const [formData, setFormData] = useState<FormDataType>();
   const [loading, setLoading] = useState<boolean>(false);
   const { user } = useUser();
@@ -50,32 +47,11 @@ const CreateStory = () => {
   const { userDetail } = useContext(UserDetailContext);
   const [storySubject, setStorySubject] = useState("");
 
-  useEffect(() => {
-    GenerateSuggestion();
-  }, []);
-
-  const GenerateSuggestion = async () => {
-    try {
-      const result = await chatSessionSuggestion.sendMessage(
-        process.env.NEXT_PUBLIC_SUGGESTION_STORY_PROMPT // Your prompt for the suggestion
-      );
-      const data = result.response.text();
-      const suggestion = JSON.parse(data);
-      // console.log(suggestion);
-
-      setSuggestion(suggestion.story_idea); // Assuming story_idea is the correct field
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   const onHandleUserSelection = (data: feildData) => {
     setFormData((prev: any) => ({
       ...prev,
       [data.fieldName]: data.fieldValue,
     }));
-    setStorySubject(storySubject);
-    // console.log(formData);
   };
 
   const GenerateStory = async (mode: "classic" | "interactive" = "classic") => {
@@ -109,7 +85,6 @@ const CreateStory = () => {
             "Here's a short story idea based on the image:",
             ""
           ) ||
-          Suggestion ||
           ""
       )
       .replace("{imageStyle}", formData?.imageStyle ?? "");
@@ -128,21 +103,16 @@ const CreateStory = () => {
         "-"
       )}`;
       const final_image_prompt = prompt;
-      // console.log(final_image_prompt);
       const imageResp = `https://gen.pollinations.ai/image/${final_image_prompt}?model=${process.env.NEXT_PUBLIC_POLLINATIONS_AI_MODEL}&width=410&height=630&enhance=false&negative_prompt=worst+quality%2C+blurry&safe=false&seed=0&key=${process.env.NEXT_PUBLIC_POLLINATIONS_API_KEY}`;
-      // console.log(imageResp);
       const resp: any = isInteractive
         ? await SaveInteractiveStarterInDB(story)
         : await SaveInDB(result?.response.text(), imageResp);
-      // console.log(resp);
       notify("Story Generated Successfully");
       await UpdateUserCredits();
       router.push((isInteractive ? "/interactive-story/" : "/view-story/") + resp);
 
-      // console.log(result?.response.text());
       setLoading(false);
     } catch (error) {
-      console.log(error);
       notifyError("Server Error! Please try in a moment.");
       setLoading(false);
     }
@@ -170,7 +140,6 @@ const CreateStory = () => {
       setLoading(false);
       return result[0]?.StoryId;
     } catch (error) {
-      // console.log(error);
       notifyError("Server Error! Please try again");
       setLoading(false);
     }
@@ -282,14 +251,14 @@ const CreateStory = () => {
               <h1 className="tc-title-gradient text-3xl font-extrabold sm:text-4xl md:text-5xl">
                 Create Story
               </h1>
-              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-blue-100/75 md:text-base">
+              <p className="tc-title-gradient mt-3 max-w-2xl text-sm leading-relaxed md:text-base">
                 Configure your story prompt, visual style, and target audience.
-                TaleCrafter AI will generate a complete illustrated storybook.
+                TaleCrafter AI will generate a complete illustrated storybook with branching plot options.
               </p>
             </div>
             <div className="inline-flex items-center rounded-xl border border-blue-300/20 bg-blue-500/10 px-4 py-3 text-blue-100/90">
-              <span className="text-sm font-medium">Credits left:</span>
-              <span className="ml-2 text-xl font-bold text-white">
+              <span className="tc-title-gradient text-sm font-medium">Credits left:</span>
+              <span className="tc-title-gradient ml-2 text-xl font-bold">
                 {userDetail?.credit ?? "-"}
               </span>
             </div>
@@ -306,7 +275,6 @@ const CreateStory = () => {
         >
           <div className="flex flex-col justify-between gap-5">
             <StorySubjectInput userSelection={onHandleUserSelection} />
-            <Suggestions Suggestion={Suggestion} text={storySubject} />
           </div>
         </MotionDiv>
 
@@ -358,18 +326,18 @@ const CreateStory = () => {
           <div className="flex flex-wrap items-center gap-3">
             <Button
               disabled={loading}
-              className="tc-btn-primary px-8 py-6 text-base shadow-[0_0_30px_rgba(29,141,255,0.3)] hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-70"
-              color="primary"
-              onClick={() => GenerateStory("classic")}
+              className="tc-btn-primary px-8 py-6 text-base shadow-[0_0_32px_rgba(56,189,248,0.38)] hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-70"
+              onClick={() => GenerateStory("interactive")}
             >
-              {user ? "Create Story" : "Login to Create Story"}
+              {user ? "Create Interactive Story" : "Login to Create Interactive Story"}
             </Button>
             <Button
               disabled={loading}
               className="tc-btn-ghost px-8 py-6 text-base hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-70"
-              onClick={() => GenerateStory("interactive")}
+              color="primary"
+              onClick={() => GenerateStory("classic")}
             >
-              {user ? "Create Interactive Story" : "Login to Create Interactive Story"}
+              {user ? "Create Story" : "Login to Create Story"}
             </Button>
           </div>
         </div>

@@ -2,7 +2,7 @@
 import { db } from "@/config/config";
 import { StoryData } from "@/config/schema";
 import { desc } from "drizzle-orm";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import StoryItemCard from "../dashboard/_components/StoryItemCard";
 import { motion } from "framer-motion";
 const MotionDiv: any = motion.div;

@@ -1,13 +1,11 @@
 import {
   Modal,
   ModalContent,
-  ModalHeader,
   ModalBody,
-  ModalFooter,
   useDisclosure,
 } from "@nextui-org/modal";
 import Image from "next/image";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 
 function CustomLoader({ isLoading, message }: any) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -32,7 +30,7 @@ function CustomLoader({ isLoading, message }: any) {
           }}
         >
           <ModalContent>
-            {(onClose) => (
+            {() => (
               <>
               <ModalBody className="w-full p-12 flex items-center justify-center bg-[#ffffff]">
                 <Image

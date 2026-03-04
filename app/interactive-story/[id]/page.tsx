@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { use } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import HTMLFlipBook from "react-pageflip";
 import { IoIosArrowDropleftCircle, IoIosArrowDroprightCircle } from "react-icons/io";
 import { toast } from "react-toastify";

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { IoPlayCircle, IoPauseCircle } from "react-icons/io5";
 
 const StoryPages = ({

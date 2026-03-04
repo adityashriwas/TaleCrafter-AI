@@ -2,7 +2,7 @@
 import { db } from "@/config/config";
 import { StoryData } from "@/config/schema";
 import { eq } from "drizzle-orm";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import BookCoverPage from "../_components/BookCoverPage";
 import StoryPages from "../_components/StoryPages";
 import HTMLFlipBook from "react-pageflip";
@@ -86,8 +86,6 @@ function ViewStory() {
     const prompt = encodeURIComponent(chapter?.imagePrompt ?? "");
     return `https://gen.pollinations.ai/image/${prompt}?model=${process.env.NEXT_PUBLIC_POLLINATIONS_AI_MODEL}&enhance=false&negative_prompt=worst+quality%2C+blurry&safe=false&seed=0&key=${process.env.NEXT_PUBLIC_POLLINATIONS_API_KEY}`;
   };
-  const getPdfSafeImageUrl = (url: string) =>
-    `/_next/image?url=${encodeURIComponent(url)}&w=1200&q=95`;
 
   const getChapterText = (chapter: any) => {
     return (
@@ -161,7 +159,7 @@ function ViewStory() {
       const exportImages = Array.from(exportRoot.querySelectorAll("img"));
       let failedImages = 0;
       await Promise.all(
-        exportImages.map(async (img, index) => {
+        exportImages.map(async (img) => {
           const image = img as HTMLImageElement;
           const currentSrc = image.currentSrc || image.src;
           if (!currentSrc) {

@@ -4,6 +4,10 @@ export const metadata: Metadata = {
   title: "Explore Stories",
   description:
     "Explore AI-generated stories from the TaleCrafter community across genres, styles, and age groups.",
+  robots: {
+    index: true,
+    follow: true,
+  },
   alternates: {
     canonical: "/explore",
   },

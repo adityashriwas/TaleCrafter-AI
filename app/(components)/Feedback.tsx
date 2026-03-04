@@ -1,4 +1,3 @@
-import React from "react";
 import { toast } from "react-toastify";
 import { useState } from "react";
 
@@ -26,7 +25,6 @@ const Contact = () => {
       setResult("Form Submitted Successfully");
       event.target.reset();
     } else {
-      console.log("Error", data);
       setResult(data.message);
     }
     notify("Feedback submitted successfully!");

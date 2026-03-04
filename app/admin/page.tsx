@@ -3,7 +3,7 @@
 import { db } from "@/config/config";
 import { StoryData, Users } from "@/config/schema";
 import { asc, desc, eq } from "drizzle-orm";
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 
 type StoryItemType = {
@@ -49,7 +49,7 @@ const AdminDashboard = () => {
       const result: any = await db
         .select()
         .from(StoryData)
-        .orderBy(desc(StoryData.id));
+        .orderBy(asc(StoryData.id));
       setStories(result);
     } catch {
       toast.error("Failed to load stories");
@@ -61,7 +61,7 @@ const AdminDashboard = () => {
   const fetchUsers = async () => {
     setLoadingUsers(true);
     try {
-      const result: any = await db.select().from(Users).orderBy(asc(Users.id));
+      const result: any = await db.select().from(Users).orderBy(desc(Users.id));
       setUsers(result);
     } catch {
       toast.error("Failed to load users");

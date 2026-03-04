@@ -1,6 +1,5 @@
 "use client";
 import { Button } from "@nextui-org/button";
-import React from "react";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
 import Video from "./Video";
@@ -96,18 +95,18 @@ const Hero = () => {
             className="mx-auto max-w-4xl text-center"
           >
             <span className="inline-flex items-center rounded-full border border-blue-300/30 bg-blue-500/10 px-5 py-2 text-sm font-medium tracking-wide text-blue-100 backdrop-blur-sm">
-              Build cinematic storybooks with AI
+              Build branching storybooks with AI
             </span>
             
             <h1 className="tc-title-gradient mt-7 text-4xl font-extrabold leading-tight sm:text-5xl md:text-6xl lg:text-7xl">
               TaleCrafter AI
               <span className="block text-3xl sm:text-4xl md:text-5xl lg:text-6xl">
-                Product-grade story creation platform
+                Convert your thoughts into interactive stories
               </span>
             </h1>
             <p className="mx-auto mt-7 max-w-3xl text-base font-medium leading-relaxed text-blue-100/75 sm:text-lg">
               Create polished, illustrated, and narrated digital books from a
-              single prompt. Designed for creators, educators, and teams that
+              single prompt with interactive branching paths. Designed for creators, educators, and teams that
               want story production to feel premium.
             </p>
           </MotionDiv>
@@ -121,7 +120,7 @@ const Hero = () => {
           >
             <Link href="/create-story">
               <Button className="tc-btn-primary px-7 py-6 text-base shadow-[0_0_30px_rgba(29,141,255,0.3)] hover:scale-[1.03]">
-                Create Story
+                Create Interactive Story
               </Button>
             </Link>
             <Link href="/dashboard">

@@ -3,7 +3,7 @@ import { db } from "@/config/config";
 import { StoryData } from "@/config/schema";
 import { useUser } from "@clerk/nextjs";
 import { desc, eq } from "drizzle-orm";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import StoryItemCard from "./StoryItemCard";
 
 type StoryItemType = {

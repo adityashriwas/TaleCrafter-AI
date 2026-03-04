@@ -1,4 +1,3 @@
-import { user } from "@nextui-org/theme";
 import { pgTable, text, serial, varchar, json, integer } from "drizzle-orm/pg-core";
 
 export const StoryData = pgTable('storyData', {

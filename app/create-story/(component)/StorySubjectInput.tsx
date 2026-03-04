@@ -1,11 +1,9 @@
 "use client";
 
-import React from "react";
-
 const StorySubjectInput = ({ userSelection }: any) => {
   return (
     <div>
-      <label className="text-2xl sm:text-3xl lg:text-4xl block w-full bg-gradient-to-b from-white to-gray-400 bg-clip-text font-bold text-transparent">
+      <label className="tc-title-gradient text-2xl sm:text-3xl lg:text-4xl block w-full font-bold">
         Your Imagination
       </label>
       <textarea
