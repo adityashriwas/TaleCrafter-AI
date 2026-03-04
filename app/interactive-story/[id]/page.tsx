@@ -20,7 +20,7 @@ import {
 } from "@/config/plottwist";
 import { db } from "@/config/config";
 import { StoryData } from "@/config/schema";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import CustomLoader from "@/app/create-story/(component)/CustomLoader";
 import BookCoverPage from "@/app/view-story/_components/BookCoverPage";
 
@@ -77,8 +77,9 @@ const SafeStoryImage = ({ src, alt }: { src?: string; alt: string }) => {
   );
 };
 
-const InteractiveStoryPage = ({ params }: { params: Promise<{ id: string }> }) => {
-  const { id } = use(params);
+const InteractiveStoryPage = () => {
+  const params = useParams<{ id: string }>();
+  const id = params?.id;
   const router = useRouter();
   const bookRef = useRef<typeof HTMLFlipBook | null>(null);
   const choiceSectionRef = useRef<HTMLDivElement | null>(null);

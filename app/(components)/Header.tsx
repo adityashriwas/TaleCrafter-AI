@@ -114,10 +114,29 @@ function Header() {
         ))}
 
         <div className="fixed bottom-0 flex w-full items-center justify-center gap-4 border-t border-blue-300/15 bg-[#010715]/95 p-5 backdrop-blur-xl shadow-inner">
-          <UserButton />
-          <h2 className="tc-title-gradient text-xl font-bold">
-            {user ? user.fullName : "Guest User"}
-          </h2>
+          {user ? (
+            <>
+              <UserButton />
+              <h2 className="tc-title-gradient text-xl font-bold">{user.fullName}</h2>
+            </>
+          ) : (
+            <div className="flex w-full items-center justify-center gap-2">
+              <Link
+                href="/sign-in"
+                className="tc-btn-ghost rounded-lg px-4 py-2 text-sm font-semibold"
+                onClick={closeNavbar}
+              >
+                Login
+              </Link>
+              <Link
+                href="/sign-up"
+                className="tc-btn-primary rounded-lg px-4 py-2 text-sm font-semibold"
+                onClick={closeNavbar}
+              >
+                Sign Up
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </>

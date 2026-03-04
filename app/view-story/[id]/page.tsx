@@ -8,8 +8,8 @@ import StoryPages from "../_components/StoryPages";
 import HTMLFlipBook from "react-pageflip";
 import { IoIosArrowDroprightCircle } from "react-icons/io";
 import { IoIosArrowDropleftCircle } from "react-icons/io";
-import { use } from "react";
 import { toast } from "react-toastify";
+import { useParams } from "next/navigation";
 
 function SafeStoryModeImage({ src, alt }: { src: string; alt: string }) {
   const [failed, setFailed] = useState(false);
@@ -33,8 +33,9 @@ function SafeStoryModeImage({ src, alt }: { src: string; alt: string }) {
   );
 }
 
-function ViewStory({ params }: { params: Promise<{ id: any }> }) {
-  const { id } = use(params);
+function ViewStory() {
+  const params = useParams<{ id: string }>();
+  const id = params?.id;
   const bookRef = useRef<typeof HTMLFlipBook | null>(null);
   const [story, setStory] = useState<any>();
   const [count, setCount] = useState(0);
