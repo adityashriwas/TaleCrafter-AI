@@ -22,7 +22,7 @@ import UploadImage from "./(component)/UploadImage";
 import { motion } from "framer-motion";
 import { dbV2 } from "@/config/configV2";
 import { InteractiveStories, InteractiveStoryNodes } from "@/config/schemaV2";
-import { createUniqueImageUrl } from "@/config/plottwist";
+import { buildChoicePrompt, createUniqueImageUrl, makePageContext, parseChoices } from "@/config/plottwist";
 const MotionDiv: any = motion.div;
 
 const CREATE_STORY_PROMPT = process.env.NEXT_PUBLIC_CREATE_STORY_PROMPT;
@@ -142,8 +142,8 @@ const CreateStory = () => {
       // console.log(result?.response.text());
       setLoading(false);
     } catch (error) {
-      // console.log(error);
-      notifyError("Server Error! Please try again");
+      console.log(error);
+      notifyError("Server Error! Please try in a moment.");
       setLoading(false);
     }
   };
@@ -197,6 +197,21 @@ const CreateStory = () => {
       throw new Error("Starter story must have at least 5 pages");
     }
 
+    const coverPromptSource = String(
+      story?.coverImagePrompt ||
+        `${story?.title ?? "Interactive story"} cinematic book cover, ${formData?.imageStyle ?? "illustration"}`
+    );
+    const defaultStyleCoverPrompt = `Add-title-"${String(story?.title ?? "Interactive Story").replace(
+      /\s+/g,
+      "-"
+    )}"-in-bold-text-for-book-cover-image,-${coverPromptSource.replace(/\s+/g, "-")}`;
+    const coverSeed = `${Date.now()}${Math.floor(Math.random() * 100000)}`;
+    const coverImageUrl = `https://gen.pollinations.ai/image/${defaultStyleCoverPrompt}?model=${process.env.NEXT_PUBLIC_POLLINATIONS_AI_MODEL}&width=410&height=630&enhance=false&negative_prompt=worst+quality%2C+blurry&safe=false&seed=${coverSeed}&key=${process.env.NEXT_PUBLIC_POLLINATIONS_API_KEY}`;
+
+    const starterContext = makePageContext(starterPages as any, 4);
+    const starterChoiceResp = await chatSession.sendMessage(buildChoicePrompt(starterContext));
+    const starterChoices = parseChoices(starterChoiceResp.response.text());
+
     const now = new Date();
 
     await dbV2.insert(InteractiveStories).values({
@@ -213,7 +228,7 @@ const CreateStory = () => {
       rootNodeId,
       currentNodeId: rootNodeId,
       totalPages: starterPages.length,
-      coverImage: starterPages[0]?.imageUrl,
+      coverImage: coverImageUrl,
       createdAt: now,
       updatedAt: now,
     });
@@ -224,7 +239,7 @@ const CreateStory = () => {
       parentNodeId: null,
       depth: 0,
       choiceTaken: null,
-      choices: null,
+      choices: starterChoices.length >= 2 ? starterChoices : ["Follow the hopeful path", "Explore the unknown path"],
       selectedChoice: null,
       pages: starterPages,
       isActive: true,

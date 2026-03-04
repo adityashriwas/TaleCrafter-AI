@@ -92,6 +92,10 @@ const ExploreMore = () => {
 
       const nextHasMore = result.length >= PAGE_SIZE;
       setHasMoreStories(nextHasMore);
+
+      if (newOffset === 0) {
+        setStoryList(result || []);
+      }
     } finally {
       loadingRef.current = false;
       setLoading(false);
@@ -142,6 +146,8 @@ const ExploreMore = () => {
     }
 
     if (!restored) {
+      GetAllStories(0);
+    } else {
       GetAllStories(0);
     }
     setIsRestored(true);

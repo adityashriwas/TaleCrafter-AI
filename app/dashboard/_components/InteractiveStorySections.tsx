@@ -17,6 +17,28 @@ type InteractiveStory = {
   coverImage: string;
 };
 
+const SafeCover = ({ src, alt }: { src?: string; alt: string }) => {
+  const [failed, setFailed] = useState(false);
+
+  if (!src || failed) {
+    return (
+      <div className="flex h-44 w-full items-center justify-center rounded-lg border border-blue-300/20 bg-white/[0.04] px-3 text-center text-sm text-blue-100/70">
+        Cover image is not available right now.
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className="h-44 w-full rounded-lg object-cover"
+      onError={() => setFailed(true)}
+      loading="lazy"
+    />
+  );
+};
+
 const InteractiveStorySections = () => {
   const { user } = useUser();
   const [stories, setStories] = useState<InteractiveStory[]>([]);
@@ -51,11 +73,6 @@ const InteractiveStorySections = () => {
     [stories]
   );
 
-  const completedStories = useMemo(
-    () => stories.filter((story) => story.status === "completed"),
-    [stories]
-  );
-
   const onDeleteStory = async (storyId: string) => {
     try {
       await dbV2.delete(InteractiveStoryNodes).where(eq(InteractiveStoryNodes.storyId, storyId));
@@ -84,11 +101,7 @@ const InteractiveStorySections = () => {
             className="rounded-xl border border-blue-300/20 bg-white/[0.04] p-4"
           >
             {story.coverImage && (
-              <img
-                src={story.coverImage}
-                alt={story.title}
-                className="h-44 w-full rounded-lg object-cover"
-              />
+              <SafeCover src={story.coverImage} alt={story.title} />
             )}
             <h4 className="mt-3 text-lg font-semibold text-white">{story.title}</h4>
             <p className="mt-1 text-sm text-blue-100/70">Pages: {story.totalPages ?? 0}</p>
@@ -117,17 +130,11 @@ const InteractiveStorySections = () => {
   };
 
   return (
-    <div className="mt-8 space-y-6">
+    <div className="mt-8">
       <div className="tc-glass-panel-soft p-5 md:p-7">
         <h3 className="tc-title-gradient text-2xl font-bold">Draft Stories</h3>
         {!loading && renderCards(draftStories, "draft")}
         {loading && <p className="mt-4 text-blue-100/70">Loading drafts...</p>}
-      </div>
-
-      <div className="tc-glass-panel-soft p-5 md:p-7">
-        <h3 className="tc-title-gradient text-2xl font-bold">Completed Stories</h3>
-        {!loading && renderCards(completedStories, "completed")}
-        {loading && <p className="mt-4 text-blue-100/70">Loading completed stories...</p>}
       </div>
     </div>
   );

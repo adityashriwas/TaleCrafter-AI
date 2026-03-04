@@ -10,6 +10,7 @@ const StoryPages = ({
 }: any) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false); // Track image loading state
+  const [imageError, setImageError] = useState(false);
 
   // Function to toggle speech
   const toggleSpeech = () => {
@@ -62,19 +63,26 @@ const StoryPages = ({
         </button>
       </h2>
       <div className="relative w-full min-h-[300px] mt-2">
-        {!imageLoaded && (
+        {!imageLoaded && !imageError && (
           <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-blue-50">
             <span className="h-10 w-10 animate-spin rounded-full border-4 border-blue-500 border-t-transparent"></span>
           </div>
         )}
-        <img
-          src={`https://gen.pollinations.ai/image/${storyChapter?.imagePrompt}?model=${process.env.NEXT_PUBLIC_POLLINATIONS_AI_MODEL}&enhance=false&negative_prompt=worst+quality%2C+blurry&safe=false&seed=0&key=${process.env.NEXT_PUBLIC_POLLINATIONS_API_KEY}`}
-          alt=""
-          className={`h-auto w-full rounded-lg bg-slate-100 object-contain transition-opacity duration-300 ${
-            imageLoaded ? "opacity-100" : "opacity-0"
-          }`}
-          onLoad={() => setImageLoaded(true)} // Set imageLoaded to true when image loads
-        />
+        {imageError ? (
+          <div className="flex min-h-[300px] w-full items-center justify-center rounded-lg border border-blue-200/40 bg-blue-50 px-6 text-center text-sm text-slate-600">
+            We couldn’t load this illustration right now. You can still continue reading this page.
+          </div>
+        ) : (
+          <img
+            src={`https://gen.pollinations.ai/image/${storyChapter?.imagePrompt}?model=${process.env.NEXT_PUBLIC_POLLINATIONS_AI_MODEL}&enhance=false&negative_prompt=worst+quality%2C+blurry&safe=false&seed=0&key=${process.env.NEXT_PUBLIC_POLLINATIONS_API_KEY}`}
+            alt={storyChapter?.title ?? "story chapter illustration"}
+            className={`h-auto w-full rounded-lg bg-slate-100 object-contain transition-opacity duration-300 ${
+              imageLoaded ? "opacity-100" : "opacity-0"
+            }`}
+            onLoad={() => setImageLoaded(true)}
+            onError={() => setImageError(true)}
+          />
+        )}
       </div>
       <div className="hsb2 max-h-52 overflow-y-scroll mt-2">
         <p className="mt-3 rounded-lg bg-blue-50 p-4 text-lg text-slate-800 md:text-xl">

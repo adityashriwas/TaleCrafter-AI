@@ -11,6 +11,28 @@ import { IoIosArrowDropleftCircle } from "react-icons/io";
 import { use } from "react";
 import { toast } from "react-toastify";
 
+function SafeStoryModeImage({ src, alt }: { src: string; alt: string }) {
+  const [failed, setFailed] = useState(false);
+
+  if (!src || failed) {
+    return (
+      <div className="mt-3 flex min-h-[240px] w-full items-center justify-center rounded-lg border border-blue-200/40 bg-blue-50 px-6 text-center text-sm text-slate-600">
+        We couldn’t load this illustration right now. You can continue reading the story text.
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className="mt-3 h-auto w-full rounded-lg bg-slate-100 object-contain"
+      loading="lazy"
+      onError={() => setFailed(true)}
+    />
+  );
+}
+
 function ViewStory({ params }: { params: Promise<{ id: any }> }) {
   const { id } = use(params);
   const bookRef = useRef<typeof HTMLFlipBook | null>(null);
@@ -385,11 +407,9 @@ function ViewStory({ params }: { params: Promise<{ id: any }> }) {
                     <h4 className="mt-1 text-xl font-semibold text-white">
                       {chapter?.title ?? "Untitled Chapter"}
                     </h4>
-                    <img
+                    <SafeStoryModeImage
                       src={getChapterImageUrl(chapter)}
                       alt={chapter?.title ?? "story chapter image"}
-                      className="mt-3 h-auto w-full rounded-lg bg-slate-100 object-contain"
-                      loading="lazy"
                     />
                     <p className="mt-3 text-sm leading-relaxed text-blue-100/85 md:text-base">
                       {getChapterText(chapter)}

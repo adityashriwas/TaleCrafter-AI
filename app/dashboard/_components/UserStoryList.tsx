@@ -199,6 +199,10 @@ const UserStoryList = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, [userEmail, isRestored, getUserStory]);
 
+  const handleStoryDeleted = (storyId: string) => {
+    setStoryList((prev) => prev.filter((item) => item.storyId !== storyId));
+  };
+
   return (
     <div className="tc-glass-panel-soft mt-8 p-5 md:p-7">
       <h3 className="tc-title-gradient text-2xl font-bold">
@@ -217,6 +221,7 @@ const UserStoryList = () => {
             key={item.storyId}
             story={item}
             currentUserEmail={userEmail ?? ""}
+            onDeleteSuccess={handleStoryDeleted}
           />
         ))}
       </div>

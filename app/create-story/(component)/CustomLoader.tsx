@@ -9,7 +9,7 @@ import {
 import Image from "next/image";
 import React, { useEffect } from "react";
 
-function CustomLoader({ isLoading }: any) {
+function CustomLoader({ isLoading, message }: any) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   useEffect(() => {
     onOpen();
@@ -42,7 +42,7 @@ function CustomLoader({ isLoading }: any) {
                   alt="loading..."
                 />
                 <h2 className="font-bold text-2xl text-primary text-center">
-                  Story is generating...
+                  {message || "Story is generating..."}
                 </h2>
               </ModalBody>
               </>

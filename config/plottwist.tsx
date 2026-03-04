@@ -54,7 +54,8 @@ Return ONLY valid JSON in this exact format:
       "text": "Narrative text for this page",
       "imagePrompt": "Detailed visual prompt for this page image"
     }
-  ]
+  ],
+  "choices": ["choice 1", "choice 2"]
 }
 Rules:
 - Output ${minPages} to ${maxPages} pages
@@ -64,8 +65,8 @@ Rules:
 - Make each page substantial, not one-liners
 ${
   finalResolution
-    ? "- This is the final resolution arc: close major threads with an emotionally satisfying ending"
-    : "- Leave room for the next choice at the end"
+    ? "- This is the final resolution arc: close major threads with an emotionally satisfying ending\n- For final resolution, return choices as an empty array"
+    : "- Leave room for the next choice at the end\n- Include exactly 2 meaningful choices for the next branch"
 }
 `;
 
@@ -89,6 +90,24 @@ export const parsePages = (raw: string): InteractivePage[] => {
       imagePrompt: String(page?.imagePrompt ?? "").trim(),
     }))
     .filter((page: InteractivePage) => page.text.length > 0);
+};
+
+export const parseContinuationPayload = (raw: string): {
+  pages: InteractivePage[];
+  choices: string[];
+} => {
+  const parsed = JSON.parse(cleanJsonText(raw));
+  const pages = parsePages(raw);
+  const choices = Array.isArray(parsed?.choices)
+    ? parsed.choices
+        .slice(0, 2)
+        .filter((item: unknown): item is string => typeof item === "string")
+    : [];
+
+  return {
+    pages,
+    choices,
+  };
 };
 
 export const createUniqueImageUrl = (prompt: string, seed: string | number) => {
