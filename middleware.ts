@@ -16,6 +16,7 @@ const ADMIN_EMAIL = (
 const isProtectedRoute = createRouteMatcher([
   "/dashboard(.*)",
   "/buy-credits(.*)",
+  "/interactive-story(.*)",
 ]);
 const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
 

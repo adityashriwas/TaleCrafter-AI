@@ -20,9 +20,13 @@ import { eq } from "drizzle-orm";
 import { chatSessionSuggestion } from "@/config/GeminiSuggestions";
 import UploadImage from "./(component)/UploadImage";
 import { motion } from "framer-motion";
+import { dbV2 } from "@/config/configV2";
+import { InteractiveStories, InteractiveStoryNodes } from "@/config/schemaV2";
+import { createUniqueImageUrl } from "@/config/plottwist";
 const MotionDiv: any = motion.div;
 
 const CREATE_STORY_PROMPT = process.env.NEXT_PUBLIC_CREATE_STORY_PROMPT;
+const MIN_STARTER_PAGES = 5;
 export interface feildData {
   fieldValue: string;
   fieldName: string;
@@ -74,7 +78,7 @@ const CreateStory = () => {
     // console.log(formData);
   };
 
-  const GenerateStory = async () => {
+  const GenerateStory = async (mode: "classic" | "interactive" = "classic") => {
     if (!user) {
       router.push("/sign-up?redirect_url=/create-story");
       return;
@@ -109,8 +113,12 @@ const CreateStory = () => {
           ""
       )
       .replace("{imageStyle}", formData?.imageStyle ?? "");
+    const isInteractive = mode === "interactive";
+    const interactivePrompt = `${FINAL_PROMPT}\n\nFor interactive story starter, return 6 to 8 chapters minimum in consistent JSON format. No markdown wrappers.`;
     try {
-      const result = await chatSession.sendMessage(FINAL_PROMPT);
+      const result = await chatSession.sendMessage(
+        isInteractive ? interactivePrompt : FINAL_PROMPT
+      );
       const story = JSON.parse(result?.response.text());
       const prompt = `Add-title-"${story?.title?.replace(
         /\s+/g,
@@ -123,11 +131,13 @@ const CreateStory = () => {
       // console.log(final_image_prompt);
       const imageResp = `https://gen.pollinations.ai/image/${final_image_prompt}?model=${process.env.NEXT_PUBLIC_POLLINATIONS_AI_MODEL}&width=410&height=630&enhance=false&negative_prompt=worst+quality%2C+blurry&safe=false&seed=0&key=${process.env.NEXT_PUBLIC_POLLINATIONS_API_KEY}`;
       // console.log(imageResp);
-      const resp: any = await SaveInDB(result?.response.text(), imageResp);
+      const resp: any = isInteractive
+        ? await SaveInteractiveStarterInDB(story)
+        : await SaveInDB(result?.response.text(), imageResp);
       // console.log(resp);
       notify("Story Generated Successfully");
       await UpdateUserCredits();
-      router.push("/view-story/" + resp);
+      router.push((isInteractive ? "/interactive-story/" : "/view-story/") + resp);
 
       // console.log(result?.response.text());
       setLoading(false);
@@ -164,6 +174,64 @@ const CreateStory = () => {
       notifyError("Server Error! Please try again");
       setLoading(false);
     }
+  };
+
+  const SaveInteractiveStarterInDB = async (story: any) => {
+    const storyId = uuid4();
+    const rootNodeId = uuid4();
+    const chapters = Array.isArray(story?.chapters) ? story.chapters : [];
+
+    const starterPages = chapters.map((chapter: any, index: number) => {
+      const prompt = String(chapter?.imagePrompt ?? chapter?.textPrompt ?? "Story illustration");
+      const seed = `${Date.now()}_${index}_${Math.floor(Math.random() * 100000)}`;
+      return {
+        pageNumber: index + 1,
+        title: String(chapter?.title ?? `Chapter ${index + 1}`),
+        text: String(chapter?.textPrompt ?? ""),
+        imagePrompt: prompt,
+        imageUrl: createUniqueImageUrl(prompt, seed),
+      };
+    });
+
+    if (starterPages.length < MIN_STARTER_PAGES) {
+      throw new Error("Starter story must have at least 5 pages");
+    }
+
+    const now = new Date();
+
+    await dbV2.insert(InteractiveStories).values({
+      storyId,
+      userEmail: user?.primaryEmailAddress?.emailAddress,
+      userName: user?.fullName,
+      userImage: user?.imageUrl,
+      title: String(story?.title ?? "Interactive Story"),
+      storySubject: formData?.storySubject,
+      storyType: formData?.storyType,
+      ageGroup: formData?.ageCategory,
+      imageStyle: formData?.imageStyle,
+      status: "draft",
+      rootNodeId,
+      currentNodeId: rootNodeId,
+      totalPages: starterPages.length,
+      coverImage: starterPages[0]?.imageUrl,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    await dbV2.insert(InteractiveStoryNodes).values({
+      nodeId: rootNodeId,
+      storyId,
+      parentNodeId: null,
+      depth: 0,
+      choiceTaken: null,
+      choices: null,
+      selectedChoice: null,
+      pages: starterPages,
+      isActive: true,
+      createdAt: now,
+    });
+
+    return storyId;
   };
 
   const UpdateUserCredits = async () => {
@@ -272,14 +340,23 @@ const CreateStory = () => {
         </MotionDiv>
 
         <div className="mt-8 flex justify-end">
-          <Button
-            disabled={loading}
-            className="tc-btn-primary px-8 py-6 text-base shadow-[0_0_30px_rgba(29,141,255,0.3)] hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-70"
-            color="primary"
-            onClick={GenerateStory}
-          >
-            {user ? "Create Story" : "Login to Create Story"}
-          </Button>
+          <div className="flex flex-wrap items-center gap-3">
+            <Button
+              disabled={loading}
+              className="tc-btn-primary px-8 py-6 text-base shadow-[0_0_30px_rgba(29,141,255,0.3)] hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-70"
+              color="primary"
+              onClick={() => GenerateStory("classic")}
+            >
+              {user ? "Create Story" : "Login to Create Story"}
+            </Button>
+            <Button
+              disabled={loading}
+              className="tc-btn-ghost px-8 py-6 text-base hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-70"
+              onClick={() => GenerateStory("interactive")}
+            >
+              {user ? "Create Interactive Story" : "Login to Create Interactive Story"}
+            </Button>
+          </div>
         </div>
       </div>
       <CustomLoader isLoading={loading} />
