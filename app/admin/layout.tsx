@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { DEFAULT_OG_IMAGE } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Admin Panel",
@@ -6,6 +7,15 @@ export const metadata: Metadata = {
   robots: {
     index: false,
     follow: false,
+  },
+  alternates: {
+    canonical: "/admin",
+  },
+  openGraph: {
+    title: "Admin Panel",
+    description: "TaleCrafter AI admin management panel.",
+    url: "/admin",
+    images: [DEFAULT_OG_IMAGE],
   },
 };
 

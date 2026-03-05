@@ -13,11 +13,7 @@ const BookCoverPage = ({ imageUrl }: any) => {
         </div>
       )}
 
-      {hasError ? (
-        <div className="flex h-full w-full items-center justify-center bg-[#001230] p-4 text-center text-sm text-blue-100">
-          Cover image is taking too long to load. Please refresh to retry.
-        </div>
-      ) : (
+      {imageUrl ? (
         <img
           src={imageUrl}
           className={`h-full w-full object-cover transition-opacity duration-300 ${
@@ -28,7 +24,7 @@ const BookCoverPage = ({ imageUrl }: any) => {
           onLoad={() => setImageLoaded(true)}
           onError={() => setHasError(true)}
         />
-      )}
+      ) : null}
     </div>
   );
 };

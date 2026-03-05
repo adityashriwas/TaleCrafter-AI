@@ -1,14 +1,27 @@
 import Hero from "./(components)/Hero";
 import type { Metadata } from "next";
+import { DEFAULT_OG_IMAGE } from "@/lib/seo";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.talecrafterai.tech";
 
 export const metadata: Metadata = {
-  title: "AI Story Generator | TaleCrafter AI",
+  title: "AI Story Generator",
   description:
     "Generate complete digital storybooks with AI. TaleCrafter AI helps creators, educators, and storytellers turn ideas into illustrated stories.",
   alternates: {
     canonical: "/",
+  },
+  openGraph: {
+    title: "AI Story Generator",
+    description:
+      "Generate complete digital storybooks with AI. TaleCrafter AI helps creators, educators, and storytellers turn ideas into illustrated stories.",
+    url: "/",
+    images: [DEFAULT_OG_IMAGE],
+  },
+  twitter: {
+    title: "AI Story Generator",
+    description: "Generate complete digital storybooks with AI.",
+    images: [DEFAULT_OG_IMAGE],
   },
 };
 

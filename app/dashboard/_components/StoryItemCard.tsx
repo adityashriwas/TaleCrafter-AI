@@ -1,8 +1,8 @@
 "use client";
 import { Card, CardFooter } from "@nextui-org/card";
 import { Button } from "@nextui-org/react";
-import { Image } from "@nextui-org/react";
 import Link from "next/link";
+import Image from "next/image";
 import { db } from "@/config/config";
 import { StoryData } from "@/config/schema";
 import { eq } from "drizzle-orm";
@@ -56,7 +56,7 @@ const StoryItemCard = ({ story, currentUserEmail, onDeleteSuccess }: StoryItemTy
   };
 
   return (
-    <Link href={"/view-story/" + story?.storyId}>
+    <Link href={"/view-story/" + story?.storyId} prefetch={true}>
       <Card
         isFooterBlurred
         radius="lg"
@@ -67,14 +67,18 @@ const StoryItemCard = ({ story, currentUserEmail, onDeleteSuccess }: StoryItemTy
             Cover image is unavailable. You can still open and read this story.
           </div>
         ) : (
-          <Image
-            alt="BookCoverImage"
-            className="object-cover w-full"
-            height={200}
-            src={story?.coverImage}
-            width="100%"
-            onError={() => setImgFailed(true)}
-          />
+          <div className="relative h-[200px] w-full">
+            <Image
+              alt={story?.output?.title ?? "Book cover image"}
+              className="object-cover"
+              fill
+              sizes="(max-width: 1024px) 100vw, 25vw"
+              src={story?.coverImage}
+              unoptimized
+              loading="lazy"
+              onError={() => setImgFailed(true)}
+            />
+          </div>
         )}
         <CardFooter className="justify-between bg-white/10 border-white/20 border-1 py-1 absolute rounded-xl w-full bottom-0 shadow-small z-10">
           <p className="text-xl text-black/80 truncate max-w-[80%]">

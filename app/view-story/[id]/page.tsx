@@ -1,7 +1,7 @@
 "use client";
 import { db } from "@/config/config";
 import { StoryData } from "@/config/schema";
-import { eq } from "drizzle-orm";
+import { desc, eq, ne, sql } from "drizzle-orm";
 import { useEffect, useRef, useState } from "react";
 import BookCoverPage from "../_components/BookCoverPage";
 import StoryPages from "../_components/StoryPages";
@@ -10,6 +10,9 @@ import { IoIosArrowDroprightCircle } from "react-icons/io";
 import { IoIosArrowDropleftCircle } from "react-icons/io";
 import { toast } from "react-toastify";
 import { useParams } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
+import { DEFAULT_OG_IMAGE, toAbsoluteUrl } from "@/lib/seo";
 
 function SafeStoryModeImage({ src, alt }: { src: string; alt: string }) {
   const [failed, setFailed] = useState(false);
@@ -23,17 +26,23 @@ function SafeStoryModeImage({ src, alt }: { src: string; alt: string }) {
   }
 
   return (
-    <img
-      src={src}
-      alt={alt}
-      className="mt-3 h-auto w-full rounded-lg bg-slate-100 object-contain"
-      loading="lazy"
-      onError={() => setFailed(true)}
-    />
+    <div className="relative mt-3 min-h-[240px] w-full overflow-hidden rounded-lg bg-transparent">
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        sizes="(max-width: 768px) 100vw, 50vw"
+        className="object-contain"
+        unoptimized
+        loading="lazy"
+        onError={() => setFailed(true)}
+      />
+    </div>
   );
 }
 
 function ViewStory() {
+  const RELATED_PAGE_SIZE = 8;
   const params = useParams<{ id: string }>();
   const id = params?.id;
   const bookRef = useRef<typeof HTMLFlipBook | null>(null);
@@ -44,17 +53,84 @@ function ViewStory() {
   const [downloadingPdf, setDownloadingPdf] = useState(false);
   const [contentMode, setContentMode] = useState<"flipbook" | "story">("flipbook");
   const [activeNarrationKey, setActiveNarrationKey] = useState<number | null>(null);
+  const [relatedStories, setRelatedStories] = useState<any[]>([]);
+  const [relatedPage, setRelatedPage] = useState(1);
+  const [relatedTotalPages, setRelatedTotalPages] = useState(0);
+  const [relatedLoading, setRelatedLoading] = useState(false);
+  const [summary, setSummary] = useState("");
 
   useEffect(() => {
     getStory();
   }, []);
 
+  useEffect(() => {
+    setRelatedPage(1);
+  }, [id]);
+
+  useEffect(() => {
+    getRelatedStories(relatedPage);
+  }, [id, relatedPage]);
+
   const getStory = async () => {
+    if (!id) return;
     const result = await db
       .select()
       .from(StoryData)
       .where(eq(StoryData.storyId, id));
     setStory(result[0]);
+    const output = (result?.[0]?.output as any) ?? {};
+    const baseSummary = String(
+      output?.chapters?.[0]?.textPrompt ?? result?.[0]?.storySubject ?? ""
+    )
+      .replace(/\{[^}]*\}/g, "")
+      .trim()
+      .slice(0, 220);
+    setSummary(
+      baseSummary.length > 30
+        ? baseSummary
+        : `Read ${output?.title ?? "this story"} on TaleCrafter AI.`
+    );
+
+  };
+
+  const getRelatedStories = async (page: number) => {
+    if (!id) return;
+    setRelatedLoading(true);
+    try {
+      const safePage = Math.max(1, page);
+      const offset = (safePage - 1) * RELATED_PAGE_SIZE;
+      const [stories, totalResult] = await Promise.all([
+        db
+          .select()
+          .from(StoryData)
+          .where(ne(StoryData.storyId, id))
+          .orderBy(desc(StoryData.id))
+          .limit(RELATED_PAGE_SIZE)
+          .offset(offset),
+        db
+          .select({ count: sql<number>`count(*)` })
+          .from(StoryData)
+          .where(ne(StoryData.storyId, id)),
+      ]);
+
+      const totalCount = Number(totalResult?.[0]?.count ?? 0);
+      const pages = Math.ceil(totalCount / RELATED_PAGE_SIZE);
+      setRelatedTotalPages(pages);
+      setRelatedStories(stories);
+
+      if (pages > 0 && safePage > pages) {
+        setRelatedPage(pages);
+      }
+    } finally {
+      setRelatedLoading(false);
+    }
+  };
+
+  const getVisiblePageNumbers = () => {
+    if (relatedTotalPages <= 1) return [];
+    const start = Math.max(1, relatedPage - 2);
+    const end = Math.min(relatedTotalPages, start + 4);
+    return Array.from({ length: end - start + 1 }, (_, idx) => start + idx);
   };
 
   const onShareStory = async () => {
@@ -260,15 +336,35 @@ function ViewStory() {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#020b1f] px-5 py-8 md:px-16 lg:px-28 xl:px-40">
+      {story?.output?.title && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": ["Book", "CreativeWork"],
+              additionalType: "https://schema.org/Story",
+              name: story.output.title,
+              author: "TaleCrafter AI",
+              description: summary,
+              image: story?.coverImage || toAbsoluteUrl(DEFAULT_OG_IMAGE),
+              url:
+                typeof window !== "undefined"
+                  ? window.location.href
+                  : toAbsoluteUrl(`/view-story/${id}`),
+            }),
+          }}
+        />
+      )}
       <div className="tc-hero-grid absolute inset-0 opacity-35" />
       <div className="tc-hero-orb tc-hero-orb-one" />
       <div className="tc-hero-orb tc-hero-orb-two" />
 
       <div className="relative">
         <div className="tc-glass-panel px-5 py-6 text-center shadow-[0_16px_45px_rgba(0,0,0,0.35)] md:px-8">
-          <h2 className="tc-title-gradient text-3xl font-extrabold sm:text-4xl md:text-5xl">
+          <h1 className="tc-title-gradient text-3xl font-extrabold sm:text-4xl md:text-5xl">
             {story?.output?.title ?? "Loading story..."}
-          </h2>
+          </h1>
         </div>
 
         {contentMode === "flipbook" && (
@@ -417,6 +513,94 @@ function ViewStory() {
                 ))}
               </div>
             ) : null}
+          </div>
+        )}
+
+        {(relatedStories.length > 0 || relatedLoading) && (
+          <div className="tc-glass-panel-soft mt-10 p-5 md:p-7">
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="text-2xl font-bold text-white">Explore More Stories</h2>
+              <Link href="/explore" prefetch={true} className="tc-btn-ghost px-4 py-2 text-sm">
+                View Explore
+              </Link>
+            </div>
+
+            <div className="mt-2 text-sm text-blue-100/70">
+              Page {relatedTotalPages === 0 ? 0 : relatedPage} of {relatedTotalPages}
+            </div>
+
+            <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+              {relatedStories.map((item) => (
+                <Link
+                  key={item.storyId}
+                  href={`/view-story/${item.storyId}`}
+                  prefetch={true}
+                  className="rounded-xl border border-blue-300/20 bg-[#04142e]/70 p-3 transition hover:border-blue-300/40"
+                >
+                  <div className="relative h-40 w-full overflow-hidden rounded-lg bg-slate-900">
+                    {item?.coverImage ? (
+                      <Image
+                        src={item.coverImage}
+                        alt={item?.output?.title ?? "Related story cover"}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 25vw"
+                        className="object-cover"
+                        unoptimized
+                        loading="lazy"
+                      />
+                    ) : null}
+                  </div>
+                  <h3 className="mt-3 line-clamp-2 text-sm font-semibold text-blue-100">
+                    {item?.output?.title ?? "Untitled Story"}
+                  </h3>
+                </Link>
+              ))}
+
+              {relatedLoading && (
+                <div className="col-span-full flex justify-center py-5">
+                  <span className="h-8 w-8 animate-spin rounded-full border-4 border-blue-400 border-t-transparent" />
+                </div>
+              )}
+            </div>
+
+            {relatedTotalPages > 1 && (
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+                <button
+                  onClick={() => setRelatedPage((prev) => Math.max(1, prev - 1))}
+                  disabled={relatedPage === 1 || relatedLoading}
+                  className="tc-btn-ghost px-3 py-2 text-xs disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Prev
+                </button>
+                {getVisiblePageNumbers().map((pageNo) => (
+                  <button
+                    key={`related-page-${pageNo}`}
+                    onClick={() => setRelatedPage(pageNo)}
+                    disabled={relatedLoading}
+                    className={`rounded-lg px-3 py-2 text-xs font-semibold ${
+                      pageNo === relatedPage
+                        ? "bg-blue-500 text-white"
+                        : "border border-blue-300/30 bg-[#04142e]/70 text-blue-100"
+                    }`}
+                  >
+                    {pageNo}
+                  </button>
+                ))}
+                <button
+                  onClick={() =>
+                    setRelatedPage((prev) => Math.min(relatedTotalPages, prev + 1))
+                  }
+                  disabled={
+                    relatedPage === relatedTotalPages ||
+                    relatedTotalPages === 0 ||
+                    relatedLoading
+                  }
+                  className="tc-btn-ghost px-3 py-2 text-xs disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Next
+                </button>
+              </div>
+            )}
           </div>
         )}
 

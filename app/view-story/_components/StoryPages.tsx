@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { IoPlayCircle, IoPauseCircle } from "react-icons/io5";
+import Image from "next/image";
 
 const StoryPages = ({
   storyChapter,
@@ -73,12 +74,16 @@ const StoryPages = ({
             We couldn’t load this illustration right now. You can still continue reading this page.
           </div>
         ) : (
-          <img
+          <Image
             src={`https://gen.pollinations.ai/image/${storyChapter?.imagePrompt}?model=${process.env.NEXT_PUBLIC_POLLINATIONS_AI_MODEL}&enhance=false&negative_prompt=worst+quality%2C+blurry&safe=false&seed=0&key=${process.env.NEXT_PUBLIC_POLLINATIONS_API_KEY}`}
             alt={storyChapter?.title ?? "story chapter illustration"}
-            className={`h-auto w-full rounded-lg bg-slate-100 object-contain transition-opacity duration-300 ${
+            className={`rounded-lg bg-slate-100 object-contain transition-opacity duration-300 ${
               imageLoaded ? "opacity-100" : "opacity-0"
             }`}
+            fill
+            sizes="(max-width: 768px) 100vw, 50vw"
+            unoptimized
+            loading="lazy"
             onLoad={() => setImageLoaded(true)}
             onError={() => setImageError(true)}
           />
