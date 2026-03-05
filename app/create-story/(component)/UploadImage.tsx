@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export default function UploadImage({
   setImageSubject,
@@ -23,23 +22,30 @@ export default function UploadImage({
     if (!image) return;
 
     setLoading(true);
-    const genAI = new GoogleGenerativeAI(
-      process.env.NEXT_PUBLIC_GEMINI_API_KEY_IMAGE_ANALYSIS!
-    );
-    const model = genAI.getGenerativeModel({
-      model: process.env.NEXT_PUBLIC_GEMINI_MODEL ?? "gemini-2.5-flash",
-    });
 
     try {
-      const imageParts = await fileToGenerativePart(image);
-      const result = await model.generateContent([
-        `Analyze this image and give me a short story idea description int 30 to 50 words that can be generated based on the appearance of the image.`,
-        imageParts,
-      ]);
-      const response = await result.response;
+      const imageBase64 = await fileToBase64(image);
+      const response = await fetch("/api/gemini", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          mode: "image-analysis",
+          prompt:
+            "Analyze this image and give me a short story idea description int 30 to 50 words that can be generated based on the appearance of the image.",
+          imageBase64,
+          mimeType: image.type || "image/jpeg",
+        }),
+      });
 
-      const text = response
-        .text()
+      if (!response.ok) {
+        throw new Error("Unable to analyze image");
+      }
+
+      const data = await response.json();
+
+      const text = String(data?.text ?? "")
         .trim()
         .replace(/```/g, "")
         .replace(/\*\*/g, "")
@@ -59,20 +65,13 @@ export default function UploadImage({
     }
   };
 
-  async function fileToGenerativePart(file: File): Promise<{
-    inlineData: { data: string; mimeType: string };
-  }> {
+  async function fileToBase64(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64data = reader.result as string;
         const base64Content = base64data.split(",")[1];
-        resolve({
-          inlineData: {
-            data: base64Content,
-            mimeType: file.type,
-          },
-        });
+        resolve(base64Content);
       };
       reader.onerror = reject;
       reader.readAsDataURL(file);

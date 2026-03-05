@@ -5,7 +5,6 @@ import StoryType from "./(component)/StoryType";
 import AgeCategory from "./(component)/AgeCategory";
 import ImageStyle from "./(component)/ImageStyle";
 import { Button } from "@nextui-org/button";
-import { chatSession } from "@/config/GeminiAI";
 import { db } from "@/config/config";
 import { StoryData } from "@/config/schema";
 import uuid4 from "uuid4";
@@ -54,6 +53,23 @@ const CreateStory = () => {
     }));
   };
 
+  const callGemini = async (prompt: string) => {
+    const response = await fetch("/api/gemini", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ prompt }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to generate content");
+    }
+
+    const data = await response.json();
+    return String(data?.text ?? "");
+  };
+
   const GenerateStory = async (mode: "classic" | "interactive" = "classic") => {
     if (!user) {
       router.push("/sign-up?redirect_url=/create-story");
@@ -73,7 +89,7 @@ const CreateStory = () => {
     }
 
     setLoading(true);
-    const FINAL_PROMPT = CREATE_STORY_PROMPT?.replace(
+    const FINAL_PROMPT = (CREATE_STORY_PROMPT ?? "").replace(
       "{ageGroup}",
       formData?.ageCategory ?? ""
     )
@@ -91,10 +107,10 @@ const CreateStory = () => {
     const isInteractive = mode === "interactive";
     const interactivePrompt = `${FINAL_PROMPT}\n\nFor interactive story starter, return 6 to 8 chapters minimum in consistent JSON format. No markdown wrappers.`;
     try {
-      const result = await chatSession.sendMessage(
+      const outputText = await callGemini(
         isInteractive ? interactivePrompt : FINAL_PROMPT
       );
-      const story = JSON.parse(result?.response.text());
+      const story = JSON.parse(outputText);
       const prompt = `Add-title-"${story?.title?.replace(
         /\s+/g,
         "-"
@@ -106,7 +122,7 @@ const CreateStory = () => {
       const imageResp = `https://gen.pollinations.ai/image/${final_image_prompt}?model=${process.env.NEXT_PUBLIC_POLLINATIONS_AI_MODEL}&width=410&height=630&enhance=false&negative_prompt=worst+quality%2C+blurry&safe=false&seed=0&key=${process.env.NEXT_PUBLIC_POLLINATIONS_API_KEY}`;
       const resp: any = isInteractive
         ? await SaveInteractiveStarterInDB(story)
-        : await SaveInDB(result?.response.text(), imageResp);
+        : await SaveInDB(outputText, imageResp);
       notify("Story Generated Successfully");
       await UpdateUserCredits();
       router.push((isInteractive ? "/interactive-story/" : "/view-story/") + resp);
@@ -178,8 +194,8 @@ const CreateStory = () => {
     const coverImageUrl = `https://gen.pollinations.ai/image/${defaultStyleCoverPrompt}?model=${process.env.NEXT_PUBLIC_POLLINATIONS_AI_MODEL}&width=410&height=630&enhance=false&negative_prompt=worst+quality%2C+blurry&safe=false&seed=${coverSeed}&key=${process.env.NEXT_PUBLIC_POLLINATIONS_API_KEY}`;
 
     const starterContext = makePageContext(starterPages as any, 4);
-    const starterChoiceResp = await chatSession.sendMessage(buildChoicePrompt(starterContext));
-    const starterChoices = parseChoices(starterChoiceResp.response.text());
+    const starterChoiceText = await callGemini(buildChoicePrompt(starterContext));
+    const starterChoices = parseChoices(starterChoiceText);
 
     const now = new Date();
 

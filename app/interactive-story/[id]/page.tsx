@@ -6,7 +6,6 @@ import { IoIosArrowDropleftCircle, IoIosArrowDroprightCircle } from "react-icons
 import { toast } from "react-toastify";
 import { asc, eq } from "drizzle-orm";
 import uuid4 from "uuid4";
-import { chatSession } from "@/config/GeminiAI";
 import { dbV2 } from "@/config/configV2";
 import { InteractiveStories, InteractiveStoryNodes } from "@/config/schemaV2";
 import {
@@ -89,6 +88,23 @@ const InteractiveStoryPage = () => {
   const [flipPage, setFlipPage] = useState(0);
   const [generatingNext, setGeneratingNext] = useState(false);
   const [loaderMessage, setLoaderMessage] = useState("Story is generating...");
+
+  const callGemini = async (prompt: string) => {
+    const response = await fetch("/api/gemini", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ prompt }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to generate continuation");
+    }
+
+    const data = await response.json();
+    return String(data?.text ?? "");
+  };
 
   const loadStory = async () => {
     setLoading(true);
@@ -243,8 +259,8 @@ const InteractiveStoryPage = () => {
         maxPages: 5,
         finalResolution: true,
       });
-      const finalResponse = await chatSession.sendMessage(finalPrompt);
-      const parsedPages = parsePages(finalResponse.response.text());
+      const finalText = await callGemini(finalPrompt);
+      const parsedPages = parsePages(finalText);
       const resolutionPages = parsedPages.slice(0, 5);
 
       if (resolutionPages.length < 3) {
@@ -361,8 +377,8 @@ const InteractiveStoryPage = () => {
         maxPages: 6,
       });
 
-      const continuationResp = await chatSession.sendMessage(continuationPrompt);
-      const payload = parseContinuationPayload(continuationResp.response.text());
+      const continuationText = await callGemini(continuationPrompt);
+      const payload = parseContinuationPayload(continuationText);
       const pages = payload.pages.slice(0, 6);
       const nextChoices = payload.choices.slice(0, 2);
 
