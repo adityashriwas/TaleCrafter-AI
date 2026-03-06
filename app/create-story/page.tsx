@@ -24,6 +24,60 @@ const MotionDiv: any = motion.div;
 
 const CREATE_STORY_PROMPT = process.env.NEXT_PUBLIC_CREATE_STORY_PROMPT;
 const MIN_STARTER_PAGES = 5;
+
+const cleanJsonText = (raw: string) =>
+  raw
+    .replace(/```json/gi, "")
+    .replace(/```/g, "")
+    .trim();
+
+const normalizeJsonCandidate = (raw: string) =>
+  raw
+    .replace(/[\u201C\u201D]/g, '"')
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/,\s*([}\]])/g, "$1")
+    .trim();
+
+const tryParseGeminiJson = (raw: string) => {
+  const cleaned = cleanJsonText(raw);
+  const firstBrace = cleaned.indexOf("{");
+  const lastBrace = cleaned.lastIndexOf("}");
+
+  const candidates = [
+    cleaned,
+    firstBrace >= 0 && lastBrace > firstBrace
+      ? cleaned.slice(firstBrace, lastBrace + 1)
+      : "",
+  ].filter(Boolean);
+
+  for (const candidate of candidates) {
+    try {
+      return JSON.parse(normalizeJsonCandidate(candidate));
+    } catch {
+      // try next candidate
+    }
+  }
+
+  return null;
+};
+
+const buildJsonRepairPrompt = (brokenJson: string) => `
+You are a strict JSON repair assistant.
+Fix the JSON below so it is syntactically valid while preserving the original meaning and fields.
+Return ONLY valid JSON. No markdown fences. No explanation.
+
+${brokenJson}
+`;
+
+const parseGeminiJson = (raw: string) => {
+  const parsed = tryParseGeminiJson(raw);
+  if (parsed) {
+    return parsed;
+  }
+
+  throw new Error("Gemini response is not valid JSON");
+};
+
 export interface feildData {
   fieldValue: string;
   fieldName: string;
@@ -53,13 +107,16 @@ const CreateStory = () => {
     }));
   };
 
-  const callGemini = async (prompt: string) => {
+  const callGemini = async (
+    prompt: string,
+    mode: "text" | "story-generation" = "text"
+  ) => {
     const response = await fetch("/api/gemini", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ prompt }),
+      body: JSON.stringify({ prompt, mode }),
     });
 
     if (!response.ok) {
@@ -108,13 +165,36 @@ const CreateStory = () => {
     const interactivePrompt = `${FINAL_PROMPT}\n\nFor interactive story starter, return 6 to 8 chapters minimum in consistent JSON format. No markdown wrappers.`;
     try {
       const outputText = await callGemini(
-        isInteractive ? interactivePrompt : FINAL_PROMPT
+        isInteractive ? interactivePrompt : FINAL_PROMPT,
+        "story-generation"
       );
-      const story = JSON.parse(outputText);
-      const prompt = `Add-title-"${story?.title?.replace(
+      let story = tryParseGeminiJson(outputText);
+
+      // Keep classic flow untouched; only repair malformed JSON for interactive starter.
+      if (!story && isInteractive) {
+        const repairedText = await callGemini(
+          buildJsonRepairPrompt(cleanJsonText(outputText)),
+          "text"
+        );
+        story = tryParseGeminiJson(repairedText);
+      }
+
+      if (!story) {
+        story = parseGeminiJson(outputText);
+      }
+
+      if (!Array.isArray(story?.chapters) || story.chapters.length === 0) {
+        throw new Error("Generated story does not contain chapters");
+      }
+      const safeTitle = String(story?.title ?? "Story");
+      const safeCoverPrompt = String(
+        story?.coverImagePrompt ??
+          `${safeTitle} ${formData?.imageStyle ?? "illustration"} book cover`
+      );
+      const prompt = `Add-title-"${safeTitle.replace(
         /\s+/g,
         "-"
-      )}"-in-bold-text-for-book-cover-image,-${story?.coverImagePrompt?.replace(
+      )}"-in-bold-text-for-book-cover-image,-${safeCoverPrompt.replace(
         /\s+/g,
         "-"
       )}`;
@@ -122,19 +202,20 @@ const CreateStory = () => {
       const imageResp = `https://gen.pollinations.ai/image/${final_image_prompt}?model=${process.env.NEXT_PUBLIC_POLLINATIONS_AI_MODEL}&width=410&height=630&enhance=false&negative_prompt=worst+quality%2C+blurry&safe=false&seed=0&key=${process.env.NEXT_PUBLIC_POLLINATIONS_API_KEY}`;
       const resp: any = isInteractive
         ? await SaveInteractiveStarterInDB(story)
-        : await SaveInDB(outputText, imageResp);
+        : await SaveInDB(story, imageResp);
       notify("Story Generated Successfully");
       await UpdateUserCredits();
       router.push((isInteractive ? "/interactive-story/" : "/view-story/") + resp);
 
       setLoading(false);
     } catch (error) {
+      console.error("Error generating story:", error);
       notifyError("Server Error! Please try in a moment.");
       setLoading(false);
     }
   };
 
-  const SaveInDB = async (output: string, imageResp: string) => {
+  const SaveInDB = async (output: any, imageResp: string) => {
     const recordId = uuid4();
     setLoading(true);
     try {
@@ -146,7 +227,7 @@ const CreateStory = () => {
           storyType: formData?.storyType,
           storySubject: formData?.storySubject,
           imageStyle: formData?.imageStyle,
-          output: JSON.parse(output),
+          output,
           coverImage: imageResp,
           userEmail: user?.primaryEmailAddress?.emailAddress,
           userName: user?.fullName,

@@ -1,9 +1,10 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
+import { createStoryChatSession, storyGenerationConfig } from "@/config/GeminiAI";
 
 type GeminiRequestBody = {
   prompt?: string;
-  mode?: "text" | "image-analysis";
+  mode?: "text" | "image-analysis" | "story-generation";
   imageBase64?: string;
   mimeType?: string;
 };
@@ -66,8 +67,17 @@ export async function POST(req: Request) {
       );
     }
 
+    if (mode === "story-generation") {
+      const storyChat = createStoryChatSession({ apiKey, modelName });
+      const result = await storyChat.sendMessage(prompt);
+      return NextResponse.json({ text: result.response.text() });
+    }
+
     const client = new GoogleGenerativeAI(apiKey);
-    const model = client.getGenerativeModel({ model: modelName });
+    const model = client.getGenerativeModel({
+      model: modelName,
+      generationConfig: storyGenerationConfig,
+    });
     const result = await model.generateContent(prompt);
 
     return NextResponse.json({ text: result.response.text() });
