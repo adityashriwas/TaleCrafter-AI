@@ -80,12 +80,15 @@ const InteractiveStoryPage = () => {
   const id = params?.id;
   const router = useRouter();
   const bookRef = useRef<typeof HTMLFlipBook | null>(null);
-  const choiceSectionRef = useRef<HTMLDivElement | null>(null);
+  const bookSectionRef = useRef<HTMLDivElement | null>(null);
+  const treeSectionRef = useRef<HTMLDivElement | null>(null);
 
   const [story, setStory] = useState<StoryRow | null>(null);
   const [nodes, setNodes] = useState<StoryNode[]>([]);
   const [loading, setLoading] = useState(false);
   const [flipPage, setFlipPage] = useState(0);
+  const [maxFlipPage, setMaxFlipPage] = useState(0);
+  const [isLandscapeSpread, setIsLandscapeSpread] = useState(false);
   const [generatingNext, setGeneratingNext] = useState(false);
   const [loaderMessage, setLoaderMessage] = useState("Story is generating...");
 
@@ -181,17 +184,55 @@ const InteractiveStoryPage = () => {
   }, [linearNodes]);
 
   const totalPages = linearPages.length;
-  const displayedPageIndex = Math.min(
-    totalPages,
-    Math.max(0, (flipPage || 0) * 2 - 1)
-  );
-  const atEnd = totalPages > 0 && displayedPageIndex >= totalPages;
+
+  const syncFlipState = () => {
+    const fallbackMax = Math.max(0, totalPages);
+    // @ts-ignore
+    const flipApi: any = bookRef.current?.pageFlip?.();
+
+    if (!flipApi) {
+      setMaxFlipPage(fallbackMax);
+      setFlipPage((prev) => Math.max(0, Math.min(prev, fallbackMax)));
+      return;
+    }
+
+    const pageCount = Number(flipApi.getPageCount?.() ?? fallbackMax + 1);
+    const runtimeMax = Number.isFinite(pageCount) && pageCount > 0 ? pageCount - 1 : fallbackMax;
+    const current = Number(flipApi.getCurrentPageIndex?.() ?? 0);
+    const orientation = String(flipApi.getOrientation?.() ?? "portrait").toLowerCase();
+    const landscape = orientation === "landscape";
+
+    setMaxFlipPage(Math.max(0, runtimeMax));
+    setIsLandscapeSpread(landscape);
+    setFlipPage(Number.isFinite(current) ? Math.max(0, Math.min(current, Math.max(0, runtimeMax))) : 0);
+  };
+
+  const storyEndThreshold = isLandscapeSpread
+    ? Math.max(0, maxFlipPage - 1)
+    : maxFlipPage;
+  const atCover = flipPage <= 0;
+  const atEnd = totalPages > 0 && flipPage >= storyEndThreshold;
+  const canFlipPrev = flipPage > 0;
+  const canFlipNext = flipPage < storyEndThreshold;
+  const displayedPageIndex = atCover
+    ? 0
+    : Math.min(totalPages, Math.max(1, flipPage));
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      syncFlipState();
+    }, 80);
+
+    return () => clearTimeout(timer);
+  }, [story?.storyId, totalPages]);
 
   useEffect(() => {
     if (!atEnd || story?.status === "completed") return;
+
     const timer = setTimeout(() => {
-      choiceSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      treeSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 180);
+
     return () => clearTimeout(timer);
   }, [atEnd, story?.status]);
 
@@ -425,6 +466,15 @@ const InteractiveStoryPage = () => {
 
       await loadStory();
       setFlipPage(0);
+      setMaxFlipPage(Math.max(0, totalPages));
+      setIsLandscapeSpread(false);
+
+      setTimeout(() => {
+        // @ts-ignore
+        const flipApi: any = bookRef.current?.pageFlip?.();
+        flipApi?.turnToPage?.(0);
+        bookSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 180);
     } catch {
       toast.error("Failed to generate continuation");
     } finally {
@@ -436,9 +486,6 @@ const InteractiveStoryPage = () => {
     if (!activeNode) return;
     await completeStoryWithResolution("End Story");
   };
-
-  const choiceOptions = activeNode?.choices?.slice(0, 2) ?? [];
-  const selectedChoice = activeNode?.selectedChoice ?? null;
 
   const treeGraph = useMemo(() => {
     if (!linearNodes.length) {
@@ -508,7 +555,7 @@ const InteractiveStoryPage = () => {
       choices.forEach((choiceText, choiceIndex) => {
         const childPos = childPositions[choiceIndex];
         const childId = `${childDepth}-${childPos}`;
-        const isChosenBranch = chosenDir === choiceIndex && Boolean(nextNode);
+        const isChosenBranch = chosenDir === choiceIndex && (Boolean(nextNode) || Boolean(takenChoice));
         const branchStatus: "selected" | "disabled" | "available" = isChosenBranch
           ? "selected"
           : chosenDir !== -1
@@ -564,12 +611,46 @@ const InteractiveStoryPage = () => {
     };
   }, [linearNodes]);
 
-  const getNodePoint = (depth: number, pos: number, maxDepth: number) => {
-    const slots = Math.max(1, 2 ** depth);
-    const x = ((pos + 0.5) / slots) * 100;
-    const y = maxDepth === 0 ? 50 : 8 + (depth / maxDepth) * 84;
-    return { x, y };
-  };
+  const treeLayout = useMemo(() => {
+    const depthBuckets = new Map<number, typeof treeGraph.nodes>();
+
+    treeGraph.nodes.forEach((node) => {
+      const bucket = depthBuckets.get(node.depth) ?? [];
+      bucket.push(node);
+      depthBuckets.set(node.depth, bucket);
+    });
+
+    depthBuckets.forEach((bucket) => {
+      bucket.sort((a, b) => a.pos - b.pos);
+    });
+
+    const maxNodesInLevel = Math.max(
+      1,
+      ...Array.from(depthBuckets.values()).map((bucket) => bucket.length)
+    );
+
+    const minWidth = Math.max(900, maxNodesInLevel * 220);
+    const height = Math.max(520, (treeGraph.maxDepth + 1) * 150);
+    const nodePointById = new Map<string, { x: number; y: number }>();
+
+    depthBuckets.forEach((bucket, depth) => {
+      const y = treeGraph.maxDepth === 0 ? 50 : 10 + (depth / treeGraph.maxDepth) * 82;
+
+      bucket.forEach((node, index) => {
+        const x =
+          bucket.length === 1
+            ? 50
+            : 10 + (index / Math.max(1, bucket.length - 1)) * 80;
+        nodePointById.set(node.id, { x, y });
+      });
+    });
+
+    return {
+      minWidth,
+      height,
+      nodePointById,
+    };
+  }, [treeGraph]);
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#020b1f] px-5 py-8 md:px-16 lg:px-28 xl:px-40">
@@ -587,10 +668,10 @@ const InteractiveStoryPage = () => {
           </p>
         </div>
 
-        <div className="mt-6 tc-glass-panel-soft p-4 md:p-6">
+        <div ref={bookSectionRef} className="mt-6 tc-glass-panel-soft p-4 md:p-6">
           <div className="mb-4 flex items-center justify-between text-sm text-blue-100/80">
             <span>
-              {flipPage === 0
+              {atCover
                 ? `Cover / ${Math.max(totalPages, 1)} pages`
                 : `Page ${Math.max(1, displayedPageIndex)} / ${Math.max(totalPages, 1)}`}
             </span>
@@ -613,7 +694,7 @@ const InteractiveStoryPage = () => {
               showCover={true}
               useMouseEvents={false}
               ref={bookRef}
-              onFlip={(event: any) => setFlipPage(Number(event?.data ?? 0))}
+              onFlip={() => syncFlipState()}
               style={{ height: "auto", maxHeight: "auto" }}
             >
               <div className="p-0">
@@ -633,20 +714,26 @@ const InteractiveStoryPage = () => {
 
           <div className="mt-5 flex w-full items-center justify-between">
             <button
-              className="tc-icon-btn p-2"
+              className={`tc-icon-btn p-2 ${!canFlipPrev ? "pointer-events-none opacity-40" : ""}`}
+              disabled={!canFlipPrev}
               onClick={() => {
+                if (!canFlipPrev) return;
                 // @ts-ignore
                 bookRef.current?.pageFlip().flipPrev();
+                setTimeout(() => syncFlipState(), 90);
               }}
               aria-label="Previous page"
             >
               <IoIosArrowDropleftCircle className="text-4xl" />
             </button>
             <button
-              className="tc-icon-btn p-2"
+              className={`tc-icon-btn p-2 ${!canFlipNext ? "pointer-events-none opacity-40" : ""}`}
+              disabled={!canFlipNext}
               onClick={() => {
+                if (!canFlipNext) return;
                 // @ts-ignore
                 bookRef.current?.pageFlip().flipNext();
+                setTimeout(() => syncFlipState(), 90);
               }}
               aria-label="Next page"
             >
@@ -655,67 +742,22 @@ const InteractiveStoryPage = () => {
           </div>
         </div>
 
-        {atEnd && story?.status !== "completed" && (
-          <div ref={choiceSectionRef} className="mt-8 tc-glass-panel-soft p-5 md:p-6">
-            <h3 className="tc-title-gradient text-2xl font-bold">Choose what happens next</h3>
-
-            <div className="mt-3 text-sm text-blue-100/70">
-              Non-selected branch will be locked permanently.
-            </div>
-
-            <div className="relative mt-7">
-              <svg className="pointer-events-none absolute inset-0 h-[130px] w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-                <path d="M 50,8 C 40,28 30,45 18,70" stroke="rgba(147,197,253,0.7)" strokeWidth="1.4" fill="none" />
-                <path d="M 50,8 C 60,28 70,45 82,70" stroke="rgba(147,197,253,0.7)" strokeWidth="1.4" fill="none" />
-              </svg>
-
-              <div className="mx-auto mb-8 flex h-9 w-9 items-center justify-center rounded-full border border-blue-300/30 bg-blue-400/20 text-xs font-bold text-blue-100">
-                {Math.min((activeNode?.depth ?? 0) + 1, MAX_DEPTH)}
-              </div>
-
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                {[0, 1].map((index) => {
-                  const choice = choiceOptions[index];
-                  const disabled = !choice || generatingNext || Boolean(selectedChoice && selectedChoice !== choice);
-                  const isChosen = selectedChoice === choice;
-
-                  return (
-                    <button
-                      key={`choice_${index}_${choice ?? "empty"}`}
-                      onClick={() => choice && onPickChoice(choice)}
-                      disabled={disabled}
-                      className={`rounded-xl border p-4 text-left transition ${
-                        isChosen
-                          ? "border-cyan-300/45 bg-cyan-400/20 text-white"
-                          : "border-blue-300/20 bg-white/5 text-blue-100 hover:bg-white/10"
-                      } ${disabled && !isChosen ? "opacity-40" : ""}`}
-                    >
-                      <p className="text-xs uppercase tracking-wide text-blue-100/70">Choice {index + 1}</p>
-                      <p className="mt-2 text-base font-semibold">{choice ?? "Generating option..."}</p>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        )}
-
-        <div className="mt-8 tc-glass-panel-soft p-5">
+        <div ref={treeSectionRef} className="mt-8 tc-glass-panel-soft p-5">
           <h3 className="tc-title-gradient text-2xl font-bold">Story Tree</h3>
           <p className="mt-2 text-sm text-blue-100/70">
-            Decision history in tree form. Blue/cyan nodes represent active path, dim nodes are disabled branches.
+            Decision history in tree form. Select available branch nodes here to continue once you reach the last page.
           </p>
 
           <div className="mt-6 overflow-x-auto">
-            <div className="relative mx-auto h-[520px] min-w-[820px]">
+            <div
+              className="relative mx-auto"
+              style={{ minWidth: `${treeLayout.minWidth}px`, height: `${treeLayout.height}px` }}
+            >
               <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
                 {treeGraph.edges.map((edge, edgeIndex) => {
-                  const from = treeGraph.nodes.find((node) => node.id === edge.from);
-                  const to = treeGraph.nodes.find((node) => node.id === edge.to);
-                  if (!from || !to) return null;
-
-                  const p1 = getNodePoint(from.depth, from.pos, treeGraph.maxDepth);
-                  const p2 = getNodePoint(to.depth, to.pos, treeGraph.maxDepth);
+                  const p1 = treeLayout.nodePointById.get(edge.from);
+                  const p2 = treeLayout.nodePointById.get(edge.to);
+                  if (!p1 || !p2) return null;
                   const midY = (p1.y + p2.y) / 2;
                   const stroke =
                     edge.status === "selected"
@@ -737,17 +779,17 @@ const InteractiveStoryPage = () => {
               </svg>
 
               {treeGraph.nodes.map((node, index) => {
-                const point = getNodePoint(node.depth, node.pos, treeGraph.maxDepth);
+                const point = treeLayout.nodePointById.get(node.id);
+                if (!point) return null;
                 const nodeLabel =
                   node.label && node.label.trim().length > 0
                     ? node.label
                     : node.realNode?.choiceTaken || "Story Path";
                 const isDisabled = node.status === "disabled";
                 const isSelected = node.status === "selected" || node.status === "current";
-                const isClickableChoiceNode =
+                const isActiveChoiceNode =
                   node.status === "available" &&
                   node.originNodeId === activeNode?.nodeId &&
-                  atEnd &&
                   !generatingNext &&
                   story?.status !== "completed";
 
@@ -758,18 +800,22 @@ const InteractiveStoryPage = () => {
                     style={{ left: `${point.x}%`, top: `${point.y}%` }}
                   >
                     <div
-                      className={`flex min-w-[120px] max-w-[180px] items-center justify-center rounded-xl border px-3 py-2 text-center text-[11px] font-semibold leading-tight shadow-lg ${
+                      className={`flex w-[180px] items-center justify-center rounded-2xl border px-3 py-3 text-center text-[12px] font-semibold leading-snug shadow-[0_8px_26px_rgba(2,8,23,0.35)] transition ${
                         node.status === "current"
                           ? "border-cyan-100 bg-cyan-500 text-white"
                           : isSelected
                           ? "border-blue-100 bg-blue-600 text-white"
                           : isDisabled
                           ? "border-slate-400 bg-slate-700 text-slate-100"
-                          : "border-blue-200 bg-blue-900 text-blue-100"
-                      } ${isClickableChoiceNode ? "cursor-pointer hover:scale-[1.03]" : ""}`}
+                          : "border-blue-200 bg-blue-900/95 text-blue-100"
+                      } ${isActiveChoiceNode ? "cursor-pointer hover:scale-[1.03]" : ""}`}
                       title={node.label}
                       onClick={() => {
-                        if (!isClickableChoiceNode) return;
+                        if (!isActiveChoiceNode) return;
+                        if (!atEnd) {
+                          toast.info("Reach the last page to unlock this choice");
+                          return;
+                        }
                         onPickChoice(node.label);
                       }}
                     >
