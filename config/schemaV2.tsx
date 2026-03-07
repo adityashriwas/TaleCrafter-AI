@@ -1,8 +1,9 @@
-import { boolean, integer, json, pgTable, serial, text, timestamp, varchar } from "drizzle-orm/pg-core";
+import { boolean, index, integer, json, pgTable, serial, text, timestamp, uniqueIndex, varchar } from "drizzle-orm/pg-core";
 
 export const InteractiveStories = pgTable("interactiveStories_v2", {
   id: serial("id").primaryKey(),
   storyId: varchar("storyId"),
+  slug: varchar("slug", { length: 90 }),
   userEmail: varchar("userEmail"),
   userName: varchar("userName"),
   userImage: varchar("userImage"),
@@ -19,7 +20,11 @@ export const InteractiveStories = pgTable("interactiveStories_v2", {
   coverImage: varchar("coverImage"),
   createdAt: timestamp("createdAt").defaultNow(),
   updatedAt: timestamp("updatedAt").defaultNow(),
-});
+}, (table) => ({
+  storyIdIdx: index("interactive_stories_story_id_idx").on(table.storyId),
+  slugIdx: index("interactive_stories_slug_idx").on(table.slug),
+  slugUniqueIdx: uniqueIndex("interactive_stories_slug_unique_idx").on(table.slug),
+}));
 
 export const InteractiveStoryNodes = pgTable("interactiveStoryNodes_v2", {
   id: serial("id").primaryKey(),

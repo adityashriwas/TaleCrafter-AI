@@ -21,6 +21,7 @@ import { dbV2 } from "@/config/configV2";
 import { InteractiveStories, InteractiveStoryNodes } from "@/config/schemaV2";
 import { buildChoicePrompt, makePageContext, parseChoices } from "@/config/plottwist";
 import { buildPollinationsImageUrl, persistImageUrl } from "@/lib/story-images";
+import { generateUniqueStorySlug } from "@/lib/story-slug";
 const MotionDiv: any = motion.div;
 
 const CREATE_STORY_PROMPT = process.env.NEXT_PUBLIC_CREATE_STORY_PROMPT;
@@ -249,7 +250,7 @@ const CreateStory = () => {
       }
       notify("Story Generated Successfully");
       await UpdateUserCredits();
-      router.push((isInteractive ? "/interactive-story/" : "/view-story/") + resp);
+      router.push((isInteractive ? "/interactive-story/" : "/story/") + resp);
 
       setLoading(false);
     } catch (error) {
@@ -261,12 +262,15 @@ const CreateStory = () => {
 
   const SaveInDB = async (output: any, imageResp: string) => {
     const recordId = uuid4();
+    const title = String(output?.title ?? formData?.storySubject ?? "AI Generated Story");
+    const slug = await generateUniqueStorySlug(title);
     setLoading(true);
     try {
       const result = await db
         .insert(StoryData)
         .values({
           storyId: recordId,
+          slug,
           ageGroup: formData?.ageCategory,
           storyType: formData?.storyType,
           storySubject: formData?.storySubject,
@@ -277,9 +281,9 @@ const CreateStory = () => {
           userName: user?.fullName,
           userImage: user?.imageUrl,
         })
-        .returning({ StoryId: StoryData?.storyId });
+        .returning({ StorySlug: StoryData.slug, StoryId: StoryData.storyId });
       setLoading(false);
-      return result[0]?.StoryId;
+      return result[0]?.StorySlug || result[0]?.StoryId;
     } catch (error) {
       notifyError("Server Error! Please try again");
       setLoading(false);
@@ -289,6 +293,8 @@ const CreateStory = () => {
   const SaveInteractiveStarterInDB = async (story: any) => {
     const storyId = uuid4();
     const rootNodeId = uuid4();
+    const interactiveTitle = String(story?.title ?? "Interactive Story");
+    const slug = await generateUniqueStorySlug(interactiveTitle);
     const chapters = Array.isArray(story?.chapters) ? story.chapters : [];
 
     const starterPages = await Promise.all(chapters.map(async (chapter: any, index: number) => {
@@ -332,10 +338,11 @@ const CreateStory = () => {
 
     await dbV2.insert(InteractiveStories).values({
       storyId,
+      slug,
       userEmail: user?.primaryEmailAddress?.emailAddress,
       userName: user?.fullName,
       userImage: user?.imageUrl,
-      title: String(story?.title ?? "Interactive Story"),
+      title: interactiveTitle,
       storySubject: formData?.storySubject,
       storyType: formData?.storyType,
       ageGroup: formData?.ageCategory,

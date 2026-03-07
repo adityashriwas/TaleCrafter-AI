@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  compress: true,
   images: {
     remotePatterns: [
       {
@@ -12,6 +13,14 @@ const nextConfig: NextConfig = {
         hostname: "gen.pollinations.ai",
       },
     ],
+  },
+  async rewrites() {
+    return [
+      {
+        source: "/sitemap-stories-:page.xml",
+        destination: "/api/sitemap/stories/:page",
+      },
+    ];
   },
 };
 

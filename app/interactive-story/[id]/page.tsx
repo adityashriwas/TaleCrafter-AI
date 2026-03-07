@@ -21,6 +21,7 @@ import {
 } from "@/lib/story-images";
 import { db } from "@/config/config";
 import { StoryData } from "@/config/schema";
+import { ensureStorySlug, generateUniqueStorySlug } from "@/lib/story-slug";
 import { useParams, useRouter } from "next/navigation";
 import CustomLoader from "@/app/create-story/(component)/CustomLoader";
 import BookCoverPage from "@/app/view-story/_components/BookCoverPage";
@@ -265,8 +266,10 @@ const InteractiveStoryPage = () => {
     };
 
     if (!existing?.[0]) {
+      const slug = await generateUniqueStorySlug(finalTitle || story?.title || "Interactive Story");
       await db.insert(StoryData).values({
         storyId: id,
+        slug,
         storySubject: story?.storySubject,
         storyType: story?.storyType,
         ageGroup: story?.ageGroup,
@@ -277,6 +280,7 @@ const InteractiveStoryPage = () => {
         userName: story?.userName,
         userImage: story?.userImage,
       });
+      return slug;
     } else {
       await db
         .update(StoryData)
@@ -285,6 +289,7 @@ const InteractiveStoryPage = () => {
           coverImage: pages[0]?.imageUrl ?? story?.coverImage,
         })
         .where(eq(StoryData.storyId, id));
+      return ensureStorySlug(existing[0]);
     }
   };
 
@@ -392,8 +397,8 @@ const InteractiveStoryPage = () => {
         })
         .where(eq(InteractiveStories.storyId, story.storyId));
 
-      await saveCompletedToClassicStory(compiledPages, story.title);
-      router.push(`/view-story/${story.storyId}`);
+      const finalSlug = await saveCompletedToClassicStory(compiledPages, story.title);
+      router.push(`/story/${finalSlug}`);
     } catch {
       toast.error("Unable to finalize story right now");
     } finally {

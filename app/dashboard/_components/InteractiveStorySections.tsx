@@ -10,6 +10,7 @@ import { InteractiveStories, InteractiveStoryNodes } from "@/config/schemaV2";
 
 type InteractiveStory = {
   storyId: string;
+  slug?: string;
   title: string;
   status: "draft" | "completed";
   totalPages: number;
@@ -112,7 +113,7 @@ const InteractiveStorySections = () => {
                   Continue
                 </Link>
               ) : (
-                <Link href={`/view-story/${story.storyId}`} className="tc-btn-primary px-4 py-2 text-sm">
+                <Link href={story.slug ? `/story/${story.slug}` : `/view-story/${story.storyId}`} className="tc-btn-primary px-4 py-2 text-sm">
                   Read
                 </Link>
               )}

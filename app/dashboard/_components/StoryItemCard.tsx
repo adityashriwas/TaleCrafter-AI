@@ -15,6 +15,7 @@ type StoryItemType = {
     storyType: string;
     ageGroup: string;
     storyId: string;
+    slug?: string;
     storySubject: string;
     imageStyle: string;
     coverImage: string;
@@ -42,6 +43,7 @@ const deleteStoryFromDB = async (storyId: string) => {
 const StoryItemCard = ({ story, currentUserEmail, onDeleteSuccess }: StoryItemType) => {
   const isOwner = story.userEmail === currentUserEmail;
   const [imgFailed, setImgFailed] = useState(false);
+  const storyHref = story?.slug ? `/story/${story.slug}` : `/view-story/${story?.storyId}`;
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -56,7 +58,7 @@ const StoryItemCard = ({ story, currentUserEmail, onDeleteSuccess }: StoryItemTy
   };
 
   return (
-    <Link href={"/view-story/" + story?.storyId} prefetch={true}>
+    <Link href={storyHref} prefetch={true}>
       <Card
         isFooterBlurred
         radius="lg"

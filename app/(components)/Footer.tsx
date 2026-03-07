@@ -4,6 +4,16 @@ import Feedback from "./Feedback";
 import Link from "next/link";
 
 const Footer = () => {
+  const genreLinks = [
+    { label: "Fantasy", href: "/ai-fantasy-story-generator" },
+    { label: "Bedtime", href: "/ai-bedtime-story-generator" },
+    { label: "Horror", href: "/explore?genre=horror" },
+    { label: "Romantic", href: "/explore?genre=romantic" },
+    { label: "Mythology", href: "/explore?genre=mythology" },
+    { label: "Adventure", href: "/explore?genre=adventure" },
+    { label: "Sci-Fi", href: "/explore?genre=sci-fi" },
+  ];
+
   return (
     <footer className="border-t border-blue-300/15 bg-[#010715]/95 text-blue-100/80 backdrop-blur-xl shadow-[0_-12px_30px_rgba(0,0,0,0.4)]">
       <div className="mx-auto flex w-full max-w-screen-xl flex-col items-center justify-between gap-6 px-4 py-5 md:flex-row">
@@ -33,6 +43,18 @@ const Footer = () => {
           >
             About
           </Link>
+          <Link
+            href="/ai-fantasy-story-generator"
+            className="rounded-lg px-3 py-1 transition duration-300 hover:bg-white/10 hover:text-white"
+          >
+            Fantasy Generator
+          </Link>
+          <Link
+            href="/ai-bedtime-story-generator"
+            className="rounded-lg px-3 py-1 transition duration-300 hover:bg-white/10 hover:text-white"
+          >
+            Bedtime Generator
+          </Link>
           <a
             className="rounded-lg px-3 py-1 transition duration-300 hover:bg-white/10 hover:text-white"
             href="mailto:contact@talecrafterai.tech"
@@ -43,6 +65,24 @@ const Footer = () => {
 
         <div className="flex-shrink-0">
           <Feedback />
+        </div>
+      </div>
+
+      <div className="mx-auto w-full max-w-screen-xl border-t border-blue-300/15 px-4 py-4">
+        <p className="text-center text-xs font-semibold uppercase tracking-wide text-blue-100/70 md:text-left">
+          Popular Story Genres
+        </p>
+        <div className="mt-3 flex flex-wrap justify-center gap-2 md:justify-start">
+          {genreLinks.map((genre) => (
+            <Link
+              key={genre.label}
+              href={genre.href}
+              prefetch={true}
+              className="rounded-full border border-blue-300/25 bg-blue-400/10 px-3 py-1 text-xs font-medium text-blue-100/85 transition hover:bg-blue-400/20 hover:text-white"
+            >
+              {genre.label}
+            </Link>
+          ))}
         </div>
       </div>
 

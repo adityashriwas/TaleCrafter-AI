@@ -1,24 +1,24 @@
 import type { Metadata } from "next";
 
 export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.talecrafterai.tech";
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://talecrafterai.tech";
 export const SITE_NAME = "TaleCrafter AI";
 export const DEFAULT_OG_IMAGE = "/logo.png";
 
 export const defaultMetadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "TaleCrafter AI - Create AI Storybooks",
+    default: "Interactive AI Story Generator with Images | TaleCrafter AI",
     template: "%s | TaleCrafter AI",
   },
   description:
-    "Create illustrated AI storybooks from prompts. Generate interactive stories, explore AI-generated tales, and bring imagination to life.",
+    "Generate interactive AI stories with images, narration, and branching paths. Create bedtime stories, kids stories, and visual storybooks in seconds.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
     title: SITE_NAME,
-    description: "Turn prompts into illustrated AI storybooks.",
+    description: "Create interactive AI stories with pictures, narration, and branching choices.",
     url: SITE_URL,
     siteName: SITE_NAME,
     images: [
@@ -35,7 +35,7 @@ export const defaultMetadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: SITE_NAME,
-    description: "Create illustrated AI stories from prompts.",
+    description: "Interactive AI story generator with images and narration.",
     images: [DEFAULT_OG_IMAGE],
   },
   robots: {

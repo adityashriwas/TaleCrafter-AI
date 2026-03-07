@@ -1,26 +1,34 @@
 import Hero from "./(components)/Hero";
 import type { Metadata } from "next";
-import { DEFAULT_OG_IMAGE } from "@/lib/seo";
+import { DEFAULT_OG_IMAGE, SITE_URL } from "@/lib/seo";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.talecrafterai.tech";
+const siteUrl = SITE_URL;
 
 export const metadata: Metadata = {
-  title: "AI Story Generator",
+  title: "Interactive AI Story Generator with Pictures and Voice",
   description:
-    "Generate complete digital storybooks with AI. TaleCrafter AI helps creators, educators, and storytellers turn ideas into illustrated stories.",
+    "Create interactive AI stories with pictures, narration, and branching choices. Best for kids stories, bedtime stories, classrooms, and creators.",
+  keywords: [
+    "interactive AI story generator",
+    "AI story generator with pictures",
+    "AI story generator with voice",
+    "kids bedtime story generator",
+    "image to story generator",
+    "AI storybook maker",
+  ],
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "AI Story Generator",
+    title: "Interactive AI Story Generator with Pictures and Voice",
     description:
-      "Generate complete digital storybooks with AI. TaleCrafter AI helps creators, educators, and storytellers turn ideas into illustrated stories.",
+      "Generate AI stories with images, narration, and branching paths.",
     url: "/",
     images: [DEFAULT_OG_IMAGE],
   },
   twitter: {
-    title: "AI Story Generator",
-    description: "Generate complete digital storybooks with AI.",
+    title: "Interactive AI Story Generator with Pictures",
+    description: "Generate AI stories with images, narration, and branching paths.",
     images: [DEFAULT_OG_IMAGE],
   },
 };
@@ -41,7 +49,7 @@ export default function Home() {
         url: siteUrl,
         potentialAction: {
           "@type": "SearchAction",
-          target: `${siteUrl}/explore`,
+          target: `${siteUrl}/explore?q={search_term_string}`,
           "query-input": "required name=search_term_string",
         },
       },

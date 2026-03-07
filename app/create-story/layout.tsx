@@ -2,8 +2,15 @@ import type { Metadata } from "next";
 import { DEFAULT_OG_IMAGE } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "Create Story",
-  description: "Generate branching interactive stories with choice-driven plot paths in TaleCrafter AI.",
+  title: "Create AI Story with Images and Voice",
+  description: "Create AI stories with pictures, narration, and branching plot choices. Generate kids stories, bedtime stories, and interactive storybooks instantly.",
+  keywords: [
+    "create AI story",
+    "AI story generator with images",
+    "interactive story generator",
+    "bedtime story generator",
+    "kids story generator",
+  ],
   robots: {
     index: true,
     follow: true,
@@ -12,14 +19,14 @@ export const metadata: Metadata = {
     canonical: "/create-story",
   },
   openGraph: {
-    title: "Create Story",
-    description: "Create illustrated AI storybooks from your prompts.",
+    title: "Create AI Story with Images and Voice",
+    description: "Generate interactive AI stories with visuals, narration, and choices.",
     url: "/create-story",
     images: [DEFAULT_OG_IMAGE],
   },
   twitter: {
-    title: "Create Story",
-    description: "Create illustrated AI storybooks from your prompts.",
+    title: "Create AI Story with Images and Voice",
+    description: "Generate interactive AI stories with visuals, narration, and choices.",
     images: [DEFAULT_OG_IMAGE],
   },
 };

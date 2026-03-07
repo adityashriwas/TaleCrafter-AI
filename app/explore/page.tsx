@@ -12,6 +12,7 @@ type StoryItemType = {
   storyType: string;
   ageGroup: string;
   storyId: string;
+  slug?: string;
   storySubject: string;
   imageStyle: string;
   coverImage: string;
