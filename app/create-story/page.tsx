@@ -19,7 +19,8 @@ import UploadImage from "./(component)/UploadImage";
 import { motion } from "framer-motion";
 import { dbV2 } from "@/config/configV2";
 import { InteractiveStories, InteractiveStoryNodes } from "@/config/schemaV2";
-import { buildChoicePrompt, createUniqueImageUrl, makePageContext, parseChoices } from "@/config/plottwist";
+import { buildChoicePrompt, makePageContext, parseChoices } from "@/config/plottwist";
+import { buildPollinationsImageUrl, persistImageUrl } from "@/lib/story-images";
 const MotionDiv: any = motion.div;
 
 const CREATE_STORY_PROMPT = process.env.NEXT_PUBLIC_CREATE_STORY_PROMPT;
@@ -127,6 +128,14 @@ const CreateStory = () => {
     return String(data?.text ?? "");
   };
 
+  const persistWithFallback = async (imageUrl: string) => {
+    try {
+      return await persistImageUrl(imageUrl);
+    } catch {
+      return imageUrl;
+    }
+  };
+
   const GenerateStory = async (mode: "classic" | "interactive" = "classic") => {
     if (!user) {
       router.push("/sign-up?redirect_url=/create-story");
@@ -191,18 +200,53 @@ const CreateStory = () => {
         story?.coverImagePrompt ??
           `${safeTitle} ${formData?.imageStyle ?? "illustration"} book cover`
       );
-      const prompt = `Add-title-"${safeTitle.replace(
-        /\s+/g,
-        "-"
-      )}"-in-bold-text-for-book-cover-image,-${safeCoverPrompt.replace(
-        /\s+/g,
-        "-"
-      )}`;
-      const final_image_prompt = prompt;
-      const imageResp = `https://gen.pollinations.ai/image/${final_image_prompt}?model=${process.env.NEXT_PUBLIC_POLLINATIONS_AI_MODEL}&width=410&height=630&enhance=false&negative_prompt=worst+quality%2C+blurry&safe=false&seed=0&key=${process.env.NEXT_PUBLIC_POLLINATIONS_API_KEY}`;
-      const resp: any = isInteractive
-        ? await SaveInteractiveStarterInDB(story)
-        : await SaveInDB(story, imageResp);
+      let resp: any;
+      if (isInteractive) {
+        resp = await SaveInteractiveStarterInDB(story);
+      } else {
+        const prompt = `Add-title-"${safeTitle.replace(
+          /\s+/g,
+          "-"
+        )}"-in-bold-text-for-book-cover-image,-${safeCoverPrompt.replace(
+          /\s+/g,
+          "-"
+        )}`;
+        const coverPollinationsUrl = buildPollinationsImageUrl(prompt, {
+          width: 410,
+          height: 630,
+          seed: 0,
+        });
+
+        const chapters = (story.chapters as any[]).map((chapter: any, index: number) => ({
+          ...chapter,
+          chapterNumber: Number(chapter?.chapterNumber ?? index + 1),
+        }));
+
+        const persistedChapterEntries = await Promise.all(
+          chapters.map(async (chapter: any, index: number) => {
+            const sourcePrompt = String(
+              chapter?.imagePrompt ?? chapter?.textPrompt ?? `${safeTitle} illustration`
+            ).trim();
+            const pollinationsUrl = buildPollinationsImageUrl(sourcePrompt, {
+              seed: `${Date.now()}_${index}_${Math.floor(Math.random() * 100000)}`,
+            });
+            const persistedUrl = await persistWithFallback(pollinationsUrl);
+
+            return {
+              ...chapter,
+              imagePrompt: sourcePrompt,
+              imageUrl: persistedUrl,
+            };
+          })
+        );
+
+        const persistedCoverImage = await persistWithFallback(coverPollinationsUrl);
+        const persistedStoryOutput = {
+          ...story,
+          chapters: persistedChapterEntries,
+        };
+        resp = await SaveInDB(persistedStoryOutput, persistedCoverImage);
+      }
       notify("Story Generated Successfully");
       await UpdateUserCredits();
       router.push((isInteractive ? "/interactive-story/" : "/view-story/") + resp);
@@ -247,17 +291,18 @@ const CreateStory = () => {
     const rootNodeId = uuid4();
     const chapters = Array.isArray(story?.chapters) ? story.chapters : [];
 
-    const starterPages = chapters.map((chapter: any, index: number) => {
+    const starterPages = await Promise.all(chapters.map(async (chapter: any, index: number) => {
       const prompt = String(chapter?.imagePrompt ?? chapter?.textPrompt ?? "Story illustration");
       const seed = `${Date.now()}_${index}_${Math.floor(Math.random() * 100000)}`;
+      const pollinationsUrl = buildPollinationsImageUrl(prompt, { seed });
       return {
         pageNumber: index + 1,
         title: String(chapter?.title ?? `Chapter ${index + 1}`),
         text: String(chapter?.textPrompt ?? ""),
         imagePrompt: prompt,
-        imageUrl: createUniqueImageUrl(prompt, seed),
+        imageUrl: await persistWithFallback(pollinationsUrl),
       };
-    });
+    }));
 
     if (starterPages.length < MIN_STARTER_PAGES) {
       throw new Error("Starter story must have at least 5 pages");
@@ -272,7 +317,12 @@ const CreateStory = () => {
       "-"
     )}"-in-bold-text-for-book-cover-image,-${coverPromptSource.replace(/\s+/g, "-")}`;
     const coverSeed = `${Date.now()}${Math.floor(Math.random() * 100000)}`;
-    const coverImageUrl = `https://gen.pollinations.ai/image/${defaultStyleCoverPrompt}?model=${process.env.NEXT_PUBLIC_POLLINATIONS_AI_MODEL}&width=410&height=630&enhance=false&negative_prompt=worst+quality%2C+blurry&safe=false&seed=${coverSeed}&key=${process.env.NEXT_PUBLIC_POLLINATIONS_API_KEY}`;
+    const coverImageUrl = buildPollinationsImageUrl(defaultStyleCoverPrompt, {
+      width: 410,
+      height: 630,
+      seed: coverSeed,
+    });
+    const persistedCoverImageUrl = await persistWithFallback(coverImageUrl);
 
     const starterContext = makePageContext(starterPages as any, 4);
     const starterChoiceText = await callGemini(buildChoicePrompt(starterContext));
@@ -294,7 +344,7 @@ const CreateStory = () => {
       rootNodeId,
       currentNodeId: rootNodeId,
       totalPages: starterPages.length,
-      coverImage: coverImageUrl,
+      coverImage: persistedCoverImageUrl,
       createdAt: now,
       updatedAt: now,
     });

@@ -13,6 +13,9 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { DEFAULT_OG_IMAGE, toAbsoluteUrl } from "@/lib/seo";
+import {
+  buildPollinationsImageUrl,
+} from "@/lib/story-images";
 
 function SafeStoryModeImage({ src, alt }: { src: string; alt: string }) {
   const [failed, setFailed] = useState(false);
@@ -77,10 +80,11 @@ function ViewStory() {
       .select()
       .from(StoryData)
       .where(eq(StoryData.storyId, id));
-    setStory(result[0]);
-    const output = (result?.[0]?.output as any) ?? {};
+    const fetchedStory = result[0];
+    setStory(fetchedStory);
+    const output = (fetchedStory?.output as any) ?? {};
     const baseSummary = String(
-      output?.chapters?.[0]?.textPrompt ?? result?.[0]?.storySubject ?? ""
+      output?.chapters?.[0]?.textPrompt ?? fetchedStory?.storySubject ?? ""
     )
       .replace(/\{[^}]*\}/g, "")
       .trim()
@@ -90,7 +94,6 @@ function ViewStory() {
         ? baseSummary
         : `Read ${output?.title ?? "this story"} on TaleCrafter AI.`
     );
-
   };
 
   const getRelatedStories = async (page: number) => {
@@ -159,8 +162,13 @@ function ViewStory() {
   };
 
   const getChapterImageUrl = (chapter: any) => {
-    const prompt = encodeURIComponent(chapter?.imagePrompt ?? "");
-    return `https://gen.pollinations.ai/image/${prompt}?model=${process.env.NEXT_PUBLIC_POLLINATIONS_AI_MODEL}&enhance=false&negative_prompt=worst+quality%2C+blurry&safe=false&seed=0&key=${process.env.NEXT_PUBLIC_POLLINATIONS_API_KEY}`;
+    const persistedImage = String(chapter?.imageUrl ?? "").trim();
+    if (persistedImage) return persistedImage;
+
+    return buildPollinationsImageUrl(
+      chapter?.imagePrompt ?? chapter?.title ?? "Story illustration",
+      { seed: 0 }
+    );
   };
 
   const getChapterText = (chapter: any) => {

@@ -10,12 +10,15 @@ import { dbV2 } from "@/config/configV2";
 import { InteractiveStories, InteractiveStoryNodes } from "@/config/schemaV2";
 import {
   buildContinuationPrompt,
-  createUniqueImageUrl,
   makePageContext,
   parseContinuationPayload,
   parsePages,
   type InteractivePage,
 } from "@/config/plottwist";
+import {
+  buildPollinationsImageUrl,
+  persistImageUrl,
+} from "@/lib/story-images";
 import { db } from "@/config/config";
 import { StoryData } from "@/config/schema";
 import { useParams, useRouter } from "next/navigation";
@@ -107,6 +110,14 @@ const InteractiveStoryPage = () => {
 
     const data = await response.json();
     return String(data?.text ?? "");
+  };
+
+  const persistWithFallback = async (imageUrl: string) => {
+    try {
+      return await persistImageUrl(imageUrl);
+    } catch {
+      return imageUrl;
+    }
   };
 
   const loadStory = async () => {
@@ -249,6 +260,7 @@ const InteractiveStoryPage = () => {
         title: page.title,
         textPrompt: page.text,
         imagePrompt: page.imagePrompt,
+        imageUrl: page.imageUrl,
       })),
     };
 
@@ -315,11 +327,16 @@ const InteractiveStoryPage = () => {
       const mappedPages = resolutionPages.map((page, index) => ({
         ...page,
         pageNumber: totalPages + index + 1,
-        imageUrl: createUniqueImageUrl(
-          page.imagePrompt || page.text,
-          `${Date.now()}_final_${index}_${Math.floor(Math.random() * 100000)}`
-        ),
+        imageUrl: buildPollinationsImageUrl(page.imagePrompt || page.text, {
+          seed: `${Date.now()}_final_${index}_${Math.floor(Math.random() * 100000)}`,
+        }),
       }));
+      const persistedResolution = await Promise.all(
+        mappedPages.map(async (page) => ({
+          ...page,
+          imageUrl: await persistWithFallback(page.imageUrl || ""),
+        }))
+      );
 
       await dbV2.insert(InteractiveStoryNodes).values({
         nodeId: finalNodeId,
@@ -329,7 +346,7 @@ const InteractiveStoryPage = () => {
         choiceTaken: selectedChoice,
         choices: null,
         selectedChoice: null,
-        pages: mappedPages,
+        pages: persistedResolution,
         isActive: false,
         createdAt: now,
       });
@@ -433,11 +450,16 @@ const InteractiveStoryPage = () => {
       const mappedPages = pages.map((page, index) => ({
         ...page,
         pageNumber: totalPages + index + 1,
-        imageUrl: createUniqueImageUrl(
-          page.imagePrompt || page.text,
-          `${Date.now()}_${index}_${Math.floor(Math.random() * 100000)}`
-        ),
+        imageUrl: buildPollinationsImageUrl(page.imagePrompt || page.text, {
+          seed: `${Date.now()}_${index}_${Math.floor(Math.random() * 100000)}`,
+        }),
       }));
+      const persistedMappedPages = await Promise.all(
+        mappedPages.map(async (page) => ({
+          ...page,
+          imageUrl: await persistWithFallback(page.imageUrl || ""),
+        }))
+      );
 
       await dbV2.insert(InteractiveStoryNodes).values({
         nodeId: nextNodeId,
@@ -450,7 +472,7 @@ const InteractiveStoryPage = () => {
             ? nextChoices
             : ["Take the hopeful next step", "Risk a bold unknown path"],
         selectedChoice: null,
-        pages: mappedPages,
+        pages: persistedMappedPages,
         isActive: true,
         createdAt: now,
       });
@@ -459,7 +481,7 @@ const InteractiveStoryPage = () => {
         .update(InteractiveStories)
         .set({
           currentNodeId: nextNodeId,
-          totalPages: totalPages + mappedPages.length,
+          totalPages: totalPages + persistedMappedPages.length,
           updatedAt: new Date(),
         })
         .where(eq(InteractiveStories.storyId, story.storyId));

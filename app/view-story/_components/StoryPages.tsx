@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { IoPlayCircle, IoPauseCircle } from "react-icons/io5";
 import Image from "next/image";
+import { buildPollinationsImageUrl } from "@/lib/story-images";
 
 const StoryPages = ({
   storyChapter,
@@ -51,6 +52,12 @@ const StoryPages = ({
     setIsPlaying(false);
   }, [activeNarrationKey, chapterKey, isPlaying]);
 
+  const chapterImageSrc =
+    storyChapter?.imageUrl ||
+    buildPollinationsImageUrl(storyChapter?.imagePrompt ?? storyChapter?.title ?? "Story illustration", {
+      seed: 0,
+    });
+
   return (
     <div>
       <h2 className="flex items-center justify-between text-2xl font-bold text-blue-700">
@@ -75,7 +82,7 @@ const StoryPages = ({
           </div>
         ) : (
           <Image
-            src={`https://gen.pollinations.ai/image/${storyChapter?.imagePrompt}?model=${process.env.NEXT_PUBLIC_POLLINATIONS_AI_MODEL}&enhance=false&negative_prompt=worst+quality%2C+blurry&safe=false&seed=0&key=${process.env.NEXT_PUBLIC_POLLINATIONS_API_KEY}`}
+            src={chapterImageSrc}
             alt={storyChapter?.title ?? "story chapter illustration"}
             className={`rounded-lg bg-slate-100 object-contain transition-opacity duration-300 ${
               imageLoaded ? "opacity-100" : "opacity-0"
