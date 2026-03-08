@@ -43,6 +43,14 @@ export const staticSitemapEntries = () => {
   return [
     { loc: SITE_URL, lastmod: now, changefreq: "weekly", priority: 1.0 },
     { loc: `${SITE_URL}/about`, lastmod: now, changefreq: "monthly", priority: 0.8 },
+    { loc: `${SITE_URL}/contact`, lastmod: now, changefreq: "monthly", priority: 0.6 },
+    { loc: `${SITE_URL}/privacy-policy`, lastmod: now, changefreq: "yearly", priority: 0.4 },
+    {
+      loc: `${SITE_URL}/terms-and-conditions`,
+      lastmod: now,
+      changefreq: "yearly",
+      priority: 0.4,
+    },
     { loc: `${SITE_URL}/explore`, lastmod: now, changefreq: "daily", priority: 0.9 },
     { loc: `${SITE_URL}/create-story`, lastmod: now, changefreq: "weekly", priority: 0.9 },
     {

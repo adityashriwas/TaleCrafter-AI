@@ -1,6 +1,5 @@
 "use client";
 import Image from "next/image";
-import Feedback from "./Feedback";
 import Link from "next/link";
 
 const Footer = () => {
@@ -55,16 +54,24 @@ const Footer = () => {
           >
             Bedtime Generator
           </Link>
-          <a
+          <Link
+            href="/contact"
             className="rounded-lg px-3 py-1 transition duration-300 hover:bg-white/10 hover:text-white"
-            href="mailto:contact@talecrafterai.tech"
           >
             Contact
-          </a>
-        </div>
-
-        <div className="flex-shrink-0">
-          <Feedback />
+          </Link>
+          <Link
+            href="/privacy-policy"
+            className="rounded-lg px-3 py-1 transition duration-300 hover:bg-white/10 hover:text-white"
+          >
+            Privacy Policy
+          </Link>
+          <Link
+            href="/terms-and-conditions"
+            className="rounded-lg px-3 py-1 transition duration-300 hover:bg-white/10 hover:text-white"
+          >
+            Terms & Conditions
+          </Link>
         </div>
       </div>
 

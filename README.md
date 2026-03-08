@@ -106,27 +106,6 @@ Experience TaleCrafter AI in action:
 
 ---
 
-## 🖼️ Cloudinary Image Persistence Setup
-
-Story images are generated from prompts, uploaded server-side to Cloudinary, and only `secure_url` values are stored for rendering.
-
-### 1) Configure Environment Variables
-
-Copy `.env.example` to your local env file and fill these values:
-
-- `CLOUDINARY_CLOUD_NAME`
-- `CLOUDINARY_API_KEY`
-- `CLOUDINARY_API_SECRET`
-- `CLOUDINARY_STORY_FOLDER` (optional, default: `talecrafter/stories`)
-
-### 2) Runtime Behavior
-
-- New story images are persisted through `POST /api/persist-image`.
-- Secrets stay server-side only.
-- If Cloudinary is not configured or upload fails, app keeps legacy URL fallback so stories remain viewable.
-
----
-
 
 ## 🎯 Usage Guide
 
