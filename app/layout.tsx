@@ -59,6 +59,11 @@ export default function RootLayout({
               gtag('js', new Date());
               gtag('config', 'G-K162WHSTLM');`}
           </Script>
+          <script
+            async
+            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7599754297123102"
+            crossOrigin="anonymous"
+          ></script>
         </head>
         <body className={myAppFont.className}>
           <Provider>
