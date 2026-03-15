@@ -38,6 +38,7 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
+      <meta name="google-adsense-account" content="ca-pub-7599754297123102"></meta>
         <head>
           <Script
             src="https://www.googletagmanager.com/gtag/js?id=G-YC3YMYEXB2"
