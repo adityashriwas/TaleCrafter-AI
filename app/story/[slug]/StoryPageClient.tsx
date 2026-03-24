@@ -89,7 +89,7 @@ export default function StoryPageClient({ initialStory, slug }: StoryPageClientP
   const [count, setCount] = useState(0);
   const [copied, setCopied] = useState(false);
   const [downloadingPdf, setDownloadingPdf] = useState(false);
-  const [contentMode, setContentMode] = useState<"flipbook" | "story">("flipbook");
+  const [contentMode, setContentMode] = useState<"flipbook" | "story">("story");
   const [activeNarrationKey, setActiveNarrationKey] = useState<number | null>(null);
   const [relatedStories, setRelatedStories] = useState<any[]>([]);
   const [relatedPage, setRelatedPage] = useState(1);
