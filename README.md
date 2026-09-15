@@ -35,4 +35,6 @@ See [MIGRATION_ROADMAP.md](./MIGRATION_ROADMAP.md).
 
 ## Payments
 
-Payments are temporarily disabled while the backend migration is underway. See [docs/payments-future.md](./docs/payments-future.md) for the old PayPal reference and future payment-provider requirements.
+Credit purchases now use Stripe Checkout through the Express backend. Configure `STRIPE_SECRET_KEY` and `CLIENT_ORIGIN` in `server/.env`, then use the buy credits page to create a protected Checkout session and verify fulfillment before credits are added.
+
+See [docs/payments-future.md](./docs/payments-future.md) for the old PayPal reference and the remaining production payment hardening plan.

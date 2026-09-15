@@ -86,6 +86,30 @@ export const syncUserFromClerk = async userId => {
 };
 
 
+export const incrementUserCredits = async (userId, amount = 1) => {
+  const safeAmount = Number(amount);
+
+  if (!Number.isInteger(safeAmount) || safeAmount <= 0) {
+    throw new ApiError(400, 'Credit amount must be a positive integer');
+  }
+
+  const currentUser = await syncUserFromClerk(userId);
+
+  const updated = await db
+    .update(Users)
+    .set({ credit: sql`${Users.credit} + ${safeAmount}` })
+    .where(eq(Users.userEmail, currentUser.userEmail))
+    .returning({
+      id: Users.id,
+      userEmail: Users.userEmail,
+      userName: Users.userName,
+      userImage: Users.userImage,
+      credit: Users.credit,
+    });
+
+  return updated[0] ?? currentUser;
+};
+
 export const decrementUserCredits = async (userId, amount = 1) => {
   const safeAmount = Number(amount);
 

@@ -1,30 +1,37 @@
-# Future Payments Reference
+# Payments Reference
 
-Payments are intentionally disabled during the backend migration.
+Credit purchases are being migrated from the previous client-side PayPal flow to a backend-owned Stripe Checkout flow.
 
-## Previous Behavior
+## Current Stripe Flow
 
-The old client-side implementation used PayPal buttons in the Next.js app to sell credit packs:
+The Next.js buy credits page lets authenticated users select one of the existing credit packs:
 
 - Basic: 10 credits for 1.99 USD
 - Premium: 75 credits for 3.99 USD
 - Ultimate: 150 credits for 5.99 USD
 
-After PayPal approval, the client directly updated the user's credit balance in the database.
+The client asks the Express backend to create a Stripe Checkout session. After Stripe redirects back to the app, the backend retrieves the session from Stripe, verifies the authenticated Clerk user, amount, currency, session status, and payment status, then adds credits from backend-owned code only.
 
-## Why It Was Removed
+## Required Environment
 
-The previous flow trusted browser-side state for payment completion and credit updates. A production implementation must verify the payment on the backend before credits are granted.
+Server-only:
 
-## Requirements For The Next Payment Provider
+- `STRIPE_SECRET_KEY`
+- `CLIENT_ORIGIN`, for example `http://localhost:3000`
 
-- Create payment/order from the backend.
-- Verify provider callback or capture result on the backend.
-- Confirm amount, currency, product/plan, status, and authenticated Clerk user.
-- Store a payment record with provider transaction ID.
-- Make credit fulfillment idempotent so refreshes/retries cannot duplicate credits.
-- Only update credits from backend-owned code.
+The hosted Checkout implementation does not require a browser-exposed Stripe publishable key.
 
-## Temporary Behavior
+## Previous PayPal Behavior
 
-The buy credits page should remain available, but it should show a "payments coming soon" style message until the new provider is chosen.
+The old implementation used PayPal buttons directly in the Next.js app. After PayPal approval, the browser updated the user's credit balance directly in the database.
+
+That approach was removed because it trusted browser-side state for payment completion and credit updates.
+
+## Remaining Production Hardening
+
+- Add a local payments table with a unique Stripe session/payment intent ID.
+- Fulfill credits idempotently from the payment record, not only Stripe session metadata.
+- Add Stripe webhooks so credits are added even if the user closes the tab after paying.
+- Verify webhook signatures with `STRIPE_WEBHOOK_SECRET`.
+- Store payment amount, currency, provider status, Clerk user ID, user email, plan ID, credits, and fulfillment timestamp.
+- Add an admin/support view for checking payment and fulfillment state.

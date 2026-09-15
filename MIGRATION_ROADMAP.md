@@ -10,7 +10,7 @@ This roadmap keeps the migration progressive so the app stays usable after each 
 - Keep Neon Postgres and Drizzle ORM as the source of truth.
 - Move backend-owned logic out of the client: database access, Gemini, Cloudinary, Pollinations, credits, story mutations, admin mutations, and feedback forwarding.
 - Keep public story reading and SEO-oriented pages available without auth.
-- Remove PayPal for now and leave a documented future payment integration plan.
+- Replace the old client-side PayPal flow with backend-owned Stripe Checkout.
 
 ## Phase 0 - Repository And Planning
 
@@ -19,7 +19,7 @@ Status: complete
 - Move Git tracking from `client/.git` to the project root.
 - Add root `.gitignore` for the monorepo-style structure.
 - Add a root README that documents the frontend/backend split.
-- Document the old PayPal behavior for future payment-provider migration.
+- Document the old PayPal behavior and the new Stripe payment direction.
 - Keep client and server independently runnable during migration.
 
 ## Phase 1 - Backend Foundation
@@ -47,7 +47,7 @@ Status: in progress
 - Move user creation/sync from `client/app/Provider.tsx` to backend.
 - Add `GET /api/v1/users/me`.
 - Add secure credit reads and backend-only credit decrement.
-- Keep purchase flow disabled until a new payment provider is selected.
+- Restore purchase flow through backend-owned Stripe Checkout.
 - Keep admin credit updates using `ADMIN_EMAIL` for now.
 
 Completed so far:
@@ -57,6 +57,7 @@ Completed so far:
 - Added a frontend API client that sends Clerk bearer tokens.
 - Added backend-only credit decrement with authenticated Clerk identity.
 - Replaced the create-story client-side credit update with the backend credit endpoint.
+- Added Stripe Checkout session creation and backend-verified credit fulfillment.
 
 ## Phase 3 - AI And Image Services
 
@@ -136,8 +137,8 @@ Remaining:
 Completed so far:
 
 - Removed the PayPal client dependency.
-- Replaced the buy credits page with a payments-coming-soon placeholder.
 - Removed the PayPal provider wrapper from the client provider.
+- Restored the buy credits UI with Stripe Checkout instead of PayPal.
 
 ## Phase 8 - Verification
 
@@ -147,11 +148,12 @@ Status: planned
 - Run backend lint/start smoke checks.
 - Manually verify public story read, explore, sign-in, dashboard, story creation, image upload analysis, interactive branching, admin, and feedback.
 
-## Future Payment Provider Plan
+## Stripe Payment Hardening Plan
 
-Status: deferred
+Status: in progress
 
-- Choose a new payment provider.
-- Implement server-side payment verification before updating credits.
-- Store payment records and provider transaction IDs.
-- Make credit addition idempotent.
+- Stripe Checkout session creation and backend verification are wired.
+- Add a dedicated payment table with a unique Stripe session/payment intent ID.
+- Add Stripe webhooks with signature verification for fulfillment independent of browser redirects.
+- Store provider transaction state and fulfillment timestamps for support/admin review.
+- Make credit addition idempotent through the local payment table.
