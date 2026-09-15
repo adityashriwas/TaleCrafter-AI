@@ -2,14 +2,12 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Provider from "./Provider";
 import Header from "./(components)/Header";
-import { Nunito } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import Footer from "./(components)/Footer";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { defaultMetadata } from "@/lib/seo";
 import Script from "next/script";
 
-const myAppFont = Nunito({ subsets: ["latin"] });
 export const metadata: Metadata = {
   ...defaultMetadata,
   applicationName: "TaleCrafter AI",
@@ -36,7 +34,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <ClerkProvider dynamic>
       <html lang="en">
         <head>
           <meta
@@ -69,7 +67,7 @@ export default function RootLayout({
             crossOrigin="anonymous"
           ></script>
         </head>
-        <body className={myAppFont.className}>
+        <body>
           <Provider>
             <Header />
             {children}
