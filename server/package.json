@@ -1,0 +1,36 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Express API for TaleCrafter AI",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "nodemon src/index.js",
+    "start": "node src/index.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write",
+    "format:check": "prettier --check ."
+  },
+  "author": "Aditya Shriwas",
+  "license": "ISC",
+  "dependencies": {
+    "@clerk/express": "^2.1.67",
+    "@google/generative-ai": "^0.24.1",
+    "@neondatabase/serverless": "^1.1.0",
+    "cloudinary": "^2.11.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "drizzle-orm": "^0.45.2",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "nodemon": "^3.1.11",
+    "prettier": "^3.7.4"
+  }
+}
