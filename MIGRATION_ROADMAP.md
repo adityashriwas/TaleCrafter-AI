@@ -98,12 +98,19 @@ Completed so far:
 
 ## Phase 5 - Interactive Story APIs
 
-Status: planned
+Status: in progress
 
 - Move interactive story loading, branching, continuation generation, and finalization to backend.
 - Protect mutation endpoints with Clerk auth.
 - Preserve public reading once a story is completed.
 - Keep branching state changes backend-owned.
+
+Completed so far:
+
+- Added protected interactive story state loading through `GET /api/v1/interactive-stories/:storyId`.
+- Moved branch continuation generation, node locking, next-node persistence, and generated page images to protected backend `POST /api/v1/interactive-stories/:storyId/choices`.
+- Moved final resolution generation, completion state updates, compiled pages, and classic-story export to protected backend `POST /api/v1/interactive-stories/:storyId/complete`.
+- Removed direct database, Gemini, Cloudinary, Pollinations, and slug logic from the interactive story client page.
 
 ## Phase 6 - Admin APIs
 

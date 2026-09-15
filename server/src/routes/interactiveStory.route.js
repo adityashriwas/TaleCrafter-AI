@@ -1,9 +1,19 @@
 import { Router } from 'express';
-import { createInteractiveStory } from '../controllers/interactiveStory.controller.js';
+import {
+  chooseInteractiveStoryPath,
+  completeInteractiveStoryPath,
+  createInteractiveStory,
+  getInteractiveStory,
+} from '../controllers/interactiveStory.controller.js';
 import { requireAuth } from '../middlewares/clerkAuth.middleware.js';
 
 const router = Router();
 
-router.post('/', requireAuth, createInteractiveStory);
+router.use(requireAuth);
+
+router.post('/', createInteractiveStory);
+router.get('/:storyId', getInteractiveStory);
+router.post('/:storyId/choices', chooseInteractiveStoryPath);
+router.post('/:storyId/complete', completeInteractiveStoryPath);
 
 export default router;

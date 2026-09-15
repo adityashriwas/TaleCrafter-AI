@@ -4,24 +4,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import HTMLFlipBook from "react-pageflip";
 import { IoIosArrowDropleftCircle, IoIosArrowDroprightCircle } from "react-icons/io";
 import { toast } from "react-toastify";
-import { asc, eq } from "drizzle-orm";
-import uuid4 from "uuid4";
-import { dbV2 } from "@/config/configV2";
-import { InteractiveStories, InteractiveStoryNodes } from "@/config/schemaV2";
-import {
-  buildContinuationPrompt,
-  makePageContext,
-  parseContinuationPayload,
-  parsePages,
-  type InteractivePage,
-} from "@/config/plottwist";
-import {
-  createPollinationsImageUrl,
-  persistImageUrl,
-} from "@/lib/story-images";
-import { db } from "@/config/config";
-import { StoryData } from "@/config/schema";
-import { ensureStorySlug, generateUniqueStorySlug } from "@/lib/story-slug";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import CustomLoader from "@/app/create-story/(component)/CustomLoader";
@@ -29,6 +11,20 @@ import BookCoverPage from "@/app/view-story/_components/BookCoverPage";
 import { apiFetch } from "@/lib/api-client";
 
 const MAX_DEPTH = 7;
+
+type InteractivePage = {
+  pageNumber: number;
+  title: string;
+  text: string;
+  imagePrompt: string;
+  imageUrl?: string;
+};
+
+type InteractiveStoryState = {
+  story: StoryRow;
+  nodes: StoryNode[];
+  completedSlug?: string;
+};
 
 type StoryRow = {
   storyId: string;
@@ -99,62 +95,25 @@ const InteractiveStoryPage = () => {
   const [generatingNext, setGeneratingNext] = useState(false);
   const [loaderMessage, setLoaderMessage] = useState("Story is generating...");
 
-  const callGemini = async (prompt: string) => {
-    const token = await getToken();
-    const data = await apiFetch<{ text: string }>("/ai/gemini", {
-      method: "POST",
-      token,
-      body: JSON.stringify({ prompt }),
-    });
-
-    return String(data?.text ?? "");
-  };
-
-  const persistWithFallback = async (imageUrl: string, token?: string | null) => {
-    try {
-      return await persistImageUrl(imageUrl, token);
-    } catch {
-      return imageUrl;
-    }
+  const applyInteractiveState = (state: InteractiveStoryState) => {
+    setStory(state.story);
+    setNodes(state.nodes ?? []);
   };
 
   const loadStory = async () => {
+    if (!id) return;
+
     setLoading(true);
     try {
-      const storyResp: any = await dbV2
-        .select()
-        .from(InteractiveStories)
-        .where(eq(InteractiveStories.storyId, id));
+      const token = await getToken();
+      const state = await apiFetch<InteractiveStoryState>(`/interactive-stories/${id}`, {
+        token,
+      });
 
-      const nodeResp: any = await dbV2
-        .select()
-        .from(InteractiveStoryNodes)
-        .where(eq(InteractiveStoryNodes.storyId, id))
-        .orderBy(asc(InteractiveStoryNodes.id));
-
-      const foundStory = storyResp?.[0] ?? null;
-      if (!foundStory) {
-        toast.error("Interactive story not found");
-        router.push("/dashboard");
-        return;
-      }
-
-      const parsedNodes: StoryNode[] = (nodeResp ?? []).map((item: any) => ({
-        nodeId: String(item.nodeId),
-        storyId: String(item.storyId),
-        parentNodeId: item.parentNodeId ? String(item.parentNodeId) : null,
-        depth: Number(item.depth ?? 0),
-        choiceTaken: item.choiceTaken ? String(item.choiceTaken) : null,
-        choices: Array.isArray(item.choices) ? item.choices : null,
-        selectedChoice: item.selectedChoice ? String(item.selectedChoice) : null,
-        pages: Array.isArray(item.pages) ? item.pages : [],
-        isActive: Boolean(item.isActive),
-      }));
-
-      setStory(foundStory);
-      setNodes(parsedNodes);
+      applyInteractiveState(state);
     } catch {
       toast.error("Unable to load interactive story");
+      router.push("/dashboard");
     } finally {
       setLoading(false);
     }
@@ -245,160 +204,28 @@ const InteractiveStoryPage = () => {
     return () => clearTimeout(timer);
   }, [atEnd, story?.status]);
 
-  const saveCompletedToClassicStory = async (pages: InteractivePage[], finalTitle: string) => {
-    const existing: any = await db
-      .select()
-      .from(StoryData)
-      .where(eq(StoryData.storyId, id));
-
-    const classicOutput = {
-      title: finalTitle,
-      chapters: pages.map((page, index) => ({
-        chapterNumber: index + 1,
-        title: page.title,
-        textPrompt: page.text,
-        imagePrompt: page.imagePrompt,
-        imageUrl: page.imageUrl,
-      })),
-    };
-
-    if (!existing?.[0]) {
-      const slug = await generateUniqueStorySlug(finalTitle || story?.title || "Interactive Story");
-      await db.insert(StoryData).values({
-        storyId: id,
-        slug,
-        storySubject: story?.storySubject,
-        storyType: story?.storyType,
-        ageGroup: story?.ageGroup,
-        imageStyle: story?.imageStyle,
-        coverImage: pages[0]?.imageUrl ?? story?.coverImage,
-        output: classicOutput,
-        userEmail: story?.userEmail,
-        userName: story?.userName,
-        userImage: story?.userImage,
-      });
-      return slug;
-    } else {
-      await db
-        .update(StoryData)
-        .set({
-          output: classicOutput,
-          coverImage: pages[0]?.imageUrl ?? story?.coverImage,
-        })
-        .where(eq(StoryData.storyId, id));
-      return ensureStorySlug(existing[0]);
-    }
-  };
-
   const completeStoryWithResolution = async (selectedChoice: string) => {
-    if (!story || !activeNode) return;
+    if (!story || !activeNode || generatingNext) return;
 
     try {
       setLoaderMessage("Compiling all choices and making final book...");
       setGeneratingNext(true);
-
-      await dbV2
-        .update(InteractiveStoryNodes)
-        .set({
-          isActive: false,
-          selectedChoice,
-        })
-        .where(eq(InteractiveStoryNodes.nodeId, activeNode.nodeId));
-
-      const context = makePageContext(linearPages, 6);
-      const finalPrompt = buildContinuationPrompt({
-        title: story.title,
-        selectedChoice,
-        context,
-        minPages: 3,
-        maxPages: 5,
-        finalResolution: true,
-      });
-      const finalText = await callGemini(finalPrompt);
-      const parsedPages = parsePages(finalText);
-      const resolutionPages = parsedPages.slice(0, 5);
-
-      if (resolutionPages.length < 3) {
-        throw new Error("Final resolution must have at least 3 pages");
-      }
-
-      const finalNodeId = uuid4();
-      const depth = Math.min(MAX_DEPTH, Number(activeNode.depth ?? 0) + 1);
-      const now = new Date();
-
-      const imageToken = await getToken();
-      const mappedPages = await Promise.all(
-        resolutionPages.map(async (page, index) => ({
-          ...page,
-          pageNumber: totalPages + index + 1,
-          imageUrl: await createPollinationsImageUrl(page.imagePrompt || page.text, {
-            seed: `${Date.now()}_final_${index}_${Math.floor(Math.random() * 100000)}`,
-          }, imageToken),
-        }))
-      );
-      const persistedResolution = await Promise.all(
-        mappedPages.map(async (page) => ({
-          ...page,
-          imageUrl: await persistWithFallback(page.imageUrl || "", imageToken),
-        }))
+      const token = await getToken();
+      const state = await apiFetch<InteractiveStoryState>(
+        `/interactive-stories/${story.storyId}/complete`,
+        {
+          method: "POST",
+          token,
+          body: JSON.stringify({ choice: selectedChoice }),
+        }
       );
 
-      await dbV2.insert(InteractiveStoryNodes).values({
-        nodeId: finalNodeId,
-        storyId: story.storyId,
-        parentNodeId: activeNode.nodeId,
-        depth,
-        choiceTaken: selectedChoice,
-        choices: null,
-        selectedChoice: null,
-        pages: persistedResolution,
-        isActive: false,
-        createdAt: now,
-      });
-
-      const refreshedNodesResp: any = await dbV2
-        .select()
-        .from(InteractiveStoryNodes)
-        .where(eq(InteractiveStoryNodes.storyId, story.storyId))
-        .orderBy(asc(InteractiveStoryNodes.id));
-
-      const refreshedNodes: StoryNode[] = (refreshedNodesResp ?? []).map((item: any) => ({
-        nodeId: String(item.nodeId),
-        storyId: String(item.storyId),
-        parentNodeId: item.parentNodeId ? String(item.parentNodeId) : null,
-        depth: Number(item.depth ?? 0),
-        choiceTaken: item.choiceTaken ? String(item.choiceTaken) : null,
-        choices: Array.isArray(item.choices) ? item.choices : null,
-        selectedChoice: item.selectedChoice ? String(item.selectedChoice) : null,
-        pages: Array.isArray(item.pages) ? item.pages : [],
-        isActive: Boolean(item.isActive),
-      }));
-
-      const finalMap = new Map<string, StoryNode>();
-      refreshedNodes.forEach((node) => finalMap.set(node.nodeId, node));
-      const chain: StoryNode[] = [];
-      let cursor: StoryNode | undefined = finalMap.get(finalNodeId);
-      while (cursor) {
-        chain.push(cursor);
-        if (!cursor.parentNodeId) break;
-        cursor = finalMap.get(cursor.parentNodeId);
+      if (state.completedSlug) {
+        router.push(`/story/${state.completedSlug}`);
+        return;
       }
 
-      const compiledPages = chain.reverse().flatMap((node) => node.pages ?? []);
-
-      await dbV2
-        .update(InteractiveStories)
-        .set({
-          status: "completed",
-          currentNodeId: finalNodeId,
-          totalPages: compiledPages.length,
-          compiledPages,
-          updatedAt: new Date(),
-        })
-        .where(eq(InteractiveStories.storyId, story.storyId));
-
-      const finalSlug = await saveCompletedToClassicStory(compiledPages, story.title);
-      router.push(`/story/${finalSlug}`);
+      applyInteractiveState(state);
     } catch {
       toast.error("Unable to finalize story right now");
     } finally {
@@ -422,79 +249,22 @@ const InteractiveStoryPage = () => {
     try {
       setLoaderMessage("Expanding your chosen path...");
       setGeneratingNext(true);
+      const token = await getToken();
+      const state = await apiFetch<InteractiveStoryState>(
+        `/interactive-stories/${story.storyId}/choices`,
+        {
+          method: "POST",
+          token,
+          body: JSON.stringify({ choice }),
+        }
+      );
 
-      await dbV2
-        .update(InteractiveStoryNodes)
-        .set({
-          isActive: false,
-          selectedChoice: choice,
-        })
-        .where(eq(InteractiveStoryNodes.nodeId, activeNode.nodeId));
-
-      const context = makePageContext(linearPages, 6);
-      const continuationPrompt = buildContinuationPrompt({
-        title: story.title,
-        selectedChoice: choice,
-        context,
-        minPages: 3,
-        maxPages: 6,
-      });
-
-      const continuationText = await callGemini(continuationPrompt);
-      const payload = parseContinuationPayload(continuationText);
-      const pages = payload.pages.slice(0, 6);
-      const nextChoices = payload.choices.slice(0, 2);
-
-      if (pages.length < 3) {
-        throw new Error("Each continuation must have minimum 3 pages");
+      if (state.completedSlug) {
+        router.push(`/story/${state.completedSlug}`);
+        return;
       }
 
-      const nextNodeId = uuid4();
-      const now = new Date();
-      const nextDepth = Number(activeNode.depth ?? 0) + 1;
-      const imageToken = await getToken();
-      const mappedPages = await Promise.all(
-        pages.map(async (page, index) => ({
-          ...page,
-          pageNumber: totalPages + index + 1,
-          imageUrl: await createPollinationsImageUrl(page.imagePrompt || page.text, {
-            seed: `${Date.now()}_${index}_${Math.floor(Math.random() * 100000)}`,
-          }, imageToken),
-        }))
-      );
-      const persistedMappedPages = await Promise.all(
-        mappedPages.map(async (page) => ({
-          ...page,
-          imageUrl: await persistWithFallback(page.imageUrl || "", imageToken),
-        }))
-      );
-
-      await dbV2.insert(InteractiveStoryNodes).values({
-        nodeId: nextNodeId,
-        storyId: story.storyId,
-        parentNodeId: activeNode.nodeId,
-        depth: nextDepth,
-        choiceTaken: choice,
-        choices:
-          nextChoices.length >= 2
-            ? nextChoices
-            : ["Take the hopeful next step", "Risk a bold unknown path"],
-        selectedChoice: null,
-        pages: persistedMappedPages,
-        isActive: true,
-        createdAt: now,
-      });
-
-      await dbV2
-        .update(InteractiveStories)
-        .set({
-          currentNodeId: nextNodeId,
-          totalPages: totalPages + persistedMappedPages.length,
-          updatedAt: new Date(),
-        })
-        .where(eq(InteractiveStories.storyId, story.storyId));
-
-      await loadStory();
+      applyInteractiveState(state);
       setFlipPage(0);
       setMaxFlipPage(Math.max(0, totalPages));
       setIsLandscapeSpread(false);
