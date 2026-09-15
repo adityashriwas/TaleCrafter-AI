@@ -3,10 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { toast } from "react-toastify";
-import { useUser } from "@clerk/nextjs";
-import { desc, eq } from "drizzle-orm";
-import { dbV2 } from "@/config/configV2";
-import { InteractiveStories, InteractiveStoryNodes } from "@/config/schemaV2";
+import { useAuth } from "@clerk/nextjs";
+import { apiFetch } from "@/lib/api-client";
 
 type InteractiveStory = {
   storyId: string;
@@ -41,21 +39,19 @@ const SafeCover = ({ src, alt }: { src?: string; alt: string }) => {
 };
 
 const InteractiveStorySections = () => {
-  const { user } = useUser();
+  const { getToken, isLoaded, userId } = useAuth();
   const [stories, setStories] = useState<InteractiveStory[]>([]);
   const [loading, setLoading] = useState(false);
 
   const loadStories = async () => {
-    const email = user?.primaryEmailAddress?.emailAddress;
-    if (!email) return;
+    if (!isLoaded || !userId) return;
 
     setLoading(true);
     try {
-      const result: any = await dbV2
-        .select()
-        .from(InteractiveStories)
-        .where(eq(InteractiveStories.userEmail, email))
-        .orderBy(desc(InteractiveStories.id));
+      const token = await getToken();
+      const result = await apiFetch<InteractiveStory[]>("/interactive-stories/me", {
+        token,
+      });
 
       setStories(result ?? []);
     } catch {
@@ -67,7 +63,7 @@ const InteractiveStorySections = () => {
 
   useEffect(() => {
     loadStories();
-  }, [user?.id]);
+  }, [isLoaded, userId]);
 
   const draftStories = useMemo(
     () => stories.filter((story) => story.status === "draft"),
@@ -76,8 +72,11 @@ const InteractiveStorySections = () => {
 
   const onDeleteStory = async (storyId: string) => {
     try {
-      await dbV2.delete(InteractiveStoryNodes).where(eq(InteractiveStoryNodes.storyId, storyId));
-      await dbV2.delete(InteractiveStories).where(eq(InteractiveStories.storyId, storyId));
+      const token = await getToken();
+      await apiFetch<{ storyId: string }>(`/interactive-stories/${storyId}`, {
+        method: "DELETE",
+        token,
+      });
       setStories((prev) => prev.filter((story) => story.storyId !== storyId));
       toast.success("Interactive story deleted");
     } catch {

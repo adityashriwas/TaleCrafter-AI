@@ -111,6 +111,7 @@ Completed so far:
 - Moved branch continuation generation, node locking, next-node persistence, and generated page images to protected backend `POST /api/v1/interactive-stories/:storyId/choices`.
 - Moved final resolution generation, completion state updates, compiled pages, and classic-story export to protected backend `POST /api/v1/interactive-stories/:storyId/complete`.
 - Removed direct database, Gemini, Cloudinary, Pollinations, and slug logic from the interactive story client page.
+- Moved dashboard interactive-story listing and deletion to protected backend APIs.
 
 ## Phase 6 - Admin APIs
 
@@ -130,6 +131,7 @@ Remaining:
 - Remove Next API routes that are replaced by Express, except SEO/sitemap routes that remain useful in Next.
 - Remove backend-only libraries from the client package after their backend replacements are wired.
 - Add a typed frontend API client that attaches Clerk tokens.
+- Split root env values into local `server/.env` and browser-safe `client/.env.local`.
 
 Completed so far:
 

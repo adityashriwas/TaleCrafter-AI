@@ -4,7 +4,9 @@ import {
   completeInteractiveStory,
   continueInteractiveStory,
   createInteractiveStarter,
+  deleteCurrentUserInteractiveStory,
   getCurrentUserInteractiveStory,
+  listCurrentUserInteractiveStories,
 } from '../services/interactiveStory.service.js';
 
 export const createInteractiveStory = asyncHandler(async (req, res) => {
@@ -14,6 +16,12 @@ export const createInteractiveStory = asyncHandler(async (req, res) => {
   });
 
   return res.status(201).json(new ApiResponse(201, story, 'Interactive story created'));
+});
+
+export const getCurrentUserInteractiveStories = asyncHandler(async (req, res) => {
+  const stories = await listCurrentUserInteractiveStories({ userId: req.auth.userId });
+
+  return res.status(200).json(new ApiResponse(200, stories, 'Interactive stories fetched'));
 });
 
 export const getInteractiveStory = asyncHandler(async (req, res) => {
@@ -43,4 +51,13 @@ export const completeInteractiveStoryPath = asyncHandler(async (req, res) => {
   });
 
   return res.status(200).json(new ApiResponse(200, story, 'Interactive story completed'));
+});
+
+export const deleteInteractiveStory = asyncHandler(async (req, res) => {
+  const story = await deleteCurrentUserInteractiveStory({
+    userId: req.auth.userId,
+    storyId: req.params.storyId,
+  });
+
+  return res.status(200).json(new ApiResponse(200, story, 'Interactive story deleted'));
 });

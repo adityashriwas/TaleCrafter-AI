@@ -272,9 +272,34 @@ export const createInteractiveStarter = async ({ userId, payload }) => {
   return { storyId };
 };
 
+export const listCurrentUserInteractiveStories = async ({ userId }) => {
+  const user = await syncUserFromClerk(userId);
+
+  return dbV2
+    .select()
+    .from(InteractiveStories)
+    .where(eq(InteractiveStories.userEmail, user.userEmail))
+    .orderBy(asc(InteractiveStories.id));
+};
+
 export const getCurrentUserInteractiveStory = async ({ userId, storyId }) => {
   const { story } = await ensureOwnedStory({ userId, storyId });
   return getInteractiveState(story);
+};
+
+export const deleteCurrentUserInteractiveStory = async ({ userId, storyId }) => {
+  const { story } = await ensureOwnedStory({ userId, storyId });
+
+  await dbV2
+    .delete(InteractiveStoryNodes)
+    .where(eq(InteractiveStoryNodes.storyId, story.storyId));
+
+  const deleted = await dbV2
+    .delete(InteractiveStories)
+    .where(eq(InteractiveStories.storyId, story.storyId))
+    .returning({ storyId: InteractiveStories.storyId });
+
+  return deleted[0] ?? { storyId: story.storyId };
 };
 
 export const completeInteractiveStory = async ({ userId, storyId, selectedChoice = 'End Story' }) => {
