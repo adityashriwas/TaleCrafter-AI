@@ -110,6 +110,11 @@ const InteractiveStoryPage = () => {
         token,
       });
 
+      if (state.completedSlug) {
+        router.replace(`/story/${state.completedSlug}`);
+        return;
+      }
+
       applyInteractiveState(state);
     } catch {
       toast.error("Unable to load interactive story");
@@ -221,7 +226,7 @@ const InteractiveStoryPage = () => {
       );
 
       if (state.completedSlug) {
-        router.push(`/story/${state.completedSlug}`);
+        router.replace(`/story/${state.completedSlug}`);
         return;
       }
 
@@ -260,7 +265,7 @@ const InteractiveStoryPage = () => {
       );
 
       if (state.completedSlug) {
-        router.push(`/story/${state.completedSlug}`);
+        router.replace(`/story/${state.completedSlug}`);
         return;
       }
 

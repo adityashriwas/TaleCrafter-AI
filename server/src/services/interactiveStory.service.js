@@ -118,9 +118,28 @@ const mapGeneratedPages = async ({ pages, pageOffset, seedPrefix }) => {
   return mappedPages;
 };
 
+const getCompletedStorySlug = async storyId => {
+  const existing = await db
+    .select({ slug: StoryData.slug })
+    .from(StoryData)
+    .where(eq(StoryData.storyId, storyId))
+    .limit(1);
+
+  return String(existing[0]?.slug ?? '').trim() || null;
+};
+
 const getInteractiveState = async story => {
   const nodes = await listStoryNodes(story.storyId);
-  return { story, nodes };
+  const completedSlug =
+    story.status === 'completed'
+      ? await getCompletedStorySlug(story.storyId)
+      : null;
+
+  return {
+    story,
+    nodes,
+    ...(completedSlug ? { completedSlug } : {}),
+  };
 };
 
 const saveCompletedToClassicStory = async ({ story, pages, finalTitle }) => {
@@ -305,13 +324,8 @@ export const deleteCurrentUserInteractiveStory = async ({ userId, storyId }) => 
 export const completeInteractiveStory = async ({ userId, storyId, selectedChoice = 'End Story' }) => {
   const { story } = await ensureOwnedStory({ userId, storyId });
   if (story.status === 'completed') {
-    const existing = await db
-      .select({ slug: StoryData.slug })
-      .from(StoryData)
-      .where(eq(StoryData.storyId, story.storyId))
-      .limit(1);
-    const slug = String(existing[0]?.slug ?? story.slug ?? '').trim();
-    return { completedSlug: slug || story.storyId, ...(await getInteractiveState(story)) };
+    const completedSlug = await getCompletedStorySlug(story.storyId);
+    return { completedSlug: completedSlug || story.storyId, ...(await getInteractiveState(story)) };
   }
 
   const nodes = await listStoryNodes(story.storyId);

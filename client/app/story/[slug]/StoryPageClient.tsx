@@ -87,7 +87,7 @@ export default function StoryPageClient({ initialStory, slug }: StoryPageClientP
   const [count, setCount] = useState(0);
   const [copied, setCopied] = useState(false);
   const [downloadingPdf, setDownloadingPdf] = useState(false);
-  const [contentMode, setContentMode] = useState<"flipbook" | "story">("story");
+  const [contentMode, setContentMode] = useState<"flipbook" | "story">("flipbook");
   const [activeNarrationKey, setActiveNarrationKey] = useState<number | null>(null);
   const [relatedStories, setRelatedStories] = useState<any[]>([]);
   const [relatedPage, setRelatedPage] = useState(1);
@@ -444,16 +444,14 @@ export default function StoryPageClient({ initialStory, slug }: StoryPageClientP
                   Switch between flipbook and full story layout.
                 </p>
               </div>
-              <div className="flex items-center gap-2">
-                {contentMode === "story" && (
-                  <button
-                    onClick={onDownloadPdf}
-                    disabled={downloadingPdf || !story}
-                    className="tc-btn-ghost px-5 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    {downloadingPdf ? "Generating PDF..." : "Download PDF"}
-                  </button>
-                )}
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  onClick={onDownloadPdf}
+                  disabled={downloadingPdf || !story}
+                  className="tc-btn-ghost px-5 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {downloadingPdf ? "Generating PDF..." : "Download PDF"}
+                </button>
                 <div className="tc-toggle-wrap">
                   <button
                     onClick={() => {
