@@ -114,19 +114,13 @@ const CreateStory = () => {
     prompt: string,
     mode: "text" | "story-generation" = "text"
   ) => {
-    const response = await fetch("/api/gemini", {
+    const token = await getToken();
+    const data = await apiFetch<{ text: string }>("/ai/gemini", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      token,
       body: JSON.stringify({ prompt, mode }),
     });
 
-    if (!response.ok) {
-      throw new Error("Failed to generate content");
-    }
-
-    const data = await response.json();
     return String(data?.text ?? "");
   };
 

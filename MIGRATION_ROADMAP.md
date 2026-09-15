@@ -60,12 +60,18 @@ Completed so far:
 
 ## Phase 3 - AI And Image Services
 
-Status: planned
+Status: in progress
 
 - Move Gemini story generation and image analysis to backend.
 - Move Pollinations URL generation to backend and use backend-only env vars.
 - Move Cloudinary image persistence to backend.
 - Remove public AI/image API keys from the frontend.
+
+Completed so far:
+
+- Added Clerk-protected `POST /api/v1/ai/gemini` on the backend.
+- Moved Gemini text, story-generation, and image-analysis calls behind the backend.
+- Updated current Gemini callers to send Clerk bearer tokens through the frontend API client.
 
 ## Phase 4 - Story APIs
 

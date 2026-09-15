@@ -23,8 +23,10 @@ import { db } from "@/config/config";
 import { StoryData } from "@/config/schema";
 import { ensureStorySlug, generateUniqueStorySlug } from "@/lib/story-slug";
 import { useParams, useRouter } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 import CustomLoader from "@/app/create-story/(component)/CustomLoader";
 import BookCoverPage from "@/app/view-story/_components/BookCoverPage";
+import { apiFetch } from "@/lib/api-client";
 
 const MAX_DEPTH = 7;
 
@@ -83,6 +85,7 @@ const InteractiveStoryPage = () => {
   const params = useParams<{ id: string }>();
   const id = params?.id;
   const router = useRouter();
+  const { getToken } = useAuth();
   const bookRef = useRef<typeof HTMLFlipBook | null>(null);
   const bookSectionRef = useRef<HTMLDivElement | null>(null);
   const treeSectionRef = useRef<HTMLDivElement | null>(null);
@@ -97,19 +100,13 @@ const InteractiveStoryPage = () => {
   const [loaderMessage, setLoaderMessage] = useState("Story is generating...");
 
   const callGemini = async (prompt: string) => {
-    const response = await fetch("/api/gemini", {
+    const token = await getToken();
+    const data = await apiFetch<{ text: string }>("/ai/gemini", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      token,
       body: JSON.stringify({ prompt }),
     });
 
-    if (!response.ok) {
-      throw new Error("Failed to generate continuation");
-    }
-
-    const data = await response.json();
     return String(data?.text ?? "");
   };
 

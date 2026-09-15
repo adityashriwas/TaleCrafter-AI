@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { useAuth } from "@clerk/nextjs";
+import { apiFetch } from "@/lib/api-client";
 
 export default function UploadImage({
   setImageSubject,
@@ -11,6 +13,7 @@ export default function UploadImage({
   const [image, setImage] = useState<File | null>(null);
   const [result, setResult] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const { getToken } = useAuth();
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -25,11 +28,10 @@ export default function UploadImage({
 
     try {
       const imageBase64 = await fileToBase64(image);
-      const response = await fetch("/api/gemini", {
+      const token = await getToken();
+      const data = await apiFetch<{ text: string }>("/ai/gemini", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        token,
         body: JSON.stringify({
           mode: "image-analysis",
           prompt:
@@ -38,12 +40,6 @@ export default function UploadImage({
           mimeType: image.type || "image/jpeg",
         }),
       });
-
-      if (!response.ok) {
-        throw new Error("Unable to analyze image");
-      }
-
-      const data = await response.json();
 
       const text = String(data?.text ?? "")
         .trim()
