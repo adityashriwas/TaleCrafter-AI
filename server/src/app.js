@@ -9,6 +9,7 @@ import userRouter from './routes/user.route.js';
 import aiRouter from './routes/ai.route.js';
 import imageRouter from './routes/image.route.js';
 import storyRouter from './routes/story.route.js';
+import interactiveStoryRouter from './routes/interactiveStory.route.js';
 
 const app = express();
 
@@ -35,6 +36,7 @@ app.use(`${API_PREFIX}/users`, userRouter);
 app.use(`${API_PREFIX}/ai`, aiRouter);
 app.use(`${API_PREFIX}/images`, imageRouter);
 app.use(`${API_PREFIX}/stories`, storyRouter);
+app.use(`${API_PREFIX}/interactive-stories`, interactiveStoryRouter);
 
 app.use((req, _res, next) => {
   next(new ApiError(404, `Route not found: ${req.method} ${req.originalUrl}`));

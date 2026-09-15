@@ -13,17 +13,12 @@ import { useRouter } from "next/navigation";
 import { UserDetailContext } from "@/app/_context/UserDetailContext";
 import UploadImage from "./(component)/UploadImage";
 import { motion } from "framer-motion";
-import { dbV2 } from "@/config/configV2";
-import { InteractiveStories, InteractiveStoryNodes } from "@/config/schemaV2";
-import { buildChoicePrompt, makePageContext, parseChoices } from "@/config/plottwist";
 import { createPollinationsImageUrl, persistImageUrl } from "@/lib/story-images";
-import { generateUniqueStorySlug } from "@/lib/story-slug";
 import { apiFetch } from "@/lib/api-client";
 import type { UserDetail } from "@/app/_context/UserDetailContext";
 const MotionDiv: any = motion.div;
 
 const CREATE_STORY_PROMPT = process.env.NEXT_PUBLIC_CREATE_STORY_PROMPT;
-const MIN_STARTER_PAGES = 5;
 
 const cleanJsonText = (raw: string) =>
   raw
@@ -281,86 +276,22 @@ const CreateStory = () => {
   };
 
   const SaveInteractiveStarterInDB = async (story: any) => {
-    const storyId = uuid4();
-    const rootNodeId = uuid4();
-    const interactiveTitle = String(story?.title ?? "Interactive Story");
-    const slug = await generateUniqueStorySlug(interactiveTitle);
-    const chapters = Array.isArray(story?.chapters) ? story.chapters : [];
-
-    const imageToken = await getToken();
-    const starterPages = await Promise.all(chapters.map(async (chapter: any, index: number) => {
-      const prompt = String(chapter?.imagePrompt ?? chapter?.textPrompt ?? "Story illustration");
-      const seed = `${Date.now()}_${index}_${Math.floor(Math.random() * 100000)}`;
-      const pollinationsUrl = await createPollinationsImageUrl(prompt, { seed }, imageToken);
-      return {
-        pageNumber: index + 1,
-        title: String(chapter?.title ?? `Chapter ${index + 1}`),
-        text: String(chapter?.textPrompt ?? ""),
-        imagePrompt: prompt,
-        imageUrl: await persistWithFallback(pollinationsUrl, imageToken),
-      };
-    }));
-
-    if (starterPages.length < MIN_STARTER_PAGES) {
-      throw new Error("Starter story must have at least 5 pages");
-    }
-
-    const coverPromptSource = String(
-      story?.coverImagePrompt ||
-        `${story?.title ?? "Interactive story"} cinematic book cover, ${formData?.imageStyle ?? "illustration"}`
-    );
-    const defaultStyleCoverPrompt = `Add-title-"${String(story?.title ?? "Interactive Story").replace(
-      /\s+/g,
-      "-"
-    )}"-in-bold-text-for-book-cover-image,-${coverPromptSource.replace(/\s+/g, "-")}`;
-    const coverSeed = `${Date.now()}${Math.floor(Math.random() * 100000)}`;
-    const coverImageUrl = await createPollinationsImageUrl(defaultStyleCoverPrompt, {
-      width: 410,
-      height: 630,
-      seed: coverSeed,
-    }, imageToken);
-    const persistedCoverImageUrl = await persistWithFallback(coverImageUrl, imageToken);
-
-    const starterContext = makePageContext(starterPages as any, 4);
-    const starterChoiceText = await callGemini(buildChoicePrompt(starterContext));
-    const starterChoices = parseChoices(starterChoiceText);
-
-    const now = new Date();
-
-    await dbV2.insert(InteractiveStories).values({
-      storyId,
-      slug,
-      userEmail: user?.primaryEmailAddress?.emailAddress,
-      userName: user?.fullName,
-      userImage: user?.imageUrl,
-      title: interactiveTitle,
-      storySubject: formData?.storySubject,
-      storyType: formData?.storyType,
-      ageGroup: formData?.ageCategory,
-      imageStyle: formData?.imageStyle,
-      status: "draft",
-      rootNodeId,
-      currentNodeId: rootNodeId,
-      totalPages: starterPages.length,
-      coverImage: persistedCoverImageUrl,
-      createdAt: now,
-      updatedAt: now,
+    const token = await getToken();
+    const result = await apiFetch<{ storyId: string }>("/interactive-stories", {
+      method: "POST",
+      token,
+      body: JSON.stringify({
+        story,
+        formData: {
+          storySubject: formData?.storySubject,
+          storyType: formData?.storyType,
+          ageGroup: formData?.ageCategory,
+          imageStyle: formData?.imageStyle,
+        },
+      }),
     });
 
-    await dbV2.insert(InteractiveStoryNodes).values({
-      nodeId: rootNodeId,
-      storyId,
-      parentNodeId: null,
-      depth: 0,
-      choiceTaken: null,
-      choices: starterChoices.length >= 2 ? starterChoices : ["Follow the hopeful path", "Explore the unknown path"],
-      selectedChoice: null,
-      pages: starterPages,
-      isActive: true,
-      createdAt: now,
-    });
-
-    return storyId;
+    return result.storyId;
   };
 
   const UpdateUserCredits = async () => {
