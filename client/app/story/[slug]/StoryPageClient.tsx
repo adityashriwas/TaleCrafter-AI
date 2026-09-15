@@ -6,13 +6,11 @@ import Image from "next/image";
 import HTMLFlipBook from "react-pageflip";
 import { IoIosArrowDropleftCircle, IoIosArrowDroprightCircle } from "react-icons/io";
 import { toast } from "react-toastify";
-import { db } from "@/config/config";
-import { StoryData } from "@/config/schema";
-import { ne, sql } from "drizzle-orm";
 import BookCoverPage from "@/app/view-story/_components/BookCoverPage";
 import StoryPages from "@/app/view-story/_components/StoryPages";
 import { buildPollinationsImageUrl } from "@/lib/story-images";
 import { DEFAULT_OG_IMAGE, toAbsoluteUrl } from "@/lib/seo";
+import { apiFetch } from "@/lib/api-client";
 
 type StoryPageClientProps = {
   initialStory: any;
@@ -114,29 +112,19 @@ export default function StoryPageClient({ initialStory, slug }: StoryPageClientP
       const safePage = Math.max(1, page);
       const offset = (safePage - 1) * RELATED_PAGE_SIZE;
       const storyType = String(story?.storyType ?? "").trim();
+      const params = new URLSearchParams({
+        limit: String(RELATED_PAGE_SIZE),
+        offset: String(offset),
+      });
+      if (storyType) params.set("storyType", storyType);
 
-      const baseFilter = ne(StoryData.storyId, story.storyId);
-      const orderClause = storyType
-        ? sql`CASE WHEN ${StoryData.storyType} = ${storyType} THEN 0 ELSE 1 END, RANDOM()`
-        : sql`RANDOM()`;
+      const result = await apiFetch<{ stories: any[]; totalCount: number }>(
+        `/stories/${story.storyId}/related?${params.toString()}`
+      );
 
-      const [result, totalResult] = await Promise.all([
-        db
-          .select()
-          .from(StoryData)
-          .where(baseFilter)
-          .orderBy(orderClause)
-          .limit(RELATED_PAGE_SIZE)
-          .offset(offset),
-        db
-          .select({ count: sql<number>`count(*)` })
-          .from(StoryData)
-          .where(baseFilter),
-      ]);
-
-      const totalCount = Number(totalResult?.[0]?.count ?? 0);
+      const totalCount = Number(result?.totalCount ?? 0);
       const pages = Math.ceil(totalCount / RELATED_PAGE_SIZE);
-      setRelatedStories(result ?? []);
+      setRelatedStories(result?.stories ?? []);
       setRelatedTotalPages(pages);
 
       if (pages > 0 && safePage > pages) {

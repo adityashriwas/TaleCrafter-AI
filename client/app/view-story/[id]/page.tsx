@@ -1,6 +1,5 @@
 import { notFound, permanentRedirect } from "next/navigation";
 import { getStoryByStoryId } from "@/lib/story-data";
-import { ensureStorySlug } from "@/lib/story-slug";
 
 export default async function LegacyViewStoryPage({
   params,
@@ -15,6 +14,11 @@ export default async function LegacyViewStoryPage({
     notFound();
   }
 
-  const slug = await ensureStorySlug(story as any);
+  const slug = String(story.slug ?? "").trim();
+
+  if (!slug) {
+    notFound();
+  }
+
   permanentRedirect(`/story/${slug}`);
 }

@@ -1,10 +1,36 @@
-import { db } from "@/config/config";
-import { StoryData } from "@/config/schema";
-import { and, desc, eq, ne } from "drizzle-orm";
 import { DEFAULT_OG_IMAGE, toAbsoluteUrl } from "@/lib/seo";
-import { ensureStorySlug } from "@/lib/story-slug";
 
-export type StoryRecord = typeof StoryData.$inferSelect;
+export type StoryRecord = {
+  id: number;
+  storyId: string | null;
+  slug: string | null;
+  storySubject: string | null;
+  storyType: string | null;
+  ageGroup: string | null;
+  imageStyle: string | null;
+  coverImage: string | null;
+  output: any;
+  userName: string | null;
+  userImage: string | null;
+  userEmail: string | null;
+};
+
+const API_BASE_URL =
+  process.env.API_BASE_URL ??
+  process.env.NEXT_PUBLIC_API_BASE_URL ??
+  "http://localhost:8000/api/v1";
+
+const backendFetch = async <T>(path: string): Promise<T | null> => {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    cache: "no-store",
+  });
+
+  if (response.status === 404) return null;
+  if (!response.ok) throw new Error(`Backend request failed: ${response.status}`);
+
+  const payload = await response.json();
+  return payload?.data ?? null;
+};
 
 const cleanText = (value: string) =>
   value
@@ -33,28 +59,18 @@ export const storyOgImage = (story: StoryRecord | null | undefined) => {
 };
 
 export const getStoryByStoryId = async (storyId: string) => {
-  const result = await db
-    .select()
-    .from(StoryData)
-    .where(eq(StoryData.storyId, storyId))
-    .limit(1);
-  return result[0] ?? null;
+  return backendFetch<StoryRecord>(`/stories/id/${encodeURIComponent(storyId)}`);
 };
 
 export const getStoryBySlug = async (slug: string) => {
-  const result = await db
-    .select()
-    .from(StoryData)
-    .where(eq(StoryData.slug, slug))
-    .limit(1);
-  return result[0] ?? null;
+  return backendFetch<StoryRecord>(`/stories/slug/${encodeURIComponent(slug)}`);
 };
 
 export const getStorySlug = async (story: StoryRecord | null | undefined) => {
   if (!story) return null;
   const slug = String(story.slug ?? "").trim();
   if (slug) return slug;
-  return ensureStorySlug(story as any);
+  return null;
 };
 
 export const storyRoutePath = (story: StoryRecord | null | undefined) => {
@@ -67,24 +83,20 @@ export const storyRoutePath = (story: StoryRecord | null | undefined) => {
 };
 
 export const getPublicStories = async () => {
-  return db
-    .select({
-      storyId: StoryData.storyId,
-      slug: StoryData.slug,
-    })
-    .from(StoryData)
-    .orderBy(desc(StoryData.id));
+  return (
+    (await backendFetch<Array<{ storyId: string | null; slug: string | null }>>(
+      "/stories/sitemap"
+    )) ?? []
+  );
 };
 
 export const getRelatedStories = async (storyId: string, storyType?: string) => {
-  const filters = storyType
-    ? and(eq(StoryData.storyType, storyType), ne(StoryData.storyId, storyId))
-    : ne(StoryData.storyId, storyId);
+  const params = new URLSearchParams({ limit: "6", offset: "0" });
+  if (storyType) params.set("storyType", storyType);
 
-  return db
-    .select()
-    .from(StoryData)
-    .where(filters)
-    .orderBy(desc(StoryData.id))
-    .limit(6);
+  const result = await backendFetch<{ stories: StoryRecord[] }>(
+    `/stories/${encodeURIComponent(storyId)}/related?${params.toString()}`
+  );
+
+  return result?.stories ?? [];
 };

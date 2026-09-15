@@ -78,13 +78,21 @@ Completed so far:
 
 ## Phase 4 - Story APIs
 
-Status: planned
+Status: in progress
 
 - Add public story read endpoints for explore, detail, related stories, and SEO.
 - Add protected story creation endpoints for classic and interactive stories.
 - Add protected owner-only delete endpoints.
 - Move slug generation and story data helpers to backend.
 - Update frontend pages/components to use backend APIs.
+
+Completed so far:
+
+- Added backend story read/list/delete routes for public stories, current-user stories, slug/id detail, related stories, sitemap entries, and owner delete.
+- Updated Explore stories to fetch from backend instead of direct Drizzle access.
+- Updated Dashboard user story list and story deletion to use authenticated backend APIs.
+- Updated public story detail helpers and related stories to fetch from backend APIs.
+- Removed backend slug mutation from legacy Next view redirect; slug creation will move with story creation later.
 
 ## Phase 5 - Interactive Story APIs
 

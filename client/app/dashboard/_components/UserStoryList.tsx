@@ -1,10 +1,8 @@
 "use client";
-import { db } from "@/config/config";
-import { StoryData } from "@/config/schema";
-import { useUser } from "@clerk/nextjs";
-import { desc, eq } from "drizzle-orm";
+import { useAuth, useUser } from "@clerk/nextjs";
 import { useCallback, useEffect, useRef, useState } from "react";
 import StoryItemCard from "./StoryItemCard";
+import { apiFetch } from "@/lib/api-client";
 
 type StoryItemType = {
   id: string;
@@ -33,6 +31,7 @@ type DashboardCache = {
 
 const UserStoryList = () => {
   const user = useUser();
+  const { getToken } = useAuth();
   const userEmail = user.user?.primaryEmailAddress?.emailAddress;
   const [storyList, setStoryList] = useState<StoryItemType[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -62,21 +61,16 @@ const UserStoryList = () => {
     } catch {
       // ignore storage failures
     }
-  }, []);
+  }, [getToken]);
 
-  const getUserStory = useCallback(async (email: string, newOffset: number) => {
+  const getUserStory = useCallback(async (_email: string, newOffset: number) => {
     if (loadingRef.current || !hasMoreRef.current) return;
     loadingRef.current = true;
     setLoading(true);
 
     try {
-      const result: any = await db
-        .select()
-        .from(StoryData)
-        .where(eq(StoryData.userEmail, email))
-        .orderBy(desc(StoryData.id))
-        .limit(PAGE_SIZE)
-        .offset(newOffset);
+      const token = await getToken();
+      const result = await apiFetch<StoryItemType[]>(`/stories/me?limit=${PAGE_SIZE}&offset=${newOffset}`, { token });
 
       setOffset(newOffset);
       setStoryList((prev) => {
@@ -91,7 +85,7 @@ const UserStoryList = () => {
       loadingRef.current = false;
       setLoading(false);
     }
-  }, []);
+  }, [getToken]);
 
   useEffect(() => {
     loadingRef.current = loading;

@@ -1,9 +1,7 @@
 "use client";
-import { db } from "@/config/config";
-import { StoryData } from "@/config/schema";
-import { desc } from "drizzle-orm";
 import { useCallback, useEffect, useRef, useState } from "react";
 import StoryItemCard from "../dashboard/_components/StoryItemCard";
+import { apiFetch } from "@/lib/api-client";
 import { motion } from "framer-motion";
 const MotionDiv: any = motion.div;
 
@@ -74,12 +72,7 @@ const ExploreMore = () => {
     setOffset(newOffset);
 
     try {
-      const result: any = await db
-        .select()
-        .from(StoryData)
-        .orderBy(desc(StoryData.id))
-        .limit(PAGE_SIZE)
-        .offset(newOffset);
+      const result = await apiFetch<StoryItemType[]>(`/stories?limit=${PAGE_SIZE}&offset=${newOffset}`);
 
       setStoryList((prev) => {
         const merged =

@@ -3,11 +3,10 @@ import { Card, CardFooter } from "@nextui-org/card";
 import { Button } from "@nextui-org/react";
 import Link from "next/link";
 import Image from "next/image";
-import { db } from "@/config/config";
-import { StoryData } from "@/config/schema";
-import { eq } from "drizzle-orm";
 import { toast } from "react-toastify";
 import { useState } from "react";
+import { useAuth } from "@clerk/nextjs";
+import { apiFetch } from "@/lib/api-client";
 
 type StoryItemType = {
   story: {
@@ -28,28 +27,18 @@ type StoryItemType = {
   onDeleteSuccess?: (storyId: string) => void;
 };
 
-const deleteStoryFromDB = async (storyId: string) => {
-  try {
-    const result = await db
-      .delete(StoryData)
-      .where(eq(StoryData.storyId, storyId));
-
-    return result;
-  } catch (error) {
-    throw new Error("Failed to delete story.");
-  }
-};
-
 const StoryItemCard = ({ story, currentUserEmail, onDeleteSuccess }: StoryItemType) => {
   const isOwner = story.userEmail === currentUserEmail;
   const [imgFailed, setImgFailed] = useState(false);
+  const { getToken } = useAuth();
   const storyHref = story?.slug ? `/story/${story.slug}` : `/view-story/${story?.storyId}`;
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault(); // prevent navigating via <Link>
     try {
-      await deleteStoryFromDB(story.storyId);
+      const token = await getToken();
+      await apiFetch(`/stories/${story.storyId}`, { method: "DELETE", token });
       toast.success("Story deleted successfully");
       onDeleteSuccess?.(story.storyId);
     } catch (error) {
