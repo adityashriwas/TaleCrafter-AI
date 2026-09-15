@@ -55,6 +55,8 @@ Completed so far:
 - Added `GET /api/v1/users/me` behind Clerk auth.
 - Moved user creation/profile sync from `client/app/Provider.tsx` to the backend.
 - Added a frontend API client that sends Clerk bearer tokens.
+- Added backend-only credit decrement with authenticated Clerk identity.
+- Replaced the create-story client-side credit update with the backend credit endpoint.
 
 ## Phase 3 - AI And Image Services
 

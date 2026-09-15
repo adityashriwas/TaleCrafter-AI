@@ -9,12 +9,10 @@ import { db } from "@/config/config";
 import { StoryData } from "@/config/schema";
 import uuid4 from "uuid4";
 import CustomLoader from "./(component)/CustomLoader";
-import { useUser } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { UserDetailContext } from "@/app/_context/UserDetailContext";
-import { Users } from "@/config/schema";
-import { eq } from "drizzle-orm";
 import UploadImage from "./(component)/UploadImage";
 import { motion } from "framer-motion";
 import { dbV2 } from "@/config/configV2";
@@ -22,6 +20,8 @@ import { InteractiveStories, InteractiveStoryNodes } from "@/config/schemaV2";
 import { buildChoicePrompt, makePageContext, parseChoices } from "@/config/plottwist";
 import { buildPollinationsImageUrl, persistImageUrl } from "@/lib/story-images";
 import { generateUniqueStorySlug } from "@/lib/story-slug";
+import { apiFetch } from "@/lib/api-client";
+import type { UserDetail } from "@/app/_context/UserDetailContext";
 const MotionDiv: any = motion.div;
 
 const CREATE_STORY_PROMPT = process.env.NEXT_PUBLIC_CREATE_STORY_PROMPT;
@@ -97,9 +97,10 @@ const CreateStory = () => {
   const [formData, setFormData] = useState<FormDataType>();
   const [loading, setLoading] = useState<boolean>(false);
   const { user } = useUser();
+  const { getToken } = useAuth();
   const notify = (msg: string) => toast(msg);
   const notifyError = (msg: string) => toast.error(msg);
-  const { userDetail } = useContext(UserDetailContext);
+  const { userDetail, setUserDetail } = useContext(UserDetailContext);
   const [storySubject, setStorySubject] = useState("");
 
   const onHandleUserSelection = (data: feildData) => {
@@ -373,13 +374,13 @@ const CreateStory = () => {
   };
 
   const UpdateUserCredits = async () => {
-    await db
-      .update(Users)
-      .set({
-        credit: Number((userDetail?.credit ?? 0) - 1),
-      })
-      .where(eq(Users.userEmail, user?.primaryEmailAddress?.emailAddress ?? ""))
-      .returning({ id: Users.id });
+    const token = await getToken();
+    const updatedUser = await apiFetch<UserDetail>("/users/me/credits/decrement", {
+      method: "POST",
+      token,
+      body: JSON.stringify({ amount: 1 }),
+    });
+    setUserDetail(updatedUser);
   };
   const fadeUp = {
     hidden: { opacity: 0, y: 24 },

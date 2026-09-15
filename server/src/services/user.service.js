@@ -1,5 +1,5 @@
 import { clerkClient } from '@clerk/express';
-import { eq } from 'drizzle-orm';
+import { and, eq, gte, sql } from 'drizzle-orm';
 import { db } from '../db/index.js';
 import { Users } from '../db/schema.js';
 import ApiError from '../utils/ApiError.js';
@@ -83,4 +83,38 @@ export const syncUserFromClerk = async userId => {
     });
 
   return updated[0] ?? currentUser;
+};
+
+
+export const decrementUserCredits = async (userId, amount = 1) => {
+  const safeAmount = Number(amount);
+
+  if (!Number.isInteger(safeAmount) || safeAmount <= 0) {
+    throw new ApiError(400, 'Credit amount must be a positive integer');
+  }
+
+  const currentUser = await syncUserFromClerk(userId);
+
+  const updated = await db
+    .update(Users)
+    .set({ credit: sql`${Users.credit} - ${safeAmount}` })
+    .where(
+      and(
+        eq(Users.userEmail, currentUser.userEmail),
+        gte(Users.credit, safeAmount)
+      )
+    )
+    .returning({
+      id: Users.id,
+      userEmail: Users.userEmail,
+      userName: Users.userName,
+      userImage: Users.userImage,
+      credit: Users.credit,
+    });
+
+  if (!updated[0]) {
+    throw new ApiError(402, 'Insufficient credits');
+  }
+
+  return updated[0];
 };
