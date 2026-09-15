@@ -1,30 +1,30 @@
-import dotenv from "dotenv";
-import { neon } from "@neondatabase/serverless";
+import dotenv from 'dotenv';
+import { neon } from '@neondatabase/serverless';
 
-dotenv.config({ path: ".env.local" });
-dotenv.config();
+dotenv.config({ path: 'server/.env' });
+dotenv.config({ path: '.env' });
 
-const connectionString = process.env.DATABASE_URL || process.env.NEXT_PUBLIC_DATABASE_URL;
+const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
-  console.error("NO_DB_URL");
+  console.error('NO_DB_URL');
   process.exit(2);
 }
 
 const sql = neon(connectionString);
 
-const clean = (value = "") =>
+const clean = (value = '') =>
   String(value)
-    .replace(/\{[^}]*\}/g, " ")
+    .replace(/\{[^}]*\}/g, ' ')
     .replace(
       /(Water ?Color|Watercolor|Anime( style)?|3D ?Cartoon|Oil (Paint|painting)|Comic( book)?|Paper ?Cut|Papercut|Pixel ?Art)[\s\S]*/gi,
-      " "
+      ' '
     )
-    .replace(/\s+/g, " ")
+    .replace(/\s+/g, ' ')
     .trim();
 
 const toOutput = (raw) => {
   if (!raw) return {};
-  if (typeof raw === "string") {
+  if (typeof raw === 'string') {
     try {
       return JSON.parse(raw);
     } catch {
@@ -42,8 +42,8 @@ const countWords = (text) => {
 const getStoryText = (output) => {
   const chapters = Array.isArray(output?.chapters) ? output.chapters : [];
   return chapters
-    .map((chapter) => clean(chapter?.textPrompt || ""))
-    .join(" ")
+    .map((chapter) => clean(chapter?.textPrompt || ''))
+    .join(' ')
     .trim();
 };
 
@@ -56,8 +56,8 @@ const perStory = rows.map((row) => {
   const chars = text.length;
 
   return {
-    storyId: String(row.storyId || ""),
-    slug: String(row.slug || ""),
+    storyId: String(row.storyId || ''),
+    slug: String(row.slug || ''),
     words,
     chars,
   };

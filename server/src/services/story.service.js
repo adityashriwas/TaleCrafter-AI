@@ -1,10 +1,11 @@
 import { randomUUID } from 'node:crypto';
-import { and, desc, eq, like, ne, sql } from 'drizzle-orm';
+import { and, desc, eq, isNotNull, like, ne, sql } from 'drizzle-orm';
 import { db } from '../db/index.js';
 import { StoryData } from '../db/schema.js';
 import ApiError from '../utils/ApiError.js';
-import { syncUserFromClerk } from './user.service.js';
+import { decrementUserCredits, syncUserFromClerk } from './user.service.js';
 import { buildPollinationsImageUrl, uploadImageToCloudinary } from './image.service.js';
+import { generateStoryJson } from './gemini.service.js';
 
 const MAX_BASE_SLUG_LENGTH = 70;
 
@@ -131,6 +132,17 @@ export const getStoryByStoryId = async storyId => {
   return result[0] ?? null;
 };
 
+
+export const listStorySitemapPage = async ({ limit, offset }) => {
+  return db
+    .select({ slug: StoryData.slug })
+    .from(StoryData)
+    .where(isNotNull(StoryData.slug))
+    .orderBy(desc(StoryData.id))
+    .limit(clampLimit(limit))
+    .offset(normalizeOffset(offset));
+};
+
 export const listStorySitemapEntries = async () => {
   return db
     .select({
@@ -240,9 +252,15 @@ const prepareClassicStoryImages = async ({ output, imageStyle }) => {
 
 export const createClassicStory = async ({ userId, payload }) => {
   const user = await syncUserFromClerk(userId);
-  const storyId = String(payload?.storyId ?? randomUUID());
+
+  if (Number(user.credit ?? 0) <= 0) {
+    throw new ApiError(402, 'Insufficient credits');
+  }
+
+  const storyId = randomUUID();
+  const generatedStory = await generateStoryJson({ formData: payload });
   const prepared = await prepareClassicStoryImages({
-    output: payload?.output ?? null,
+    output: generatedStory,
     imageStyle: payload?.imageStyle,
   });
   const title = extractStoryTitle({
@@ -268,7 +286,12 @@ export const createClassicStory = async ({ userId, payload }) => {
     })
     .returning({ storyId: StoryData.storyId, slug: StoryData.slug });
 
-  return inserted[0];
+  const updatedUser = await decrementUserCredits(userId, 1);
+
+  return {
+    ...inserted[0],
+    user: updatedUser,
+  };
 };
 
 export const deleteCurrentUserStory = async ({ userId, storyId }) => {

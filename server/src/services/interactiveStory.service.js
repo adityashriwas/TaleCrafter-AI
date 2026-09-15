@@ -5,9 +5,9 @@ import { StoryData } from '../db/schema.js';
 import { InteractiveStories, InteractiveStoryNodes } from '../db/schemaV2.js';
 import ApiError from '../utils/ApiError.js';
 import { buildPollinationsImageUrl, uploadImageToCloudinary } from './image.service.js';
-import { generateGeminiText } from './gemini.service.js';
+import { generateGeminiText, generateStoryJson } from './gemini.service.js';
 import { generateUniqueStorySlug } from './story.service.js';
-import { syncUserFromClerk } from './user.service.js';
+import { decrementUserCredits, syncUserFromClerk } from './user.service.js';
 import {
   buildChoicePrompt,
   buildContinuationPrompt,
@@ -199,8 +199,13 @@ const saveCompletedToClassicStory = async ({ story, pages, finalTitle }) => {
 
 export const createInteractiveStarter = async ({ userId, payload }) => {
   const user = await syncUserFromClerk(userId);
-  const story = payload?.story ?? {};
-  const formData = payload?.formData ?? {};
+
+  if (Number(user.credit ?? 0) <= 0) {
+    throw new ApiError(402, 'Insufficient credits');
+  }
+
+  const formData = payload ?? {};
+  const story = await generateStoryJson({ formData, interactive: true });
   const storyId = randomUUID();
   const rootNodeId = randomUUID();
   const interactiveTitle = String(story?.title ?? 'Interactive Story');
@@ -288,7 +293,9 @@ export const createInteractiveStarter = async ({ userId, payload }) => {
     createdAt: now,
   });
 
-  return { storyId };
+  const updatedUser = await decrementUserCredits(userId, 1);
+
+  return { storyId, user: updatedUser };
 };
 
 export const listCurrentUserInteractiveStories = async ({ userId }) => {

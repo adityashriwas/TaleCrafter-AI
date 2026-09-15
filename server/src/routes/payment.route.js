@@ -1,17 +1,23 @@
 import { Router } from 'express';
 import {
   createStripeCheckout,
-  fulfillStripeCheckout,
+  getStripeCheckout,
 } from '../controllers/payment.controller.js';
 import { requireAuth } from '../middlewares/clerkAuth.middleware.js';
+import { validate } from '../middlewares/validate.middleware.js';
+import {
+  createStripeCheckoutSchema,
+  fulfillStripeCheckoutSchema,
+} from '../validations/payment.validation.js';
 
 const router = Router();
 
-router.post('/stripe/checkout-session', requireAuth, createStripeCheckout);
-router.post(
-  '/stripe/checkout-session/:sessionId/fulfill',
+router.post('/stripe/checkout-session', requireAuth, validate(createStripeCheckoutSchema), createStripeCheckout);
+router.get(
+  '/stripe/checkout-session/:sessionId',
   requireAuth,
-  fulfillStripeCheckout
+  validate(fulfillStripeCheckoutSchema),
+  getStripeCheckout
 );
 
 export default router;

@@ -1,28 +1,31 @@
 "use client";
 
-import { db } from "@/config/config";
-import { StoryData, Users } from "@/config/schema";
-import { asc, desc, eq } from "drizzle-orm";
+import { useAuth } from "@clerk/nextjs";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
+import { apiFetch } from "@/lib/api-client";
+
+type StoryOutput = {
+  title?: string;
+};
 
 type StoryItemType = {
   id: number;
   storyId: string;
-  storyType: string;
-  ageGroup: string;
-  storySubject: string;
-  imageStyle: string;
-  userEmail: string;
-  userName: string;
-  output: any;
+  storyType: string | null;
+  ageGroup: string | null;
+  storySubject: string | null;
+  imageStyle: string | null;
+  userEmail: string | null;
+  userName: string | null;
+  output: StoryOutput | null;
 };
 
 type UserType = {
   id: number;
-  userName: string;
+  userName: string | null;
   userEmail: string;
-  userImage?: string;
+  userImage?: string | null;
   credit: number;
 };
 
@@ -32,24 +35,24 @@ const AdminDashboard = () => {
   const [users, setUsers] = useState<UserType[]>([]);
   const [loadingStories, setLoadingStories] = useState(false);
   const [loadingUsers, setLoadingUsers] = useState(false);
+  const { getToken } = useAuth();
 
   const [storySearch, setStorySearch] = useState("");
   const [storyTypeFilter, setStoryTypeFilter] = useState("all");
   const [userSearch, setUserSearch] = useState("");
   const [editedCredits, setEditedCredits] = useState<Record<string, number>>({});
 
-  useEffect(() => {
-    fetchStories();
-    fetchUsers();
-  }, []);
+  const getAuthToken = async () => {
+    const token = await getToken();
+    if (!token) throw new Error("Admin session is not available");
+    return token;
+  };
 
   const fetchStories = async () => {
     setLoadingStories(true);
     try {
-      const result: any = await db
-        .select()
-        .from(StoryData)
-        .orderBy(asc(StoryData.id));
+      const token = await getAuthToken();
+      const result = await apiFetch<StoryItemType[]>("/admin/stories", { token });
       setStories(result);
     } catch {
       toast.error("Failed to load stories");
@@ -61,7 +64,8 @@ const AdminDashboard = () => {
   const fetchUsers = async () => {
     setLoadingUsers(true);
     try {
-      const result: any = await db.select().from(Users).orderBy(desc(Users.id));
+      const token = await getAuthToken();
+      const result = await apiFetch<UserType[]>("/admin/users", { token });
       setUsers(result);
     } catch {
       toast.error("Failed to load users");
@@ -70,9 +74,19 @@ const AdminDashboard = () => {
     }
   };
 
+  useEffect(() => {
+    fetchStories();
+    fetchUsers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleDeleteStory = async (storyId: string) => {
     try {
-      await db.delete(StoryData).where(eq(StoryData.storyId, storyId));
+      const token = await getAuthToken();
+      await apiFetch(`/admin/stories/${encodeURIComponent(storyId)}`, {
+        method: "DELETE",
+        token,
+      });
       setStories((prev) => prev.filter((s) => s.storyId !== storyId));
       toast.success("Story deleted successfully");
     } catch {
@@ -82,7 +96,11 @@ const AdminDashboard = () => {
 
   const handleDeleteUser = async (userEmail: string) => {
     try {
-      await db.delete(Users).where(eq(Users.userEmail, userEmail));
+      const token = await getAuthToken();
+      await apiFetch(`/admin/users/${encodeURIComponent(userEmail)}`, {
+        method: "DELETE",
+        token,
+      });
       setUsers((prev) => prev.filter((u) => u.userEmail !== userEmail));
       toast.success("User deleted successfully");
     } catch {
@@ -95,15 +113,23 @@ const AdminDashboard = () => {
     if (!user) return;
 
     const newCredit = editedCredits[userEmail] ?? user.credit;
-    if (Number.isNaN(newCredit)) {
+    if (!Number.isInteger(newCredit) || newCredit < 0) {
       toast.error("Invalid credit value");
       return;
     }
 
     try {
-      await db.update(Users).set({ credit: newCredit }).where(eq(Users.userEmail, userEmail));
+      const token = await getAuthToken();
+      const updatedUser = await apiFetch<UserType>(
+        `/admin/users/${encodeURIComponent(userEmail)}/credit`,
+        {
+          method: "PATCH",
+          token,
+          body: JSON.stringify({ credit: newCredit }),
+        }
+      );
       setUsers((prev) =>
-        prev.map((u) => (u.userEmail === userEmail ? { ...u, credit: newCredit } : u))
+        prev.map((u) => (u.userEmail === userEmail ? updatedUser : u))
       );
       toast.success("User credit updated");
     } catch {
@@ -113,7 +139,7 @@ const AdminDashboard = () => {
 
   const storyTypeOptions = useMemo(() => {
     const types = new Set(stories.map((s) => s.storyType).filter(Boolean));
-    return ["all", ...Array.from(types)];
+    return ["all", ...Array.from(types)] as string[];
   }, [stories]);
 
   const filteredStories = useMemo(() => {

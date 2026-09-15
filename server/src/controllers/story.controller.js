@@ -9,6 +9,7 @@ import {
   listPublicStories,
   listRelatedStories,
   listStorySitemapEntries,
+  listStorySitemapPage,
 } from '../services/story.service.js';
 import ApiError from '../utils/ApiError.js';
 
@@ -42,6 +43,14 @@ export const getStorySitemapEntries = asyncHandler(async (_req, res) => {
   return res.status(200).json(new ApiResponse(200, stories, 'Stories fetched'));
 });
 
+export const getStorySitemapPage = asyncHandler(async (req, res) => {
+  const stories = await listStorySitemapPage({
+    limit: req.query.limit,
+    offset: req.query.offset,
+  });
+  return res.status(200).json(new ApiResponse(200, stories, 'Stories fetched'));
+});
+
 export const getRelatedStoryList = asyncHandler(async (req, res) => {
   const result = await listRelatedStories({
     storyId: req.params.storyId,
@@ -66,7 +75,7 @@ export const deleteStory = asyncHandler(async (req, res) => {
 export const createStory = asyncHandler(async (req, res) => {
   const story = await createClassicStory({
     userId: req.auth.userId,
-    payload: req.body ?? {},
+    payload: req.validated.body,
   });
 
   return res.status(201).json(new ApiResponse(201, story, 'Story created'));

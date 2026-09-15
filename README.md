@@ -35,6 +35,6 @@ See [MIGRATION_ROADMAP.md](./MIGRATION_ROADMAP.md).
 
 ## Payments
 
-Credit purchases now use Stripe Checkout through the Express backend. Configure `STRIPE_SECRET_KEY` and `CLIENT_ORIGIN` in `server/.env`, then use the buy credits page to create a protected Checkout session and verify fulfillment before credits are added.
+Credit purchases now use Stripe Checkout through the Express backend. Configure `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, and `CLIENT_ORIGIN` in `server/.env`, run the payment ledger migration, then use the buy credits page to create a protected Checkout session. Credits are fulfilled from the Stripe webhook, not from browser success-page state.
 
 See [docs/payments-future.md](./docs/payments-future.md) for the old PayPal reference and the remaining production payment hardening plan.

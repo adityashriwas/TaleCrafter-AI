@@ -7,6 +7,9 @@ import Footer from "./(components)/Footer";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { defaultMetadata } from "@/lib/seo";
 import Script from "next/script";
+import { Inter } from "next/font/google";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   ...defaultMetadata,
@@ -67,7 +70,7 @@ export default function RootLayout({
             crossOrigin="anonymous"
           ></script>
         </head>
-        <body>
+        <body className={inter.className}>
           <Provider>
             <Header />
             {children}

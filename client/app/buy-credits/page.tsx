@@ -44,7 +44,7 @@ function PricingOptions() {
   const [selectedPrice, setSelectedPrice] = useState<number>(0);
   const [shouldScrollToPayment, setShouldScrollToPayment] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
-  const [fulfillingPayment, setFulfillingPayment] = useState(false);
+  const [checkingPayment, setCheckingPayment] = useState(false);
   const { userDetail, setUserDetail } = useContext(UserDetailContext);
   const { getToken } = useAuth();
   const router = useRouter();
@@ -88,30 +88,40 @@ function PricingOptions() {
     if (!sessionId || fulfilledSessionRef.current === sessionId) return;
     fulfilledSessionRef.current = sessionId;
 
-    const fulfillPayment = async () => {
+    const checkPayment = async () => {
       try {
-        setFulfillingPayment(true);
+        setCheckingPayment(true);
         const token = await getToken();
-        const updatedUser = await apiFetch<UserDetail>(
-          "/payments/stripe/checkout-session/" + sessionId + "/fulfill",
-          {
-            method: "POST",
-            token,
-          }
-        );
+        const status = await apiFetch<{
+          status: string;
+          credits: number;
+          user?: UserDetail;
+        }>("/payments/stripe/checkout-session/" + sessionId, {
+          method: "GET",
+          token,
+        });
 
-        setUserDetail(updatedUser);
-        notify("Payment successful, credits have been added!");
-        router.replace("/dashboard");
+        if (status.user) {
+          setUserDetail(status.user);
+        }
+
+        if (status.status === "fulfilled") {
+          notify("Payment successful, credits have been added!");
+          router.replace("/dashboard");
+          return;
+        }
+
+        notify("Payment received. Credits will appear after Stripe confirms the webhook.");
+        router.replace("/buy-credits");
       } catch {
-        notifyError("Unable to verify payment. Please contact support if you were charged.");
+        notifyError("Unable to verify payment status. Please contact support if you were charged.");
         router.replace("/buy-credits");
       } finally {
-        setFulfillingPayment(false);
+        setCheckingPayment(false);
       }
     };
 
-    fulfillPayment();
+    checkPayment();
   }, [getToken, router, setUserDetail]);
 
   const startStripeCheckout = async () => {
@@ -240,11 +250,11 @@ function PricingOptions() {
             </p>
             <button
               onClick={startStripeCheckout}
-              disabled={checkoutLoading || fulfillingPayment}
+              disabled={checkoutLoading || checkingPayment}
               className="tc-btn-primary w-full px-5 py-3 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {fulfillingPayment
-                ? "Verifying payment..."
+              {checkingPayment
+                ? "Checking payment..."
                 : checkoutLoading
                 ? "Opening Stripe..."
                 : "Checkout with Stripe"}

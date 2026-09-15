@@ -149,3 +149,91 @@ export const generateGeminiText = async ({
 
   return result.response.text();
 };
+
+
+const DEFAULT_CREATE_STORY_PROMPT = [
+  'Generate a story for {ageGroup} age group.',
+  'Story type: {storyType}.',
+  'Story subject: {storySubject}.',
+  'Image style: {imageStyle}.',
+  'Return only strict JSON with title, coverImagePrompt, characterDescriptions, and chapters.',
+].join('\n');
+
+export const buildStoryPrompt = ({ ageGroup, storyType, storySubject, imageStyle }) => {
+  const template = process.env.CREATE_STORY_PROMPT || process.env.NEXT_PUBLIC_CREATE_STORY_PROMPT || DEFAULT_CREATE_STORY_PROMPT;
+  return template
+    .replaceAll('{ageGroup}', String(ageGroup ?? ''))
+    .replaceAll('{storyType}', String(storyType ?? ''))
+    .replaceAll('{storySubject}', String(storySubject ?? ''))
+    .replaceAll('{imageStyle}', String(imageStyle ?? ''));
+};
+
+const cleanJsonText = raw =>
+  String(raw ?? '')
+    .replace(/```json/gi, '')
+    .replace(/```/g, '')
+    .trim();
+
+const normalizeJsonCandidate = raw =>
+  String(raw ?? '')
+    .replace(/[\u201C\u201D]/g, '"')
+    .replace(/[\u2018\u2019]/g, '\'')
+    .replace(/,\s*([}\]])/g, '$1')
+    .trim();
+
+export const tryParseGeminiJson = raw => {
+  const cleaned = cleanJsonText(raw);
+  const firstBrace = cleaned.indexOf('{');
+  const lastBrace = cleaned.lastIndexOf('}');
+  const candidates = [
+    cleaned,
+    firstBrace >= 0 && lastBrace > firstBrace
+      ? cleaned.slice(firstBrace, lastBrace + 1)
+      : '',
+  ].filter(Boolean);
+
+  for (const candidate of candidates) {
+    try {
+      return JSON.parse(normalizeJsonCandidate(candidate));
+    } catch {
+      // Try the next candidate.
+    }
+  }
+
+  return null;
+};
+
+const buildJsonRepairPrompt = brokenJson => `
+You are a strict JSON repair assistant.
+Fix the JSON below so it is syntactically valid while preserving the original meaning and fields.
+Return ONLY valid JSON. No markdown fences. No explanation.
+
+${brokenJson}
+`;
+
+export const generateStoryJson = async ({ formData, interactive = false }) => {
+  const basePrompt = buildStoryPrompt(formData);
+  const prompt = interactive
+    ? `${basePrompt}\n\nFor interactive story starter, return 6 to 8 chapters minimum in consistent JSON format. No markdown wrappers.`
+    : basePrompt;
+  const outputText = await generateGeminiText({ prompt, mode: 'story-generation' });
+  let story = tryParseGeminiJson(outputText);
+
+  if (!story && interactive) {
+    const repairedText = await generateGeminiText({
+      prompt: buildJsonRepairPrompt(cleanJsonText(outputText)),
+      mode: 'text',
+    });
+    story = tryParseGeminiJson(repairedText);
+  }
+
+  if (!story) {
+    throw new ApiError(502, 'Gemini response is not valid story JSON');
+  }
+
+  if (!Array.isArray(story?.chapters) || story.chapters.length === 0) {
+    throw new ApiError(502, 'Generated story does not contain chapters');
+  }
+
+  return story;
+};

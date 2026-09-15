@@ -12,7 +12,7 @@ import {
 export const createInteractiveStory = asyncHandler(async (req, res) => {
   const story = await createInteractiveStarter({
     userId: req.auth.userId,
-    payload: req.body ?? {},
+    payload: req.validated.body,
   });
 
   return res.status(201).json(new ApiResponse(201, story, 'Interactive story created'));
@@ -37,7 +37,7 @@ export const chooseInteractiveStoryPath = asyncHandler(async (req, res) => {
   const story = await continueInteractiveStory({
     userId: req.auth.userId,
     storyId: req.params.storyId,
-    selectedChoice: req.body?.choice,
+    selectedChoice: req.validated.body.selectedChoice ?? req.validated.body.choice,
   });
 
   return res.status(200).json(new ApiResponse(200, story, 'Interactive story continued'));
@@ -47,7 +47,7 @@ export const completeInteractiveStoryPath = asyncHandler(async (req, res) => {
   const story = await completeInteractiveStory({
     userId: req.auth.userId,
     storyId: req.params.storyId,
-    selectedChoice: req.body?.choice ?? 'End Story',
+    selectedChoice: req.validated.body?.selectedChoice ?? req.validated.body?.choice ?? 'End Story',
   });
 
   return res.status(200).json(new ApiResponse(200, story, 'Interactive story completed'));

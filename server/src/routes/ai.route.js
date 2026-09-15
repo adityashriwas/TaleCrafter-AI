@@ -1,9 +1,11 @@
 import { Router } from 'express';
 import { generateGemini } from '../controllers/ai.controller.js';
 import { requireAuth } from '../middlewares/clerkAuth.middleware.js';
+import { validate } from '../middlewares/validate.middleware.js';
+import { geminiSchema } from '../validations/ai.validation.js';
 
 const router = Router();
 
-router.post('/gemini', requireAuth, generateGemini);
+router.post('/gemini', requireAuth, validate(geminiSchema), generateGemini);
 
 export default router;

@@ -86,19 +86,19 @@ export const syncUserFromClerk = async userId => {
 };
 
 
-export const incrementUserCredits = async (userId, amount = 1) => {
+export const incrementUserCreditsByEmail = async (userEmail, amount = 1) => {
   const safeAmount = Number(amount);
+  const safeEmail = String(userEmail ?? '').trim().toLowerCase();
 
+  if (!safeEmail) throw new ApiError(400, 'User email is required');
   if (!Number.isInteger(safeAmount) || safeAmount <= 0) {
     throw new ApiError(400, 'Credit amount must be a positive integer');
   }
 
-  const currentUser = await syncUserFromClerk(userId);
-
   const updated = await db
     .update(Users)
     .set({ credit: sql`${Users.credit} + ${safeAmount}` })
-    .where(eq(Users.userEmail, currentUser.userEmail))
+    .where(eq(Users.userEmail, safeEmail))
     .returning({
       id: Users.id,
       userEmail: Users.userEmail,
@@ -107,7 +107,13 @@ export const incrementUserCredits = async (userId, amount = 1) => {
       credit: Users.credit,
     });
 
-  return updated[0] ?? currentUser;
+  if (!updated[0]) throw new ApiError(404, 'User not found');
+  return updated[0];
+};
+
+export const incrementUserCredits = async (userId, amount = 1) => {
+  const currentUser = await syncUserFromClerk(userId);
+  return incrementUserCreditsByEmail(currentUser.userEmail, amount);
 };
 
 export const decrementUserCredits = async (userId, amount = 1) => {

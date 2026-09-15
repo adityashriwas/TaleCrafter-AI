@@ -1,14 +1,16 @@
 import ApiResponse from '../utils/ApiResponse.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import {
+  constructStripeWebhookEvent,
   createStripeCheckoutSession,
   fulfillStripeCheckoutSession,
+  getStripeCheckoutStatus,
 } from '../services/payment.service.js';
 
 export const createStripeCheckout = asyncHandler(async (req, res) => {
   const checkout = await createStripeCheckoutSession({
     userId: req.auth.userId,
-    planId: req.body?.planId,
+    planId: req.validated.body.planId,
     origin: req.get('origin'),
   });
 
@@ -17,13 +19,32 @@ export const createStripeCheckout = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, checkout, 'Stripe checkout session created'));
 });
 
-export const fulfillStripeCheckout = asyncHandler(async (req, res) => {
-  const user = await fulfillStripeCheckoutSession({
+export const getStripeCheckout = asyncHandler(async (req, res) => {
+  const status = await getStripeCheckoutStatus({
     userId: req.auth.userId,
     sessionId: req.params.sessionId,
   });
 
   return res
     .status(200)
-    .json(new ApiResponse(200, user, 'Credits added successfully'));
+    .json(new ApiResponse(200, status, 'Stripe checkout status fetched'));
+});
+
+export const handleStripeWebhook = asyncHandler(async (req, res) => {
+  const event = constructStripeWebhookEvent({
+    rawBody: req.body,
+    signature: req.get('stripe-signature'),
+  });
+
+  if (
+    event.type === 'checkout.session.completed' ||
+    event.type === 'checkout.session.async_payment_succeeded'
+  ) {
+    await fulfillStripeCheckoutSession({
+      session: event.data.object,
+      rawEvent: event,
+    });
+  }
+
+  return res.status(200).json({ received: true });
 });

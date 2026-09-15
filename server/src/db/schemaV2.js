@@ -15,9 +15,9 @@ export const InteractiveStories = pgTable(
   'interactiveStories_v2',
   {
     id: serial('id').primaryKey(),
-    storyId: varchar('storyId'),
+    storyId: varchar('storyId').notNull(),
     slug: varchar('slug', { length: 90 }),
-    userEmail: varchar('userEmail'),
+    userEmail: varchar('userEmail').notNull(),
     userName: varchar('userName'),
     userImage: varchar('userImage'),
     title: text('title'),
@@ -25,10 +25,10 @@ export const InteractiveStories = pgTable(
     storyType: varchar('storyType'),
     ageGroup: varchar('ageGroup'),
     imageStyle: varchar('imageStyle'),
-    status: varchar('status').default('draft'),
-    rootNodeId: varchar('rootNodeId'),
-    currentNodeId: varchar('currentNodeId'),
-    totalPages: integer('totalPages').default(0),
+    status: varchar('status').default('draft').notNull(),
+    rootNodeId: varchar('rootNodeId').notNull(),
+    currentNodeId: varchar('currentNodeId').notNull(),
+    totalPages: integer('totalPages').default(0).notNull(),
     compiledPages: json('compiledPages'),
     coverImage: varchar('coverImage'),
     createdAt: timestamp('createdAt').defaultNow(),
@@ -36,6 +36,9 @@ export const InteractiveStories = pgTable(
   },
   table => ({
     storyIdIdx: index('interactive_stories_story_id_idx').on(table.storyId),
+    storyIdUniqueIdx: uniqueIndex('interactive_stories_story_id_unique_idx').on(
+      table.storyId
+    ),
     slugIdx: index('interactive_stories_slug_idx').on(table.slug),
     slugUniqueIdx: uniqueIndex('interactive_stories_slug_unique_idx').on(
       table.slug
@@ -45,14 +48,14 @@ export const InteractiveStories = pgTable(
 
 export const InteractiveStoryNodes = pgTable('interactiveStoryNodes_v2', {
   id: serial('id').primaryKey(),
-  nodeId: varchar('nodeId'),
-  storyId: varchar('storyId'),
+  nodeId: varchar('nodeId').notNull(),
+  storyId: varchar('storyId').notNull(),
   parentNodeId: varchar('parentNodeId'),
-  depth: integer('depth').default(0),
+  depth: integer('depth').default(0).notNull(),
   choiceTaken: text('choiceTaken'),
   choices: json('choices'),
   selectedChoice: text('selectedChoice'),
   pages: json('pages'),
-  isActive: boolean('isActive').default(true),
+  isActive: boolean('isActive').default(true).notNull(),
   createdAt: timestamp('createdAt').defaultNow(),
 });

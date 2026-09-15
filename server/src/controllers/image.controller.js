@@ -6,10 +6,10 @@ import {
 } from '../services/image.service.js';
 
 export const createPollinationsImageUrl = asyncHandler(async (req, res) => {
-  const imageUrl = buildPollinationsImageUrl(req.body?.prompt, {
-    seed: req.body?.seed,
-    width: req.body?.width,
-    height: req.body?.height,
+  const imageUrl = buildPollinationsImageUrl(req.validated.body.prompt, {
+    seed: req.validated.body.seed,
+    width: req.validated.body.width,
+    height: req.validated.body.height,
   });
 
   return res
@@ -18,7 +18,7 @@ export const createPollinationsImageUrl = asyncHandler(async (req, res) => {
 });
 
 export const persistImage = asyncHandler(async (req, res) => {
-  const uploadResult = await uploadImageToCloudinary(req.body?.imageUrl);
+  const uploadResult = await uploadImageToCloudinary(req.validated.body.imageUrl);
 
   return res.status(200).json(
     new ApiResponse(

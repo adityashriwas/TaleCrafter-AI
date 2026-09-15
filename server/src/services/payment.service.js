@@ -1,6 +1,12 @@
 import Stripe from 'stripe';
+import { eq } from 'drizzle-orm';
+import { db } from '../db/index.js';
+import { Payments } from '../db/schema.js';
 import ApiError from '../utils/ApiError.js';
-import { incrementUserCredits, syncUserFromClerk } from './user.service.js';
+import {
+  incrementUserCreditsByEmail,
+  syncUserFromClerk,
+} from './user.service.js';
 
 export const CREDIT_PLANS = [
   {
@@ -57,6 +63,43 @@ const getAppOrigin = origin => {
   return 'http://localhost:3000';
 };
 
+const getPaymentBySessionId = async sessionId => {
+  const rows = await db
+    .select()
+    .from(Payments)
+    .where(eq(Payments.providerSessionId, sessionId))
+    .limit(1);
+
+  return rows[0] ?? null;
+};
+
+const paymentIntentIdFromSession = session => {
+  const value = session.payment_intent;
+  if (!value) return null;
+  if (typeof value === 'string') return value;
+  return value.id ?? null;
+};
+
+const assertSessionMatchesPlan = ({ session, payment }) => {
+  const plan = getPlan(payment.planId);
+
+  if (session.mode !== 'payment') {
+    throw new ApiError(400, 'Invalid checkout session type');
+  }
+
+  if (session.currency !== payment.currency || session.amount_total !== payment.amountCents) {
+    throw new ApiError(400, 'Checkout session amount does not match the payment ledger');
+  }
+
+  if (plan.amountCents !== payment.amountCents || plan.credits !== payment.credits) {
+    throw new ApiError(400, 'Payment ledger does not match the configured plan');
+  }
+
+  if (session.metadata?.userEmail !== payment.userEmail) {
+    throw new ApiError(403, 'Checkout session user does not match the payment ledger');
+  }
+};
+
 export const createStripeCheckoutSession = async ({ userId, planId, origin }) => {
   const user = await syncUserFromClerk(userId);
   const plan = getPlan(planId);
@@ -86,7 +129,6 @@ export const createStripeCheckoutSession = async ({ userId, planId, origin }) =>
       planId: plan.id,
       credits: String(plan.credits),
       userEmail: user.userEmail,
-      fulfilled: 'false',
     },
   });
 
@@ -94,52 +136,102 @@ export const createStripeCheckoutSession = async ({ userId, planId, origin }) =>
     throw new ApiError(502, 'Unable to create Stripe checkout session');
   }
 
+  await db
+    .insert(Payments)
+    .values({
+      provider: 'stripe',
+      providerSessionId: session.id,
+      userEmail: user.userEmail,
+      planId: plan.id,
+      amountCents: plan.amountCents,
+      currency: 'usd',
+      credits: plan.credits,
+      status: 'pending',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .onConflictDoNothing({ target: Payments.providerSessionId });
+
   return { url: session.url, sessionId: session.id };
 };
 
-export const fulfillStripeCheckoutSession = async ({ userId, sessionId }) => {
+export const getStripeCheckoutStatus = async ({ userId, sessionId }) => {
   const safeSessionId = String(sessionId ?? '').trim();
   if (!safeSessionId) throw new ApiError(400, 'Stripe session ID is required');
 
   const user = await syncUserFromClerk(userId);
-  const stripe = getStripe();
-  const session = await stripe.checkout.sessions.retrieve(safeSessionId);
-  const metadata = session.metadata ?? {};
+  const payment = await getPaymentBySessionId(safeSessionId);
 
-  if (session.mode !== 'payment') {
-    throw new ApiError(400, 'Invalid checkout session type');
-  }
-
-  if (metadata.userEmail !== user.userEmail) {
+  if (!payment) throw new ApiError(404, 'Payment not found');
+  if (payment.userEmail !== user.userEmail) {
     throw new ApiError(403, 'This checkout session does not belong to you');
   }
 
-  const plan = getPlan(metadata.planId);
+  return {
+    status: payment.status,
+    credits: payment.credits,
+    fulfilledAt: payment.fulfilledAt,
+    user,
+  };
+};
 
-  if (session.currency !== 'usd' || session.amount_total !== plan.amountCents) {
-    throw new ApiError(400, 'Checkout session amount does not match the plan');
+export const fulfillStripeCheckoutSession = async ({ session, rawEvent }) => {
+  const safeSessionId = String(session?.id ?? '').trim();
+  if (!safeSessionId) throw new ApiError(400, 'Stripe session ID is required');
+
+  const payment = await getPaymentBySessionId(safeSessionId);
+  if (!payment) throw new ApiError(404, 'Payment ledger entry not found');
+
+  assertSessionMatchesPlan({ session, payment });
+
+  if (payment.status === 'fulfilled') {
+    return { status: 'fulfilled', idempotent: true };
   }
 
-  if (session.status !== 'complete') {
-    throw new ApiError(402, 'Checkout session is not complete');
-  }
+  if (session.status !== 'complete' || session.payment_status !== 'paid') {
+    await db
+      .update(Payments)
+      .set({
+        status: 'failed',
+        rawEvent,
+        updatedAt: new Date(),
+      })
+      .where(eq(Payments.providerSessionId, safeSessionId));
 
-  if (session.payment_status !== 'paid') {
     throw new ApiError(402, 'Payment has not been completed');
   }
 
-  if (metadata.fulfilled === 'true') {
-    return user;
+  const updatedUser = await incrementUserCreditsByEmail(payment.userEmail, payment.credits);
+
+  await db
+    .update(Payments)
+    .set({
+      status: 'fulfilled',
+      providerPaymentIntentId: paymentIntentIdFromSession(session),
+      rawEvent,
+      fulfilledAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .where(eq(Payments.providerSessionId, safeSessionId));
+
+  return { status: 'fulfilled', user: updatedUser };
+};
+
+export const constructStripeWebhookEvent = ({ rawBody, signature }) => {
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  if (!webhookSecret) {
+    throw new ApiError(503, 'Stripe webhook secret is not configured');
   }
-  const updatedUser = await incrementUserCredits(userId, plan.credits);
 
-  await stripe.checkout.sessions.update(safeSessionId, {
-    metadata: {
-      ...metadata,
-      fulfilled: 'true',
-      fulfilledAt: new Date().toISOString(),
-    },
-  });
+  if (!signature) {
+    throw new ApiError(400, 'Stripe signature is required');
+  }
 
-  return updatedUser;
+  const stripe = getStripe();
+
+  try {
+    return stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
+  } catch {
+    throw new ApiError(400, 'Invalid Stripe webhook signature');
+  }
 };

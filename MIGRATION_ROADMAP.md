@@ -57,7 +57,7 @@ Completed so far:
 - Added a frontend API client that sends Clerk bearer tokens.
 - Added backend-only credit decrement with authenticated Clerk identity.
 - Replaced the create-story client-side credit update with the backend credit endpoint.
-- Added Stripe Checkout session creation and backend-verified credit fulfillment.
+- Added Stripe Checkout session creation, a local payment ledger, and webhook-based credit fulfillment.
 
 ## Phase 3 - AI And Image Services
 
@@ -71,7 +71,7 @@ Status: in progress
 Completed so far:
 
 - Added Clerk-protected `POST /api/v1/ai/gemini` on the backend.
-- Moved Gemini text, story-generation, and image-analysis calls behind the backend.
+- Moved Gemini text and image-analysis calls behind the backend, and moved full classic/interactive story generation into backend commands.
 - Updated current Gemini callers to send Clerk bearer tokens through the frontend API client.
 - Added Clerk-protected image routes for Pollinations URL creation and Cloudinary persistence.
 - Moved Pollinations provider key usage and Cloudinary signing to the backend.
@@ -93,9 +93,9 @@ Completed so far:
 - Updated Explore stories to fetch from backend instead of direct Drizzle access.
 - Updated Dashboard user story list and story deletion to use authenticated backend APIs.
 - Updated public story detail helpers and related stories to fetch from backend APIs.
-- Removed backend slug mutation from legacy Next view redirect; slug creation will move with story creation later.
-- Moved classic story persistence, slug generation, chapter image generation, and Cloudinary persistence to protected backend `POST /api/v1/stories`.
-- Moved interactive starter creation, root node persistence, starter choices, and initial images to protected backend `POST /api/v1/interactive-stories`.
+- Removed backend slug mutation from legacy Next view redirect; slug creation is backend-owned during story creation.
+- Moved classic story request validation, credit check, Gemini generation, persistence, slug generation, chapter image generation, Cloudinary persistence, and credit decrement to protected backend `POST /api/v1/stories`.
+- Moved interactive starter request validation, credit check, Gemini generation, root node persistence, starter choices, initial images, and credit decrement to protected backend `POST /api/v1/interactive-stories`.
 
 ## Phase 5 - Interactive Story APIs
 
@@ -116,11 +116,16 @@ Completed so far:
 
 ## Phase 6 - Admin APIs
 
-Status: planned
+Status: in progress
 
 - Move admin story/user reads and mutations to backend.
 - Keep current `ADMIN_EMAIL` authorization initially.
 - Future discussion: replace email-based admin checks with Clerk metadata roles.
+
+Completed so far:
+
+- Added protected Express admin routes for story/user listing, deletion, credit updates, and story slug backfill.
+- Updated the admin page to use authenticated backend APIs instead of direct Drizzle access.
 
 ## Phase 7 - Client Cleanup
 
@@ -128,10 +133,8 @@ Status: in progress
 
 Remaining:
 
-- Remove client-side database imports.
-- Remove Next API routes that are replaced by Express, except SEO/sitemap routes that remain useful in Next.
-- Remove backend-only libraries from the client package after their backend replacements are wired.
-- Add a typed frontend API client that attaches Clerk tokens.
+- Finish replacing legacy `any` and `@ts-ignore` frontend debt.
+- Tighten accessibility warnings from the new React ESLint profile.
 - Split root env values into local `server/.env` and browser-safe `client/.env.local`.
 
 Completed so far:
@@ -139,21 +142,32 @@ Completed so far:
 - Removed the PayPal client dependency.
 - Removed the PayPal provider wrapper from the client provider.
 - Restored the buy credits UI with Stripe Checkout instead of PayPal.
+- Removed client-side Drizzle, Neon, Gemini, Cloudinary, and database config files/dependencies.
+- Removed replaced Next API routes for Gemini, image persistence, and admin slug backfill.
+- Kept the Next sitemap route but changed it to consume the Express sitemap API instead of direct DB access.
+- Added React/TypeScript ESLint tooling and aligned React type packages with the React 18 runtime.
 
 ## Phase 8 - Verification
 
-Status: planned
+Status: in progress
 
 - Run frontend typecheck/build.
 - Run backend lint/start smoke checks.
 - Manually verify public story read, explore, sign-in, dashboard, story creation, image upload analysis, interactive branching, admin, and feedback.
 
+Completed so far:
+
+- Backend lint passes.
+- Frontend typecheck passes.
+- Frontend lint runs with warnings for existing legacy UI debt.
+
 ## Stripe Payment Hardening Plan
 
 Status: in progress
 
-- Stripe Checkout session creation and backend verification are wired.
-- Add a dedicated payment table with a unique Stripe session/payment intent ID.
-- Add Stripe webhooks with signature verification for fulfillment independent of browser redirects.
-- Store provider transaction state and fulfillment timestamps for support/admin review.
-- Make credit addition idempotent through the local payment table.
+- Stripe Checkout session creation is wired.
+- Added a dedicated payment table schema with a unique Stripe session ID.
+- Added Stripe webhook signature verification and webhook-based fulfillment.
+- Store provider transaction state, raw event payload, and fulfillment timestamps.
+- Credit addition is idempotent through the local payment table status.
+- Remaining: run the SQL migration in the target database and add automated payment idempotency tests in the future test phase.

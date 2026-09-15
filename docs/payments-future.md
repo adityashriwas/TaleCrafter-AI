@@ -10,13 +10,14 @@ The Next.js buy credits page lets authenticated users select one of the existing
 - Premium: 75 credits for 3.99 USD
 - Ultimate: 150 credits for 5.99 USD
 
-The client asks the Express backend to create a Stripe Checkout session. After Stripe redirects back to the app, the backend retrieves the session from Stripe, verifies the authenticated Clerk user, amount, currency, session status, and payment status, then adds credits from backend-owned code only.
+The client asks the Express backend to create a Stripe Checkout session. The backend records a pending payment ledger row. Stripe then calls the backend webhook, where the signature, session, user, amount, currency, and plan are verified before credits are added from backend-owned code only. The success-page redirect only reads ledger status; it does not fulfill credits.
 
 ## Required Environment
 
 Server-only:
 
 - `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
 - `CLIENT_ORIGIN`, for example `http://localhost:3000`
 
 The hosted Checkout implementation does not require a browser-exposed Stripe publishable key.
@@ -29,9 +30,7 @@ That approach was removed because it trusted browser-side state for payment comp
 
 ## Remaining Production Hardening
 
-- Add a local payments table with a unique Stripe session/payment intent ID.
-- Fulfill credits idempotently from the payment record, not only Stripe session metadata.
-- Add Stripe webhooks so credits are added even if the user closes the tab after paying.
-- Verify webhook signatures with `STRIPE_WEBHOOK_SECRET`.
-- Store payment amount, currency, provider status, Clerk user ID, user email, plan ID, credits, and fulfillment timestamp.
+- Run `server/src/db/migrations/0001_payment_ledger_and_constraints.sql` in each database environment.
+- Add automated payment idempotency and webhook signature tests in the future test phase.
+- Store Clerk user ID in the payment ledger in addition to email if/when the user schema is expanded.
 - Add an admin/support view for checking payment and fulfillment state.

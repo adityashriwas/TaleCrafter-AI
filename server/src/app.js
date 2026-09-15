@@ -11,6 +11,8 @@ import imageRouter from './routes/image.route.js';
 import storyRouter from './routes/story.route.js';
 import interactiveStoryRouter from './routes/interactiveStory.route.js';
 import paymentRouter from './routes/payment.route.js';
+import { handleStripeWebhook } from './controllers/payment.controller.js';
+import adminRouter from './routes/admin.route.js';
 
 const app = express();
 
@@ -39,6 +41,12 @@ app.use(
   })
 );
 
+app.post(
+  `${API_PREFIX}/payments/stripe/webhook`,
+  express.raw({ type: 'application/json' }),
+  handleStripeWebhook
+);
+
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true, limit: '2mb' }));
 app.use(cookieParser());
@@ -53,6 +61,7 @@ app.use(`${API_PREFIX}/images`, imageRouter);
 app.use(`${API_PREFIX}/stories`, storyRouter);
 app.use(`${API_PREFIX}/interactive-stories`, interactiveStoryRouter);
 app.use(`${API_PREFIX}/payments`, paymentRouter);
+app.use(`${API_PREFIX}/admin`, adminRouter);
 
 app.use((req, _res, next) => {
   next(new ApiError(404, `Route not found: ${req.method} ${req.originalUrl}`));

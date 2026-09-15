@@ -13,7 +13,7 @@ export const getCurrentUser = asyncHandler(async (req, res) => {
 });
 
 export const decrementCurrentUserCredits = asyncHandler(async (req, res) => {
-  const amount = req.body?.amount ?? 1;
+  const amount = req.validated.body?.amount ?? 1;
   const user = await decrementUserCredits(req.auth.userId, amount);
 
   return res

@@ -5,7 +5,6 @@ import StoryType from "./(component)/StoryType";
 import AgeCategory from "./(component)/AgeCategory";
 import ImageStyle from "./(component)/ImageStyle";
 import { Button } from "@nextui-org/button";
-import uuid4 from "uuid4";
 import CustomLoader from "./(component)/CustomLoader";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { toast } from "react-toastify";
@@ -16,61 +15,6 @@ import { motion } from "framer-motion";
 import { apiFetch } from "@/lib/api-client";
 import type { UserDetail } from "@/app/_context/UserDetailContext";
 const MotionDiv: any = motion.div;
-
-const CREATE_STORY_PROMPT = process.env.NEXT_PUBLIC_CREATE_STORY_PROMPT;
-
-const cleanJsonText = (raw: string) =>
-  raw
-    .replace(/```json/gi, "")
-    .replace(/```/g, "")
-    .trim();
-
-const normalizeJsonCandidate = (raw: string) =>
-  raw
-    .replace(/[\u201C\u201D]/g, '"')
-    .replace(/[\u2018\u2019]/g, "'")
-    .replace(/,\s*([}\]])/g, "$1")
-    .trim();
-
-const tryParseGeminiJson = (raw: string) => {
-  const cleaned = cleanJsonText(raw);
-  const firstBrace = cleaned.indexOf("{");
-  const lastBrace = cleaned.lastIndexOf("}");
-
-  const candidates = [
-    cleaned,
-    firstBrace >= 0 && lastBrace > firstBrace
-      ? cleaned.slice(firstBrace, lastBrace + 1)
-      : "",
-  ].filter(Boolean);
-
-  for (const candidate of candidates) {
-    try {
-      return JSON.parse(normalizeJsonCandidate(candidate));
-    } catch {
-      // try next candidate
-    }
-  }
-
-  return null;
-};
-
-const buildJsonRepairPrompt = (brokenJson: string) => `
-You are a strict JSON repair assistant.
-Fix the JSON below so it is syntactically valid while preserving the original meaning and fields.
-Return ONLY valid JSON. No markdown fences. No explanation.
-
-${brokenJson}
-`;
-
-const parseGeminiJson = (raw: string) => {
-  const parsed = tryParseGeminiJson(raw);
-  if (parsed) {
-    return parsed;
-  }
-
-  throw new Error("Gemini response is not valid JSON");
-};
 
 export interface feildData {
   fieldValue: string;
@@ -84,9 +28,20 @@ export interface FormDataType {
   imageStyle: string;
 }
 
+type ClassicStoryResponse = {
+  slug?: string;
+  storyId?: string;
+  user?: UserDetail;
+};
+
+type InteractiveStoryResponse = {
+  storyId: string;
+  user?: UserDetail;
+};
+
 const CreateStory = () => {
   const router = useRouter();
-  const [formData, setFormData] = useState<FormDataType>();
+  const [formData, setFormData] = useState<Partial<FormDataType>>({});
   const [loading, setLoading] = useState<boolean>(false);
   const { user } = useUser();
   const { getToken } = useAuth();
@@ -96,24 +51,33 @@ const CreateStory = () => {
   const [storySubject, setStorySubject] = useState("");
 
   const onHandleUserSelection = (data: feildData) => {
-    setFormData((prev: any) => ({
+    setFormData((prev) => ({
       ...prev,
       [data.fieldName]: data.fieldValue,
     }));
   };
 
-  const callGemini = async (
-    prompt: string,
-    mode: "text" | "story-generation" = "text"
-  ) => {
-    const token = await getToken();
-    const data = await apiFetch<{ text: string }>("/ai/gemini", {
-      method: "POST",
-      token,
-      body: JSON.stringify({ prompt, mode }),
-    });
+  const buildRequestBody = () => {
+    const subject =
+      formData.storySubject ||
+      storySubject.replace("Here's a short story idea based on the image:", "").trim();
 
-    return String(data?.text ?? "");
+    return {
+      storySubject: subject,
+      storyType: formData.storyType,
+      ageGroup: formData.ageCategory,
+      imageStyle: formData.imageStyle,
+    };
+  };
+
+  const validateStoryRequest = () => {
+    const body = buildRequestBody();
+    if (!body.storySubject || !body.storyType || !body.ageGroup || !body.imageStyle) {
+      notifyError("Please complete all story options before generating.");
+      return null;
+    }
+
+    return body;
   };
 
   const GenerateStory = async (mode: "classic" | "interactive" = "classic") => {
@@ -128,123 +92,41 @@ const CreateStory = () => {
     }
 
     if (userDetail.credit <= 0) {
-      notifyError(
-        "You have no credit left! Please buy credit to generate story"
-      );
+      notifyError("You have no credit left! Please buy credit to generate story");
       return;
     }
 
-    setLoading(true);
-    const FINAL_PROMPT = (CREATE_STORY_PROMPT ?? "").replace(
-      "{ageGroup}",
-      formData?.ageCategory ?? ""
-    )
-      .replace("{storyType}", formData?.storyType ?? "")
-      .replace(
-        "{storySubject}",
-        formData?.storySubject ||
-          storySubject.replace(
-            "Here's a short story idea based on the image:",
-            ""
-          ) ||
-          ""
-      )
-      .replace("{imageStyle}", formData?.imageStyle ?? "");
-    const isInteractive = mode === "interactive";
-    const interactivePrompt = `${FINAL_PROMPT}\n\nFor interactive story starter, return 6 to 8 chapters minimum in consistent JSON format. No markdown wrappers.`;
-    try {
-      const outputText = await callGemini(
-        isInteractive ? interactivePrompt : FINAL_PROMPT,
-        "story-generation"
-      );
-      let story = tryParseGeminiJson(outputText);
+    const body = validateStoryRequest();
+    if (!body) return;
 
-      // Keep classic flow untouched; only repair malformed JSON for interactive starter.
-      if (!story && isInteractive) {
-        const repairedText = await callGemini(
-          buildJsonRepairPrompt(cleanJsonText(outputText)),
-          "text"
-        );
-        story = tryParseGeminiJson(repairedText);
-      }
-
-      if (!story) {
-        story = parseGeminiJson(outputText);
-      }
-
-      if (!Array.isArray(story?.chapters) || story.chapters.length === 0) {
-        throw new Error("Generated story does not contain chapters");
-      }
-      let resp: any;
-      if (isInteractive) {
-        resp = await SaveInteractiveStarterInDB(story);
-      } else {
-        resp = await SaveInDB(story);
-      }
-      notify("Story Generated Successfully");
-      await UpdateUserCredits();
-      router.push((isInteractive ? "/interactive-story/" : "/story/") + resp);
-
-      setLoading(false);
-    } catch (error) {
-      console.error("Error generating story:", error);
-      notifyError("Server Error! Please try in a moment.");
-      setLoading(false);
-    }
-  };
-
-  const SaveInDB = async (output: any) => {
-    const recordId = uuid4();
     setLoading(true);
     try {
       const token = await getToken();
-      const result = await apiFetch<{ slug?: string; storyId?: string }>("/stories", {
+      const isInteractive = mode === "interactive";
+      const endpoint = isInteractive ? "/interactive-stories" : "/stories";
+      const result = await apiFetch<ClassicStoryResponse | InteractiveStoryResponse>(endpoint, {
         method: "POST",
         token,
-        body: JSON.stringify({
-          storyId: recordId,
-          ageGroup: formData?.ageCategory,
-          storyType: formData?.storyType,
-          storySubject: formData?.storySubject,
-          imageStyle: formData?.imageStyle,
-          output,
-        }),
+        body: JSON.stringify(body),
       });
-      setLoading(false);
-      return result?.slug || result?.storyId;
+
+      if (result.user) {
+        setUserDetail(result.user);
+      }
+
+      notify("Story Generated Successfully");
+      const target = isInteractive
+        ? (result as InteractiveStoryResponse).storyId
+        : (result as ClassicStoryResponse).slug || (result as ClassicStoryResponse).storyId;
+
+      if (!target) throw new Error("Story response did not include a navigation target");
+      router.push((isInteractive ? "/interactive-story/" : "/story/") + target);
     } catch (error) {
-      notifyError("Server Error! Please try again");
+      console.error("Error generating story:", error);
+      notifyError("Server Error! Please try in a moment.");
+    } finally {
       setLoading(false);
     }
-  };
-
-  const SaveInteractiveStarterInDB = async (story: any) => {
-    const token = await getToken();
-    const result = await apiFetch<{ storyId: string }>("/interactive-stories", {
-      method: "POST",
-      token,
-      body: JSON.stringify({
-        story,
-        formData: {
-          storySubject: formData?.storySubject,
-          storyType: formData?.storyType,
-          ageGroup: formData?.ageCategory,
-          imageStyle: formData?.imageStyle,
-        },
-      }),
-    });
-
-    return result.storyId;
-  };
-
-  const UpdateUserCredits = async () => {
-    const token = await getToken();
-    const updatedUser = await apiFetch<UserDetail>("/users/me/credits/decrement", {
-      method: "POST",
-      token,
-      body: JSON.stringify({ amount: 1 }),
-    });
-    setUserDetail(updatedUser);
   };
   const fadeUp = {
     hidden: { opacity: 0, y: 24 },
