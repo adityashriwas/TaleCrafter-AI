@@ -42,13 +42,19 @@ Completed so far:
 
 ## Phase 2 - User And Credit APIs
 
-Status: planned
+Status: in progress
 
 - Move user creation/sync from `client/app/Provider.tsx` to backend.
 - Add `GET /api/v1/users/me`.
 - Add secure credit reads and backend-only credit decrement.
 - Keep purchase flow disabled until a new payment provider is selected.
 - Keep admin credit updates using `ADMIN_EMAIL` for now.
+
+Completed so far:
+
+- Added `GET /api/v1/users/me` behind Clerk auth.
+- Moved user creation/profile sync from `client/app/Provider.tsx` to the backend.
+- Added a frontend API client that sends Clerk bearer tokens.
 
 ## Phase 3 - AI And Image Services
 

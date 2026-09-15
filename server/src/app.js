@@ -5,6 +5,7 @@ import { clerkMiddleware } from '@clerk/express';
 import { API_PREFIX } from './constants.js';
 import ApiError from './utils/ApiError.js';
 import healthRouter from './routes/health.route.js';
+import userRouter from './routes/user.route.js';
 
 const app = express();
 
@@ -26,6 +27,8 @@ app.use(cookieParser());
 app.use(`${API_PREFIX}/health`, healthRouter);
 
 app.use(clerkMiddleware());
+
+app.use(`${API_PREFIX}/users`, userRouter);
 
 app.use((req, _res, next) => {
   next(new ApiError(404, `Route not found: ${req.method} ${req.originalUrl}`));

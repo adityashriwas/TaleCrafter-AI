@@ -376,7 +376,7 @@ const CreateStory = () => {
     await db
       .update(Users)
       .set({
-        credit: Number(userDetail?.credit - 1),
+        credit: Number((userDetail?.credit ?? 0) - 1),
       })
       .where(eq(Users.userEmail, user?.primaryEmailAddress?.emailAddress ?? ""))
       .returning({ id: Users.id });
