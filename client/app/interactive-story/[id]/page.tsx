@@ -16,7 +16,7 @@ import {
   type InteractivePage,
 } from "@/config/plottwist";
 import {
-  buildPollinationsImageUrl,
+  createPollinationsImageUrl,
   persistImageUrl,
 } from "@/lib/story-images";
 import { db } from "@/config/config";
@@ -110,9 +110,9 @@ const InteractiveStoryPage = () => {
     return String(data?.text ?? "");
   };
 
-  const persistWithFallback = async (imageUrl: string) => {
+  const persistWithFallback = async (imageUrl: string, token?: string | null) => {
     try {
-      return await persistImageUrl(imageUrl);
+      return await persistImageUrl(imageUrl, token);
     } catch {
       return imageUrl;
     }
@@ -326,17 +326,20 @@ const InteractiveStoryPage = () => {
       const depth = Math.min(MAX_DEPTH, Number(activeNode.depth ?? 0) + 1);
       const now = new Date();
 
-      const mappedPages = resolutionPages.map((page, index) => ({
-        ...page,
-        pageNumber: totalPages + index + 1,
-        imageUrl: buildPollinationsImageUrl(page.imagePrompt || page.text, {
-          seed: `${Date.now()}_final_${index}_${Math.floor(Math.random() * 100000)}`,
-        }),
-      }));
+      const imageToken = await getToken();
+      const mappedPages = await Promise.all(
+        resolutionPages.map(async (page, index) => ({
+          ...page,
+          pageNumber: totalPages + index + 1,
+          imageUrl: await createPollinationsImageUrl(page.imagePrompt || page.text, {
+            seed: `${Date.now()}_final_${index}_${Math.floor(Math.random() * 100000)}`,
+          }, imageToken),
+        }))
+      );
       const persistedResolution = await Promise.all(
         mappedPages.map(async (page) => ({
           ...page,
-          imageUrl: await persistWithFallback(page.imageUrl || ""),
+          imageUrl: await persistWithFallback(page.imageUrl || "", imageToken),
         }))
       );
 
@@ -449,17 +452,20 @@ const InteractiveStoryPage = () => {
       const nextNodeId = uuid4();
       const now = new Date();
       const nextDepth = Number(activeNode.depth ?? 0) + 1;
-      const mappedPages = pages.map((page, index) => ({
-        ...page,
-        pageNumber: totalPages + index + 1,
-        imageUrl: buildPollinationsImageUrl(page.imagePrompt || page.text, {
-          seed: `${Date.now()}_${index}_${Math.floor(Math.random() * 100000)}`,
-        }),
-      }));
+      const imageToken = await getToken();
+      const mappedPages = await Promise.all(
+        pages.map(async (page, index) => ({
+          ...page,
+          pageNumber: totalPages + index + 1,
+          imageUrl: await createPollinationsImageUrl(page.imagePrompt || page.text, {
+            seed: `${Date.now()}_${index}_${Math.floor(Math.random() * 100000)}`,
+          }, imageToken),
+        }))
+      );
       const persistedMappedPages = await Promise.all(
         mappedPages.map(async (page) => ({
           ...page,
-          imageUrl: await persistWithFallback(page.imageUrl || ""),
+          imageUrl: await persistWithFallback(page.imageUrl || "", imageToken),
         }))
       );
 

@@ -72,6 +72,9 @@ Completed so far:
 - Added Clerk-protected `POST /api/v1/ai/gemini` on the backend.
 - Moved Gemini text, story-generation, and image-analysis calls behind the backend.
 - Updated current Gemini callers to send Clerk bearer tokens through the frontend API client.
+- Added Clerk-protected image routes for Pollinations URL creation and Cloudinary persistence.
+- Moved Pollinations provider key usage and Cloudinary signing to the backend.
+- Kept a keyless public fallback image URL builder for legacy/unpersisted story reads.
 
 ## Phase 4 - Story APIs
 

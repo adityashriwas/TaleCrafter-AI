@@ -18,7 +18,7 @@ import { motion } from "framer-motion";
 import { dbV2 } from "@/config/configV2";
 import { InteractiveStories, InteractiveStoryNodes } from "@/config/schemaV2";
 import { buildChoicePrompt, makePageContext, parseChoices } from "@/config/plottwist";
-import { buildPollinationsImageUrl, persistImageUrl } from "@/lib/story-images";
+import { createPollinationsImageUrl, persistImageUrl } from "@/lib/story-images";
 import { generateUniqueStorySlug } from "@/lib/story-slug";
 import { apiFetch } from "@/lib/api-client";
 import type { UserDetail } from "@/app/_context/UserDetailContext";
@@ -124,9 +124,9 @@ const CreateStory = () => {
     return String(data?.text ?? "");
   };
 
-  const persistWithFallback = async (imageUrl: string) => {
+  const persistWithFallback = async (imageUrl: string, token?: string | null) => {
     try {
-      return await persistImageUrl(imageUrl);
+      return await persistImageUrl(imageUrl, token);
     } catch {
       return imageUrl;
     }
@@ -169,6 +169,7 @@ const CreateStory = () => {
     const isInteractive = mode === "interactive";
     const interactivePrompt = `${FINAL_PROMPT}\n\nFor interactive story starter, return 6 to 8 chapters minimum in consistent JSON format. No markdown wrappers.`;
     try {
+      const imageToken = await getToken();
       const outputText = await callGemini(
         isInteractive ? interactivePrompt : FINAL_PROMPT,
         "story-generation"
@@ -207,11 +208,11 @@ const CreateStory = () => {
           /\s+/g,
           "-"
         )}`;
-        const coverPollinationsUrl = buildPollinationsImageUrl(prompt, {
+        const coverPollinationsUrl = await createPollinationsImageUrl(prompt, {
           width: 410,
           height: 630,
           seed: 0,
-        });
+        }, imageToken);
 
         const chapters = (story.chapters as any[]).map((chapter: any, index: number) => ({
           ...chapter,
@@ -223,10 +224,10 @@ const CreateStory = () => {
             const sourcePrompt = String(
               chapter?.imagePrompt ?? chapter?.textPrompt ?? `${safeTitle} illustration`
             ).trim();
-            const pollinationsUrl = buildPollinationsImageUrl(sourcePrompt, {
+            const pollinationsUrl = await createPollinationsImageUrl(sourcePrompt, {
               seed: `${Date.now()}_${index}_${Math.floor(Math.random() * 100000)}`,
-            });
-            const persistedUrl = await persistWithFallback(pollinationsUrl);
+            }, imageToken);
+            const persistedUrl = await persistWithFallback(pollinationsUrl, imageToken);
 
             return {
               ...chapter,
@@ -236,7 +237,7 @@ const CreateStory = () => {
           })
         );
 
-        const persistedCoverImage = await persistWithFallback(coverPollinationsUrl);
+        const persistedCoverImage = await persistWithFallback(coverPollinationsUrl, imageToken);
         const persistedStoryOutput = {
           ...story,
           chapters: persistedChapterEntries,
@@ -292,16 +293,17 @@ const CreateStory = () => {
     const slug = await generateUniqueStorySlug(interactiveTitle);
     const chapters = Array.isArray(story?.chapters) ? story.chapters : [];
 
+    const imageToken = await getToken();
     const starterPages = await Promise.all(chapters.map(async (chapter: any, index: number) => {
       const prompt = String(chapter?.imagePrompt ?? chapter?.textPrompt ?? "Story illustration");
       const seed = `${Date.now()}_${index}_${Math.floor(Math.random() * 100000)}`;
-      const pollinationsUrl = buildPollinationsImageUrl(prompt, { seed });
+      const pollinationsUrl = await createPollinationsImageUrl(prompt, { seed }, imageToken);
       return {
         pageNumber: index + 1,
         title: String(chapter?.title ?? `Chapter ${index + 1}`),
         text: String(chapter?.textPrompt ?? ""),
         imagePrompt: prompt,
-        imageUrl: await persistWithFallback(pollinationsUrl),
+        imageUrl: await persistWithFallback(pollinationsUrl, imageToken),
       };
     }));
 
@@ -318,12 +320,12 @@ const CreateStory = () => {
       "-"
     )}"-in-bold-text-for-book-cover-image,-${coverPromptSource.replace(/\s+/g, "-")}`;
     const coverSeed = `${Date.now()}${Math.floor(Math.random() * 100000)}`;
-    const coverImageUrl = buildPollinationsImageUrl(defaultStyleCoverPrompt, {
+    const coverImageUrl = await createPollinationsImageUrl(defaultStyleCoverPrompt, {
       width: 410,
       height: 630,
       seed: coverSeed,
-    });
-    const persistedCoverImageUrl = await persistWithFallback(coverImageUrl);
+    }, imageToken);
+    const persistedCoverImageUrl = await persistWithFallback(coverImageUrl, imageToken);
 
     const starterContext = makePageContext(starterPages as any, 4);
     const starterChoiceText = await callGemini(buildChoicePrompt(starterContext));

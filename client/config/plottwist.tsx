@@ -112,7 +112,7 @@ export const parseContinuationPayload = (raw: string): {
 
 export const createUniqueImageUrl = (prompt: string, seed: string | number) => {
   const encodedPrompt = encodeURIComponent(prompt);
-  return `https://gen.pollinations.ai/image/${encodedPrompt}?model=${process.env.NEXT_PUBLIC_POLLINATIONS_AI_MODEL}&enhance=false&negative_prompt=worst+quality%2C+blurry&safe=false&seed=${seed}&key=${process.env.NEXT_PUBLIC_POLLINATIONS_API_KEY}`;
+  return `https://gen.pollinations.ai/image/${encodedPrompt}?model=flux&enhance=false&negative_prompt=worst+quality%2C+blurry&safe=false&seed=${seed}`;
 };
 
 export const makePageContext = (pages: InteractivePage[], maxPages = 4) => {
