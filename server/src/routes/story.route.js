@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import {
+  createStory,
   deleteStory,
   getCurrentUserStories,
   getPublicStories,
@@ -13,6 +14,7 @@ import { requireAuth } from '../middlewares/clerkAuth.middleware.js';
 const router = Router();
 
 router.get('/', getPublicStories);
+router.post('/', requireAuth, createStory);
 router.get('/me', requireAuth, getCurrentUserStories);
 router.get('/sitemap', getStorySitemapEntries);
 router.get('/slug/:slug', getStorySlugDetail);

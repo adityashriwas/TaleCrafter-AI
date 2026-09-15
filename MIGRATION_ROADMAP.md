@@ -93,6 +93,7 @@ Completed so far:
 - Updated Dashboard user story list and story deletion to use authenticated backend APIs.
 - Updated public story detail helpers and related stories to fetch from backend APIs.
 - Removed backend slug mutation from legacy Next view redirect; slug creation will move with story creation later.
+- Moved classic story persistence and slug generation to protected backend `POST /api/v1/stories`.
 
 ## Phase 5 - Interactive Story APIs
 

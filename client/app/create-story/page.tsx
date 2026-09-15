@@ -5,8 +5,6 @@ import StoryType from "./(component)/StoryType";
 import AgeCategory from "./(component)/AgeCategory";
 import ImageStyle from "./(component)/ImageStyle";
 import { Button } from "@nextui-org/button";
-import { db } from "@/config/config";
-import { StoryData } from "@/config/schema";
 import uuid4 from "uuid4";
 import CustomLoader from "./(component)/CustomLoader";
 import { useAuth, useUser } from "@clerk/nextjs";
@@ -258,28 +256,24 @@ const CreateStory = () => {
 
   const SaveInDB = async (output: any, imageResp: string) => {
     const recordId = uuid4();
-    const title = String(output?.title ?? formData?.storySubject ?? "AI Generated Story");
-    const slug = await generateUniqueStorySlug(title);
     setLoading(true);
     try {
-      const result = await db
-        .insert(StoryData)
-        .values({
+      const token = await getToken();
+      const result = await apiFetch<{ slug?: string; storyId?: string }>("/stories", {
+        method: "POST",
+        token,
+        body: JSON.stringify({
           storyId: recordId,
-          slug,
           ageGroup: formData?.ageCategory,
           storyType: formData?.storyType,
           storySubject: formData?.storySubject,
           imageStyle: formData?.imageStyle,
           output,
           coverImage: imageResp,
-          userEmail: user?.primaryEmailAddress?.emailAddress,
-          userName: user?.fullName,
-          userImage: user?.imageUrl,
-        })
-        .returning({ StorySlug: StoryData.slug, StoryId: StoryData.storyId });
+        }),
+      });
       setLoading(false);
-      return result[0]?.StorySlug || result[0]?.StoryId;
+      return result?.slug || result?.storyId;
     } catch (error) {
       notifyError("Server Error! Please try again");
       setLoading(false);

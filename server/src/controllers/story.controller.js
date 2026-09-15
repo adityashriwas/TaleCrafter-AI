@@ -1,6 +1,7 @@
 import ApiResponse from '../utils/ApiResponse.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import {
+  createClassicStory,
   deleteCurrentUserStory,
   getStoryBySlug,
   getStoryByStoryId,
@@ -59,4 +60,14 @@ export const deleteStory = asyncHandler(async (req, res) => {
     storyId: req.params.storyId,
   });
   return res.status(200).json(new ApiResponse(200, story, 'Story deleted'));
+});
+
+
+export const createStory = asyncHandler(async (req, res) => {
+  const story = await createClassicStory({
+    userId: req.auth.userId,
+    payload: req.body ?? {},
+  });
+
+  return res.status(201).json(new ApiResponse(201, story, 'Story created'));
 });
