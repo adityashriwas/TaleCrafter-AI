@@ -1,8 +1,10 @@
+import { randomUUID } from 'node:crypto';
 import { and, desc, eq, like, ne, sql } from 'drizzle-orm';
 import { db } from '../db/index.js';
 import { StoryData } from '../db/schema.js';
 import ApiError from '../utils/ApiError.js';
 import { syncUserFromClerk } from './user.service.js';
+import { buildPollinationsImageUrl, uploadImageToCloudinary } from './image.service.js';
 
 const MAX_BASE_SLUG_LENGTH = 70;
 
@@ -165,11 +167,86 @@ export const listRelatedStories = async ({ storyId, storyType, limit, offset }) 
   };
 };
 
+const persistImageWithFallback = async imageUrl => {
+  try {
+    const result = await uploadImageToCloudinary(imageUrl);
+    return result.secureUrl || imageUrl;
+  } catch {
+    return imageUrl;
+  }
+};
+
+const mapWithConcurrency = async (items, concurrency, mapper) => {
+  const results = new Array(items.length);
+  let cursor = 0;
+
+  const workers = Array.from(
+    { length: Math.min(concurrency, Math.max(1, items.length)) },
+    async () => {
+      while (cursor < items.length) {
+        const index = cursor;
+        cursor += 1;
+        results[index] = await mapper(items[index], index);
+      }
+    }
+  );
+
+  await Promise.all(workers);
+  return results;
+};
+
+const prepareClassicStoryImages = async ({ output, imageStyle }) => {
+  const story = output ?? {};
+  const title = String(story?.title ?? 'Story');
+  const chapters = Array.isArray(story?.chapters) ? story.chapters : [];
+  const coverPromptSource = String(
+    story?.coverImagePrompt ??
+      `${title} ${imageStyle ?? 'illustration'} book cover`
+  );
+  const coverPrompt = `Add-title-"${title.replace(/\s+/g, '-')}"-in-bold-text-for-book-cover-image,-${coverPromptSource.replace(/\s+/g, '-')}`;
+  const coverUrl = buildPollinationsImageUrl(coverPrompt, {
+    width: 410,
+    height: 630,
+    seed: Date.now(),
+  });
+
+  const [coverImage, persistedChapters] = await Promise.all([
+    persistImageWithFallback(coverUrl),
+    mapWithConcurrency(chapters, 3, async (chapter, index) => {
+      const sourcePrompt = String(
+        chapter?.imagePrompt ?? chapter?.textPrompt ?? `${title} illustration`
+      ).trim();
+      const generatedImageUrl = buildPollinationsImageUrl(sourcePrompt, {
+        seed: `${Date.now()}_${index}_${Math.floor(Math.random() * 100000)}`,
+      });
+
+      return {
+        ...chapter,
+        chapterNumber: Number(chapter?.chapterNumber ?? index + 1),
+        imagePrompt: sourcePrompt,
+        imageUrl: await persistImageWithFallback(generatedImageUrl),
+      };
+    }),
+  ]);
+
+  return {
+    output: {
+      ...story,
+      chapters: persistedChapters,
+    },
+    coverImage,
+  };
+};
+
 export const createClassicStory = async ({ userId, payload }) => {
   const user = await syncUserFromClerk(userId);
-  const output = payload?.output ?? null;
+  const storyId = String(payload?.storyId ?? randomUUID());
+  const prepared = await prepareClassicStoryImages({
+    output: payload?.output ?? null,
+    imageStyle: payload?.imageStyle,
+  });
   const title = extractStoryTitle({
-    output,
+    output: prepared.output,
     storySubject: payload?.storySubject,
   });
   const slug = await generateUniqueStorySlug(title);
@@ -177,14 +254,14 @@ export const createClassicStory = async ({ userId, payload }) => {
   const inserted = await db
     .insert(StoryData)
     .values({
-      storyId: payload?.storyId,
+      storyId,
       slug,
       ageGroup: payload?.ageGroup,
       storyType: payload?.storyType,
       storySubject: payload?.storySubject,
       imageStyle: payload?.imageStyle,
-      output,
-      coverImage: payload?.coverImage,
+      output: prepared.output,
+      coverImage: prepared.coverImage,
       userEmail: user.userEmail,
       userName: user.userName,
       userImage: user.userImage,

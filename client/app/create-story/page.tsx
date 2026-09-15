@@ -13,7 +13,6 @@ import { useRouter } from "next/navigation";
 import { UserDetailContext } from "@/app/_context/UserDetailContext";
 import UploadImage from "./(component)/UploadImage";
 import { motion } from "framer-motion";
-import { createPollinationsImageUrl, persistImageUrl } from "@/lib/story-images";
 import { apiFetch } from "@/lib/api-client";
 import type { UserDetail } from "@/app/_context/UserDetailContext";
 const MotionDiv: any = motion.div;
@@ -117,14 +116,6 @@ const CreateStory = () => {
     return String(data?.text ?? "");
   };
 
-  const persistWithFallback = async (imageUrl: string, token?: string | null) => {
-    try {
-      return await persistImageUrl(imageUrl, token);
-    } catch {
-      return imageUrl;
-    }
-  };
-
   const GenerateStory = async (mode: "classic" | "interactive" = "classic") => {
     if (!user) {
       router.push("/sign-up?redirect_url=/create-story");
@@ -162,7 +153,6 @@ const CreateStory = () => {
     const isInteractive = mode === "interactive";
     const interactivePrompt = `${FINAL_PROMPT}\n\nFor interactive story starter, return 6 to 8 chapters minimum in consistent JSON format. No markdown wrappers.`;
     try {
-      const imageToken = await getToken();
       const outputText = await callGemini(
         isInteractive ? interactivePrompt : FINAL_PROMPT,
         "story-generation"
@@ -185,57 +175,11 @@ const CreateStory = () => {
       if (!Array.isArray(story?.chapters) || story.chapters.length === 0) {
         throw new Error("Generated story does not contain chapters");
       }
-      const safeTitle = String(story?.title ?? "Story");
-      const safeCoverPrompt = String(
-        story?.coverImagePrompt ??
-          `${safeTitle} ${formData?.imageStyle ?? "illustration"} book cover`
-      );
       let resp: any;
       if (isInteractive) {
         resp = await SaveInteractiveStarterInDB(story);
       } else {
-        const prompt = `Add-title-"${safeTitle.replace(
-          /\s+/g,
-          "-"
-        )}"-in-bold-text-for-book-cover-image,-${safeCoverPrompt.replace(
-          /\s+/g,
-          "-"
-        )}`;
-        const coverPollinationsUrl = await createPollinationsImageUrl(prompt, {
-          width: 410,
-          height: 630,
-          seed: 0,
-        }, imageToken);
-
-        const chapters = (story.chapters as any[]).map((chapter: any, index: number) => ({
-          ...chapter,
-          chapterNumber: Number(chapter?.chapterNumber ?? index + 1),
-        }));
-
-        const persistedChapterEntries = await Promise.all(
-          chapters.map(async (chapter: any, index: number) => {
-            const sourcePrompt = String(
-              chapter?.imagePrompt ?? chapter?.textPrompt ?? `${safeTitle} illustration`
-            ).trim();
-            const pollinationsUrl = await createPollinationsImageUrl(sourcePrompt, {
-              seed: `${Date.now()}_${index}_${Math.floor(Math.random() * 100000)}`,
-            }, imageToken);
-            const persistedUrl = await persistWithFallback(pollinationsUrl, imageToken);
-
-            return {
-              ...chapter,
-              imagePrompt: sourcePrompt,
-              imageUrl: persistedUrl,
-            };
-          })
-        );
-
-        const persistedCoverImage = await persistWithFallback(coverPollinationsUrl, imageToken);
-        const persistedStoryOutput = {
-          ...story,
-          chapters: persistedChapterEntries,
-        };
-        resp = await SaveInDB(persistedStoryOutput, persistedCoverImage);
+        resp = await SaveInDB(story);
       }
       notify("Story Generated Successfully");
       await UpdateUserCredits();
@@ -249,7 +193,7 @@ const CreateStory = () => {
     }
   };
 
-  const SaveInDB = async (output: any, imageResp: string) => {
+  const SaveInDB = async (output: any) => {
     const recordId = uuid4();
     setLoading(true);
     try {
@@ -264,7 +208,6 @@ const CreateStory = () => {
           storySubject: formData?.storySubject,
           imageStyle: formData?.imageStyle,
           output,
-          coverImage: imageResp,
         }),
       });
       setLoading(false);

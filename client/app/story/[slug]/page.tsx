@@ -7,9 +7,9 @@ import { extractStorySummary, getStoryBySlug } from "@/lib/story-data";
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string } | Promise<{ slug: string }>;
+  params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const resolvedParams = await Promise.resolve(params);
+  const resolvedParams = await params;
   const slug = decodeURIComponent(resolvedParams.slug);
   const story = await getStoryBySlug(slug);
 
@@ -74,9 +74,9 @@ export async function generateMetadata({
 export default async function StorySlugPage({
   params,
 }: {
-  params: { slug: string } | Promise<{ slug: string }>;
+  params: Promise<{ slug: string }>;
 }) {
-  const resolvedParams = await Promise.resolve(params);
+  const resolvedParams = await params;
   const slug = decodeURIComponent(resolvedParams.slug);
   const story = await getStoryBySlug(slug);
 
