@@ -69,11 +69,11 @@ const ExploreMore = () => {
 
     loadingRef.current = true;
     setLoading(true);
-    setOffset(newOffset);
 
     try {
       const result = await apiFetch<StoryItemType[]>(`/stories?limit=${PAGE_SIZE}&offset=${newOffset}`);
 
+      setOffset(newOffset);
       setStoryList((prev) => {
         const merged =
           newOffset === 0 ? result : [...(prev || []), ...(result || [])];
@@ -90,6 +90,8 @@ const ExploreMore = () => {
       if (newOffset === 0) {
         setStoryList(result || []);
       }
+    } catch {
+      setHasMoreStories(false);
     } finally {
       loadingRef.current = false;
       setLoading(false);
@@ -140,8 +142,6 @@ const ExploreMore = () => {
     }
 
     if (!restored) {
-      GetAllStories(0);
-    } else {
       GetAllStories(0);
     }
     setIsRestored(true);

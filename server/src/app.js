@@ -13,13 +13,27 @@ import interactiveStoryRouter from './routes/interactiveStory.route.js';
 
 const app = express();
 
-const allowedOrigins = process.env.CORS_ORIGIN
-  ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
-  : true;
+const configuredOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim()).filter(Boolean)
+  : [];
+
+const devOrigins = [
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+];
+
+const allowedOrigins = new Set([...configuredOrigins, ...devOrigins]);
 
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin(origin, callback) {
+      if (!origin || allowedOrigins.has(origin)) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new ApiError(403, 'Not allowed by CORS'));
+    },
     credentials: true,
   })
 );

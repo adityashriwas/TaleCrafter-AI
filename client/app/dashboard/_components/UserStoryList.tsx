@@ -81,6 +81,8 @@ const UserStoryList = () => {
         return Array.from(uniqueById.values());
       });
       setHasMoreStories(result.length >= PAGE_SIZE);
+    } catch {
+      setHasMoreStories(false);
     } finally {
       loadingRef.current = false;
       setLoading(false);
