@@ -320,6 +320,12 @@ export const deleteCurrentUserInteractiveStory = async ({ userId, storyId }) => 
     .delete(InteractiveStoryNodes)
     .where(eq(InteractiveStoryNodes.storyId, story.storyId));
 
+  await db
+    .delete(StoryData)
+    .where(
+      eq(StoryData.storyId, story.storyId)
+    );
+
   const deleted = await dbV2
     .delete(InteractiveStories)
     .where(eq(InteractiveStories.storyId, story.storyId))

@@ -1,7 +1,8 @@
 import { randomUUID } from 'node:crypto';
 import { and, desc, eq, isNotNull, like, ne, sql } from 'drizzle-orm';
-import { db } from '../db/index.js';
+import { db, dbV2 } from '../db/index.js';
 import { StoryData } from '../db/schema.js';
+import { InteractiveStories, InteractiveStoryNodes } from '../db/schemaV2.js';
 import ApiError from '../utils/ApiError.js';
 import { decrementUserCredits, syncUserFromClerk } from './user.service.js';
 import { buildPollinationsImageUrl, uploadImageToCloudinary } from './image.service.js';
@@ -313,6 +314,19 @@ export const deleteCurrentUserStory = async ({ userId, storyId }) => {
   if (!deleted[0]) {
     throw new ApiError(404, 'Story not found or you do not have access');
   }
+
+  await dbV2
+    .delete(InteractiveStoryNodes)
+    .where(eq(InteractiveStoryNodes.storyId, safeStoryId));
+
+  await dbV2
+    .delete(InteractiveStories)
+    .where(
+      and(
+        eq(InteractiveStories.storyId, safeStoryId),
+        eq(InteractiveStories.userEmail, user.userEmail)
+      )
+    );
 
   return deleted[0];
 };

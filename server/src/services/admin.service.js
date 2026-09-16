@@ -1,6 +1,7 @@
 import { asc, desc, eq, isNull, sql } from 'drizzle-orm';
-import { db } from '../db/index.js';
+import { db, dbV2 } from '../db/index.js';
 import { StoryData, Users } from '../db/schema.js';
+import { InteractiveStories, InteractiveStoryNodes } from '../db/schemaV2.js';
 import ApiError from '../utils/ApiError.js';
 import { extractStoryTitle, generateUniqueStorySlug } from './story.service.js';
 
@@ -31,6 +32,15 @@ export const deleteAdminStory = async storyId => {
     .returning({ storyId: StoryData.storyId });
 
   if (!deleted[0]) throw new ApiError(404, 'Story not found');
+
+  await dbV2
+    .delete(InteractiveStoryNodes)
+    .where(eq(InteractiveStoryNodes.storyId, safeStoryId));
+
+  await dbV2
+    .delete(InteractiveStories)
+    .where(eq(InteractiveStories.storyId, safeStoryId));
+
   return deleted[0];
 };
 

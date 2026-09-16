@@ -27,6 +27,34 @@ type StoryItemType = {
   onDeleteSuccess?: (storyId: string) => void;
 };
 
+const removeStoryFromCachedLists = (storyId: string) => {
+  if (typeof window === "undefined") return;
+
+  const cacheKeys = ["explore_stories_cache_v1"];
+  for (let index = 0; index < sessionStorage.length; index += 1) {
+    const key = sessionStorage.key(index);
+    if (key?.startsWith("dashboard_stories_cache_v1_")) {
+      cacheKeys.push(key);
+    }
+  }
+
+  cacheKeys.forEach((key) => {
+    try {
+      const raw = sessionStorage.getItem(key);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed?.storyList)) return;
+
+      parsed.storyList = parsed.storyList.filter(
+        (item: { storyId?: string }) => item.storyId !== storyId
+      );
+      sessionStorage.setItem(key, JSON.stringify(parsed));
+    } catch {
+      // Ignore invalid cache entries.
+    }
+  });
+};
+
 const StoryItemCard = ({ story, currentUserEmail, onDeleteSuccess }: StoryItemType) => {
   const isOwner = story.userEmail === currentUserEmail;
   const [imgFailed, setImgFailed] = useState(false);
@@ -40,6 +68,7 @@ const StoryItemCard = ({ story, currentUserEmail, onDeleteSuccess }: StoryItemTy
       const token = await getToken();
       await apiFetch(`/stories/${story.storyId}`, { method: "DELETE", token });
       toast.success("Story deleted successfully");
+      removeStoryFromCachedLists(story.storyId);
       onDeleteSuccess?.(story.storyId);
     } catch (error) {
       toast.error("Failed to delete story");

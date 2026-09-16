@@ -52,8 +52,8 @@ export default function TermsAndConditionsPage() {
       <div className="tc-hero-orb tc-hero-orb-one" />
       <div className="tc-hero-orb tc-hero-orb-two" />
 
-      <div className="relative mx-auto max-w-5xl space-y-6">
-        <section className="tc-glass-panel p-6 md:p-10">
+      <article className="relative mx-auto max-w-4xl">
+        <header className="border-b border-blue-300/15 pb-8">
           <h1 className="tc-title-gradient text-3xl font-extrabold md:text-5xl">
             Terms & Conditions
           </h1>
@@ -64,9 +64,9 @@ export default function TermsAndConditionsPage() {
             By accessing or using TaleCrafter AI, you agree to these Terms &
             Conditions. If you do not agree, please do not use our services.
           </p>
-        </section>
+        </header>
 
-        <section className="tc-glass-panel-soft rounded-2xl p-6 md:p-8">
+        <section className="border-b border-blue-300/15 py-8">
           <h2 className="text-2xl font-semibold text-white">Service overview</h2>
           <p className="mt-4 text-sm leading-relaxed text-blue-100/80 md:text-base">
             TaleCrafter AI provides tools to generate written stories, chapter
@@ -75,7 +75,7 @@ export default function TermsAndConditionsPage() {
           </p>
         </section>
 
-        <section className="tc-glass-panel-soft rounded-2xl p-6 md:p-8">
+        <section className="border-b border-blue-300/15 py-8">
           <h2 className="text-2xl font-semibold text-white">Accounts and eligibility</h2>
           <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-blue-100/80 md:text-base">
             <li>You are responsible for maintaining account security.</li>
@@ -84,7 +84,7 @@ export default function TermsAndConditionsPage() {
           </ul>
         </section>
 
-        <section className="tc-glass-panel-soft rounded-2xl p-6 md:p-8">
+        <section className="border-b border-blue-300/15 py-8">
           <h2 className="text-2xl font-semibold text-white">Credits, payments, and refunds</h2>
           <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-blue-100/80 md:text-base">
             <li>Certain features require paid credits or subscriptions.</li>
@@ -94,7 +94,7 @@ export default function TermsAndConditionsPage() {
           </ul>
         </section>
 
-        <section className="tc-glass-panel-soft rounded-2xl p-6 md:p-8">
+        <section className="border-b border-blue-300/15 py-8">
           <h2 className="text-2xl font-semibold text-white">Content rights and responsibility</h2>
           <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-blue-100/80 md:text-base">
             <li>
@@ -112,7 +112,7 @@ export default function TermsAndConditionsPage() {
           </ul>
         </section>
 
-        <section className="tc-glass-panel-soft rounded-2xl p-6 md:p-8">
+        <section className="border-b border-blue-300/15 py-8">
           <h2 className="text-2xl font-semibold text-white">Prohibited use</h2>
           <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-blue-100/80 md:text-base">
             <li>No attempts to exploit, reverse engineer, or disrupt the service.</li>
@@ -121,7 +121,7 @@ export default function TermsAndConditionsPage() {
           </ul>
         </section>
 
-        <section className="tc-glass-panel-soft rounded-2xl p-6 md:p-8">
+        <section className="border-b border-blue-300/15 py-8">
           <h2 className="text-2xl font-semibold text-white">Limitation of liability</h2>
           <p className="mt-4 text-sm leading-relaxed text-blue-100/80 md:text-base">
             The service is provided "as is" without warranties of uninterrupted
@@ -131,13 +131,13 @@ export default function TermsAndConditionsPage() {
           </p>
         </section>
 
-        <section className="tc-glass-panel-soft rounded-2xl p-6 md:p-8">
+        <section className="py-8">
           <h2 className="text-2xl font-semibold text-white">Contact</h2>
           <p className="mt-4 text-sm leading-relaxed text-blue-100/80 md:text-base">
             Questions about these terms can be sent to contact@talecrafterai.tech.
           </p>
         </section>
-      </div>
+      </article>
     </div>
   );
 }

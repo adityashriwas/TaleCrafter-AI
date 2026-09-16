@@ -52,8 +52,8 @@ export default function PrivacyPolicyPage() {
       <div className="tc-hero-orb tc-hero-orb-one" />
       <div className="tc-hero-orb tc-hero-orb-two" />
 
-      <div className="relative mx-auto max-w-5xl space-y-6">
-        <section className="tc-glass-panel p-6 md:p-10">
+      <article className="relative mx-auto max-w-4xl">
+        <header className="border-b border-blue-300/15 pb-8">
           <h1 className="tc-title-gradient text-3xl font-extrabold md:text-5xl">
             Privacy Policy
           </h1>
@@ -66,9 +66,9 @@ export default function PrivacyPolicyPage() {
             This Privacy Policy explains what information we collect and how we
             use it when you use our website and services.
           </p>
-        </section>
+        </header>
 
-        <section className="tc-glass-panel-soft rounded-2xl p-6 md:p-8">
+        <section className="border-b border-blue-300/15 py-8">
           <h2 className="text-2xl font-semibold text-white">Information we collect</h2>
           <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-blue-100/80 md:text-base">
             <li>Account details such as name, email address, and profile image.</li>
@@ -79,7 +79,7 @@ export default function PrivacyPolicyPage() {
           </ul>
         </section>
 
-        <section className="tc-glass-panel-soft rounded-2xl p-6 md:p-8">
+        <section className="border-b border-blue-300/15 py-8">
           <h2 className="text-2xl font-semibold text-white">How we use your data</h2>
           <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-blue-100/80 md:text-base">
             <li>To create, store, and display stories and related media.</li>
@@ -90,7 +90,7 @@ export default function PrivacyPolicyPage() {
           </ul>
         </section>
 
-        <section className="tc-glass-panel-soft rounded-2xl p-6 md:p-8">
+        <section className="border-b border-blue-300/15 py-8">
           <h2 className="text-2xl font-semibold text-white">Data sharing and providers</h2>
           <p className="mt-4 text-sm leading-relaxed text-blue-100/80 md:text-base">
             We may use trusted third-party services for authentication,
@@ -100,7 +100,7 @@ export default function PrivacyPolicyPage() {
           </p>
         </section>
 
-        <section className="tc-glass-panel-soft rounded-2xl p-6 md:p-8">
+        <section className="border-b border-blue-300/15 py-8">
           <h2 className="text-2xl font-semibold text-white">Retention and security</h2>
           <p className="mt-4 text-sm leading-relaxed text-blue-100/80 md:text-base">
             We retain data for as long as needed to provide the service, comply
@@ -110,7 +110,7 @@ export default function PrivacyPolicyPage() {
           </p>
         </section>
 
-        <section className="tc-glass-panel-soft rounded-2xl p-6 md:p-8">
+        <section className="py-8">
           <h2 className="text-2xl font-semibold text-white">Your choices</h2>
           <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-blue-100/80 md:text-base">
             <li>You can request account data updates or deletion, where applicable.</li>
@@ -118,7 +118,7 @@ export default function PrivacyPolicyPage() {
             <li>You can stop using the service at any time.</li>
           </ul>
         </section>
-      </div>
+      </article>
     </div>
   );
 }

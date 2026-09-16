@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import StoryItemCard from "../dashboard/_components/StoryItemCard";
 import { apiFetch } from "@/lib/api-client";
 import { motion } from "framer-motion";
+import CustomLoader from "./CustomLoader";
 const MotionDiv: any = motion.div;
 
 type StoryItemType = {
@@ -46,6 +47,7 @@ const ExploreMore = () => {
     hidden: { opacity: 0, y: 22 },
     show: { opacity: 1, y: 0 },
   };
+  const isInitialStoriesLoading = !isRestored || (loading && storyList.length === 0);
 
   const persistState = useCallback(
     (scrollY?: number) => {
@@ -243,7 +245,9 @@ const ExploreMore = () => {
 
         <div ref={loadTriggerRef} className="h-6" />
 
-        {loading && (
+        <CustomLoader isLoading={isInitialStoriesLoading} />
+
+        {loading && storyList.length > 0 && (
           <div className="mt-5 flex justify-center">
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-400 border-t-transparent" />
           </div>
@@ -257,7 +261,7 @@ const ExploreMore = () => {
           </div>
         )}
 
-        {!loading && storyList.length === 0 && (
+        {!isInitialStoriesLoading && storyList.length === 0 && (
           <div className="mt-10 w-full text-center">
             <p className="text-blue-100/70">
               No stories found yet.

@@ -243,7 +243,7 @@ const Hero = () => {
 
         </section>
 
-        <section className="relative px-4 py-10 sm:py-12 md:px-16 lg:px-32 xl:px-44">
+        <section className="relative mt-24 px-4 py-10 sm:py-12 md:mt-32 md:px-16 lg:mt-40 lg:px-32 xl:px-44">
           <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {heroStats.map((stat, index) => (
               <AnimatedStat key={stat.label} stat={stat} index={index} />
@@ -251,7 +251,7 @@ const Hero = () => {
           </div>
         </section>
 
-        <section className="section-spacing relative px-4 md:px-16 lg:px-32 xl:px-44">
+        <section className="section-spacing relative mt-24 px-4 md:mt-32 md:px-16 lg:mt-40 lg:px-32 xl:px-44">
           <div className="mx-auto max-w-5xl text-center">
             <h2 className="tc-title-gradient heading">
               Built for modern AI storytelling workflows
@@ -289,12 +289,13 @@ const Hero = () => {
             ))}
           </MotionDiv>
 
-          <div className="mt-16 md:mt-20">
-            <Video />
-          </div>
         </section>
 
-        <section id="pricing" className="section-spacing relative px-4 md:px-16 lg:px-32 xl:px-44">
+        <section className="section-spacing relative mt-24 px-4 md:mt-32 md:px-16 lg:mt-40 lg:px-32 xl:px-44">
+          <Video />
+        </section>
+
+        <section id="pricing" className="section-spacing relative mt-24 px-4 md:mt-32 md:px-16 lg:mt-40 lg:px-32 xl:px-44">
           <div className="text-center">
             <h2 className="tc-title-gradient text-3xl font-bold sm:text-4xl">
               Simple pricing for rapid creation
@@ -321,7 +322,7 @@ const Hero = () => {
                           {plan.name}
                         </h3>
                         {isFeatured && (
-                          <span className="rounded-full border border-blue-200/60 bg-blue-600 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+                          <span className="whitespace-nowrap rounded-full border border-blue-200/60 bg-blue-600 px-2 py-0.5 text-[9px] font-bold uppercase tracking-normal text-white">
                             Most Popular
                           </span>
                         )}
