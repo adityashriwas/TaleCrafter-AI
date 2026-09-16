@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import HTMLFlipBook from "react-pageflip";
+import Image from "next/image";
+import dynamic from "next/dynamic";
 import { IoIosArrowDropleftCircle, IoIosArrowDroprightCircle } from "react-icons/io";
 import { toast } from "react-toastify";
 import { useParams, useRouter } from "next/navigation";
@@ -11,6 +12,15 @@ import BookCoverPage from "@/app/view-story/_components/BookCoverPage";
 import { apiFetch } from "@/lib/api-client";
 
 const MAX_DEPTH = 7;
+
+const HTMLFlipBook = dynamic(() => import("react-pageflip"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-[420px] w-full max-w-[380px] items-center justify-center rounded-lg bg-blue-50 text-sm text-slate-600">
+      Loading book...
+    </div>
+  ),
+});
 
 type InteractivePage = {
   pageNumber: number;
@@ -67,13 +77,17 @@ const SafeStoryImage = ({ src, alt }: { src?: string; alt: string }) => {
   }
 
   return (
-    <img
-      src={src}
-      alt={alt}
-      className="mt-3 h-auto min-h-[260px] w-full rounded-lg bg-slate-100 object-contain"
-      loading="lazy"
-      onError={() => setFailed(true)}
-    />
+    <div className="relative mt-3 min-h-[260px] w-full overflow-hidden rounded-lg bg-slate-100">
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        sizes="(max-width: 768px) 100vw, 50vw"
+        className="object-contain"
+        onError={() => setFailed(true)}
+        unoptimized
+      />
+    </div>
   );
 };
 
@@ -82,7 +96,7 @@ const InteractiveStoryPage = () => {
   const id = params?.id;
   const router = useRouter();
   const { getToken } = useAuth();
-  const bookRef = useRef<typeof HTMLFlipBook | null>(null);
+  const bookRef = useRef<any>(null);
   const bookSectionRef = useRef<HTMLDivElement | null>(null);
   const treeSectionRef = useRef<HTMLDivElement | null>(null);
 

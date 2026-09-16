@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Image from "next/image";
 
 const BookCoverPage = ({ imageUrl }: any) => {
   const [imageLoaded, setImageLoaded] = useState(false); // Track image loading
@@ -14,13 +15,16 @@ const BookCoverPage = ({ imageUrl }: any) => {
       )}
 
       {imageUrl ? (
-        <img
+        <Image
           src={imageUrl}
+          fill
+          sizes="(max-width: 768px) 100vw, 50vw"
           className={`h-full w-full object-cover transition-opacity duration-300 ${
             imageLoaded ? "opacity-100" : "opacity-0"
           }`}
           alt="cover"
-          loading="eager"
+          priority
+          unoptimized
           onLoad={() => setImageLoaded(true)}
           onError={() => setHasError(true)}
         />

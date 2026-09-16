@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { toast } from "react-toastify";
 import { useAuth } from "@clerk/nextjs";
 import { apiFetch } from "@/lib/api-client";
@@ -28,13 +29,17 @@ const SafeCover = ({ src, alt }: { src?: string; alt: string }) => {
   }
 
   return (
-    <img
-      src={src}
-      alt={alt}
-      className="h-44 w-full rounded-lg object-cover"
-      onError={() => setFailed(true)}
-      loading="lazy"
-    />
+    <div className="relative h-44 w-full overflow-hidden rounded-lg">
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+        className="object-cover"
+        onError={() => setFailed(true)}
+        unoptimized
+      />
+    </div>
   );
 };
 

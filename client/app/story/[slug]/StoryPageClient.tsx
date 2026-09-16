@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import HTMLFlipBook from "react-pageflip";
+import Script from "next/script";
+import dynamic from "next/dynamic";
 import { IoIosArrowDropleftCircle, IoIosArrowDroprightCircle } from "react-icons/io";
 import { toast } from "react-toastify";
 import BookCoverPage from "@/app/view-story/_components/BookCoverPage";
@@ -16,6 +17,15 @@ type StoryPageClientProps = {
   initialStory: any;
   slug: string;
 };
+
+const HTMLFlipBook = dynamic(() => import("react-pageflip"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-[420px] w-full max-w-[380px] items-center justify-center rounded-lg bg-blue-50 text-sm text-slate-600">
+      Loading book...
+    </div>
+  ),
+});
 
 function SafeStoryModeImage({ src, alt }: { src: string; alt: string }) {
   const [failed, setFailed] = useState(false);
@@ -82,7 +92,7 @@ const getStoryPublishedDate = (story: any) => {
 
 export default function StoryPageClient({ initialStory, slug }: StoryPageClientProps) {
   const RELATED_PAGE_SIZE = 10;
-  const bookRef = useRef<typeof HTMLFlipBook | null>(null);
+  const bookRef = useRef<any>(null);
   const [story] = useState<any>(initialStory);
   const [count, setCount] = useState(0);
   const [copied, setCopied] = useState(false);
@@ -344,11 +354,13 @@ export default function StoryPageClient({ initialStory, slug }: StoryPageClientP
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#020b1f] px-5 py-8 md:px-16 lg:px-28 xl:px-40">
-      <script
+      <Script
+        id={`story-structured-data-${slug}`}
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: structuredData,
         }}
+        strategy="beforeInteractive"
       />
 
       <div className="tc-hero-grid absolute inset-0 opacity-35" />
@@ -654,9 +666,12 @@ export default function StoryPageClient({ initialStory, slug }: StoryPageClientP
                   {title}
                 </h1>
                 {story?.coverImage && (
-                  <img
+                  <Image
                     src={story.coverImage}
                     alt="cover"
+                    width={794}
+                    height={600}
+                    unoptimized
                     style={{
                       maxWidth: "100%",
                       width: "auto",
@@ -716,9 +731,12 @@ export default function StoryPageClient({ initialStory, slug }: StoryPageClientP
                   >
                     {chapter?.title ?? "Untitled Chapter"}
                   </h2>
-                  <img
+                  <Image
                     src={getChapterImageUrl(chapter)}
                     alt={chapter?.title ?? "chapter image"}
+                    width={794}
+                    height={600}
+                    unoptimized
                     style={{
                       maxWidth: "100%",
                       width: "auto",

@@ -1,6 +1,7 @@
 import Hero from "./(components)/Hero";
 import type { Metadata } from "next";
 import { DEFAULT_OG_IMAGE, SITE_URL } from "@/lib/seo";
+import Script from "next/script";
 
 const siteUrl = SITE_URL;
 
@@ -70,9 +71,11 @@ export default function Home() {
 
   return (
     <div>
-      <script
+      <Script
+        id="home-structured-data"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        strategy="beforeInteractive"
       />
       <Hero />
     </div>
