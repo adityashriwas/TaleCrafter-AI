@@ -207,8 +207,8 @@ const UserStoryList = () => {
       </h3>
       <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {storyList?.length === 0 && !loading && (
-          <div className="col-span-4 text-center">
-            <p className="inline-flex rounded-xl border border-blue-300/20 bg-white/[0.04] px-5 py-3 text-blue-100/70">
+          <div className="col-span-4">
+            <p className="text-blue-100/70">
               You have not created a story yet.
             </p>
           </div>
@@ -232,8 +232,8 @@ const UserStoryList = () => {
       )}
 
       {!hasMoreStories && storyList.length > 0 && (
-        <div className="mt-8 text-center">
-          <p className="inline-flex rounded-xl border border-blue-300/20 bg-white/[0.04] px-5 py-3 text-blue-100/70">
+        <div className="mt-8">
+          <p className="text-blue-100/70">
             You have reached the end of your stories.
           </p>
         </div>

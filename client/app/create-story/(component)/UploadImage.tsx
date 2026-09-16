@@ -81,14 +81,25 @@ export default function UploadImage({
           <h2 className="tc-title-gradient text-2xl sm:text-3xl lg:text-4xl font-bold text-center">
             Pick an Image to generate a story
           </h2>
-          <div className="mb-8 flex items-center justify-center">
+          <div className="mb-8 mt-5 flex flex-col items-center justify-center gap-3">
             <input
               id="image-upload"
               type="file"
               accept="image/*"
               onChange={handleImageUpload}
-              className="block mt-2 w-full cursor-pointer text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition duration-150 ease-in-out"
+              className="sr-only"
             />
+            <label
+              htmlFor="image-upload"
+              className="tc-btn-ghost inline-flex cursor-pointer items-center justify-center px-6 py-3 text-sm"
+            >
+              Choose Image
+            </label>
+            {image && (
+              <p className="max-w-full truncate text-sm text-blue-100/70">
+                {image.name}
+              </p>
+            )}
           </div>
           {image && (
             <div className="mb-8 flex justify-center">
@@ -102,9 +113,10 @@ export default function UploadImage({
             </div>
           )}
           <button
+            type="button"
             onClick={() => identifyImage()}
             disabled={!image || loading}
-            className="mt-5 text-xl p-2 sm:size-full bg-gray-800 text-white shadow-md hover:bg-gray-700 transition cursor-pointer"
+            className="tc-btn-primary mt-5 w-full px-6 py-3 text-base disabled:cursor-not-allowed disabled:opacity-70"
           >
             {loading ? "Identifying image..." : "Generate Idea"}
           </button>

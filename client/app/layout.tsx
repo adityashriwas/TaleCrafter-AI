@@ -7,7 +7,10 @@ import Footer from "./(components)/Footer";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { defaultMetadata } from "@/lib/seo";
 import Script from "next/script";
-import { Inter } from "next/font/google";
+import { Inter, Geist } from "next/font/google";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -38,7 +41,7 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider dynamic>
-      <html lang="en">
+      <html lang="en" className={cn("dark", "font-sans", geist.variable)}>
         <head>
           <meta
             name="google-adsense-account"

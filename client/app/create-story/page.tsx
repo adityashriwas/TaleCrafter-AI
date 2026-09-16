@@ -225,21 +225,32 @@ const CreateStory = () => {
 
         <div className="mt-8 flex justify-end">
           <div className="flex flex-wrap items-center gap-3">
-            <Button
-              disabled={loading}
-              className="tc-btn-primary px-8 py-6 text-base shadow-[0_0_32px_rgba(56,189,248,0.38)] hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-70"
-              onClick={() => GenerateStory("interactive")}
-            >
-              {user ? "Create Interactive Story" : "Login to Create Interactive Story"}
-            </Button>
-            <Button
-              disabled={loading}
-              className="tc-btn-ghost px-8 py-6 text-base hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-70"
-              color="primary"
-              onClick={() => GenerateStory("classic")}
-            >
-              {user ? "Create Story" : "Login to Create Story"}
-            </Button>
+            {!user ? (
+              <Button
+                disabled={loading}
+                className="tc-btn-primary px-8 py-6 text-base hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-70"
+                onClick={() => GenerateStory("classic")}
+              >
+                Login to Create Story
+              </Button>
+            ) : (
+              <>
+                <Button
+                  disabled={loading}
+                  className="tc-btn-primary px-8 py-6 text-base hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-70"
+                  onClick={() => GenerateStory("interactive")}
+                >
+                  Create Interactive Story
+                </Button>
+                <Button
+                  disabled={loading}
+                  className="tc-btn-primary px-8 py-6 text-base hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-70"
+                  onClick={() => GenerateStory("classic")}
+                >
+                  Create Story
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </div>

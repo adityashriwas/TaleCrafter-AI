@@ -1,38 +1,143 @@
 "use client";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@nextui-org/button";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
 import Video from "./Video";
 import { motion } from "framer-motion";
+import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 const MotionDiv: any = motion.div;
 
-const Hero = () => {
-  const pollinationsShowcaseUrl = "https://pollinations.ai/apps";
-  const pollinationsThreadUrl =
-    "https://github.com/pollinations/pollinations/issues/7357";
+type StatItem = {
+  value: number;
+  suffix?: string;
+  label: string;
+  isText?: boolean;
+};
 
+const AnimatedStat = ({ stat, index }: { stat: StatItem; index: number }) => {
+  const [displayValue, setDisplayValue] = useState(stat.isText ? stat.value : 0);
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const ref = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const node = ref.current;
+
+    if (!node || stat.isText) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting || hasAnimated) {
+          return;
+        }
+
+        setHasAnimated(true);
+        const duration = 1300;
+        const start = performance.now();
+
+        const tick = (now: number) => {
+          const progress = Math.min((now - start) / duration, 1);
+          const easedProgress = 1 - Math.pow(1 - progress, 3);
+
+          setDisplayValue(Math.round(stat.value * easedProgress));
+
+          if (progress < 1) {
+            requestAnimationFrame(tick);
+          }
+        };
+
+        requestAnimationFrame(tick);
+      },
+      { threshold: 0.45 }
+    );
+
+    observer.observe(node);
+
+    return () => observer.disconnect();
+  }, [hasAnimated, stat.isText, stat.value]);
+
+  return (
+    <MotionDiv
+      ref={ref}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, amount: 0.35 }}
+      transition={{ delay: index * 0.08, duration: 0.55 }}
+      variants={{
+        hidden: { opacity: 0, y: 26 },
+        show: { opacity: 1, y: 0 },
+      }}
+      className="group relative min-h-[155px] overflow-hidden rounded-2xl border border-blue-200/15 bg-white/[0.055] p-6 text-left shadow-[0_18px_55px_rgba(0,0,0,0.22)] backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-cyan-200/35 hover:bg-white/[0.075] sm:min-h-[175px] sm:p-7"
+    >
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-200/45 to-transparent" />
+      <div className="absolute -right-16 -top-16 h-32 w-32 rounded-full bg-cyan-300/10 blur-2xl transition group-hover:bg-cyan-300/20" />
+      <p
+        className={`text-4xl font-extrabold leading-none tracking-normal sm:text-5xl ${
+          index === 0 ? "text-cyan-200" : "text-white"
+        }`}
+      >
+        {stat.isText ? "TTS" : displayValue}
+        {stat.suffix}
+      </p>
+      <p className="mt-6 max-w-[12rem] text-base font-medium leading-relaxed text-blue-100/72 sm:text-lg">
+        {stat.label}
+      </p>
+    </MotionDiv>
+  );
+};
+
+const Hero = () => {
   const pricingPlans = [
+    {
+      name: "Free",
+      price: "$0",
+      credits: "5",
+      subtitle: "Included for new accounts",
+      recommended: false,
+      ctaLabel: "Start Free",
+      href: "/create-story",
+    },
     {
       name: "Basic",
       price: "$1.99",
       credits: "10",
       subtitle: "Great for getting started",
+      recommended: false,
+      ctaLabel: "Select Plan",
+      href: "/buy-credits",
     },
     {
       name: "Premium",
       price: "$3.99",
       credits: "75",
       subtitle: "Most popular for regular creators",
+      recommended: true,
+      ctaLabel: "Choose Premium",
+      href: "/buy-credits",
     },
     {
       name: "Ultimate",
       price: "$5.99",
       credits: "150",
       subtitle: "Best value for power users",
+      recommended: false,
+      ctaLabel: "Select Plan",
+      href: "/buy-credits",
     },
   ];
 
   const { isSignedIn } = useUser();
+  const secondaryHeroHref = isSignedIn ? "/dashboard" : "#pricing";
+  const secondaryHeroLabel = isSignedIn ? "Dashboard" : "View Pricing";
+
+  const heroStats: StatItem[] = [
+    { value: 40, suffix: "+", label: "Languages" },
+    { value: 9, label: "Story Genres" },
+    { value: 7, label: "Art Styles" },
+    { value: 30, suffix: "+", label: "Countries Reached" },
+  ];
 
   const featureItems = [
     {
@@ -86,7 +191,7 @@ const Hero = () => {
         <div className="tc-hero-orb tc-hero-orb-two" />
         <div className="tc-hero-orb tc-hero-orb-three" />
 
-        <section className="relative flex min-h-screen flex-col justify-center px-4 py-16 md:px-16 lg:px-32 xl:px-44">
+        <section className="section-spacing relative flex min-h-[86vh] flex-col justify-center px-4 md:px-16 lg:px-32 xl:px-44">
           <MotionDiv
             initial="hidden"
             animate="show"
@@ -97,24 +202,27 @@ const Hero = () => {
             <span className="inline-flex items-center rounded-full border border-blue-300/30 bg-blue-500/10 px-5 py-2 text-sm font-medium tracking-wide text-blue-100 backdrop-blur-sm">
               Build branching storybooks with AI
             </span>
-            
+
             <h1 className="tc-title-gradient mt-7 text-4xl font-extrabold leading-tight sm:text-5xl md:text-6xl lg:text-7xl">
               TaleCrafter AI
               <span className="block text-3xl sm:text-4xl md:text-5xl lg:text-6xl">
                 Convert your thoughts into interactive stories
               </span>
             </h1>
-            <p className="mx-auto mt-7 max-w-3xl text-base font-medium leading-relaxed text-blue-100/75 sm:text-lg">
-              Create polished, illustrated, and narrated digital books from a
-              single prompt with interactive branching paths. Designed for creators, educators, and teams that
-              want story production to feel premium.
-            </p>
+            <TextGenerateEffect
+              as="p"
+              words="Create polished, illustrated, and narrated digital books from a single prompt with interactive branching paths. Designed for creators, educators, and teams that want story production to feel premium."
+              className="mx-auto mt-7 max-w-3xl text-base font-medium leading-relaxed text-blue-100/75 sm:text-lg"
+              duration={0.4}
+              staggerDelay={0.035}
+              startDelay={0.8}
+            />
           </MotionDiv>
 
           <MotionDiv
             initial="hidden"
             animate="show"
-            transition={{ delay: 0.2, duration: 0.6 }}
+            transition={{ delay: 1.8, duration: 0.6 }}
             variants={fadeUp}
             className="mt-10 flex flex-wrap items-center justify-center gap-4"
           >
@@ -123,132 +231,29 @@ const Hero = () => {
                 Create Interactive Story
               </Button>
             </Link>
-            <Link href="/dashboard">
-              <Button className="tc-btn-ghost px-7 py-6 text-base backdrop-blur-sm hover:scale-[1.03]">
-                {isSignedIn ? "Dashboard" : "Get Started"}
+            <Link href={secondaryHeroHref}>
+              <Button
+                aria-label={secondaryHeroLabel}
+                className="tc-btn-ghost tc-btn-hero-secondary px-7 py-6 text-base backdrop-blur-sm hover:scale-[1.03]"
+              >
+                {secondaryHeroLabel}
               </Button>
             </Link>
           </MotionDiv>
 
-          <MotionDiv
-            initial="hidden"
-            animate="show"
-            transition={{ delay: 0.3, duration: 0.6 }}
-            variants={fadeUp}
-            className="tc-glass-panel mx-auto mt-20 grid max-w-5xl grid-cols-2 gap-3 p-4 sm:grid-cols-4"
-          >
-            <div className="rounded-xl bg-blue-400/10 p-4 text-center">
-              <p className="text-2xl font-bold text-white">40+</p>
-              <p className="text-xs uppercase tracking-wide text-blue-100/70">
-                Languages
-              </p>
-            </div>
-            <div className="rounded-xl bg-blue-400/10 p-4 text-center">
-              <p className="text-2xl font-bold text-white">9</p>
-              <p className="text-xs uppercase tracking-wide text-blue-100/70">
-                Story Genres
-              </p>
-            </div>
-            <div className="rounded-xl bg-blue-400/10 p-4 text-center">
-              <p className="text-2xl font-bold text-white">7</p>
-              <p className="text-xs uppercase tracking-wide text-blue-100/70">
-                Art Styles
-              </p>
-            </div>
-            <div className="rounded-xl bg-blue-400/10 p-4 text-center">
-              <p className="text-2xl font-bold text-white">TTS</p>
-              <p className="text-xs uppercase tracking-wide text-blue-100/70">
-                Narrated Reading
-              </p>
-            </div>
-          </MotionDiv>
+        </section>
 
-          <div className="mx-auto mt-10 grid w-full max-w-6xl grid-cols-1 gap-5 lg:grid-cols-2">
-            <MotionDiv
-              initial="hidden"
-              animate="show"
-              transition={{ delay: 0.35, duration: 0.6 }}
-              variants={fadeUp}
-            className="rounded-2xl border border-cyan-300/35 bg-cyan-400/[0.08] p-5 text-left shadow-[0_0_45px_rgba(34,211,238,0.12)] backdrop-blur-md"
-            >
-              <div className="mb-3 inline-flex items-center rounded-full border border-cyan-300/35 bg-cyan-300/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-cyan-100">
-                New Recognition <strong className="text-xl">🌟</strong>
-              </div>
-              <h3 className="text-xl font-bold text-white sm:text-2xl">
-                Official Pollinations Recognition
-              </h3>
-              <p className="mt-2 text-sm text-blue-100/80 sm:text-base">
-                TaleCrafter AI is approved and featured on Pollinations showcase.
-              </p>
-              <div className="mt-4 flex flex-wrap gap-3">
-                <a
-                  href={pollinationsShowcaseUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex rounded-lg border border-blue-300/30 bg-blue-500/20 px-4 py-2 text-sm font-semibold text-blue-100 transition hover:bg-blue-500/35"
-                >
-                  View Pollinations
-                </a>
-                <a
-                  href={pollinationsThreadUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex rounded-lg border border-blue-300/30 bg-white/10 px-4 py-2 text-sm font-semibold text-blue-100 transition hover:bg-white/20"
-                >
-                  Verification Thread
-                </a>
-              </div>
-            </MotionDiv>
-
-            <MotionDiv
-              initial="hidden"
-              animate="show"
-              transition={{ delay: 0.4, duration: 0.6 }}
-              variants={fadeUp}
-            className="rounded-2xl border border-cyan-300/35 bg-cyan-400/[0.08] p-5 text-left shadow-[0_0_45px_rgba(34,211,238,0.12)] backdrop-blur-md"
-            >
-              <h3 className="text-xl font-bold text-white sm:text-2xl">
-                Used Worldwide
-              </h3>
-              <p className="mt-2 text-sm text-blue-100/80 sm:text-base">
-                Used across regions by creators, educators, and storytellers.
-              </p>
-              <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                <div className="rounded-xl bg-blue-400/10 p-3 text-center">
-                  <p className="text-xl font-bold text-white">900+</p>
-                  <p className="text-[11px] uppercase tracking-wide text-blue-100/70">
-                    Sessions
-                  </p>
-                </div>
-                <div className="rounded-xl bg-blue-400/10 p-3 text-center">
-                  <p className="text-xl font-bold text-white">75%</p>
-                  <p className="text-[11px] uppercase tracking-wide text-blue-100/70">
-                    Organic Engagement
-                  </p>
-                </div>
-                <div className="rounded-xl bg-blue-400/10 p-3 text-center">
-                  <p className="text-xl font-bold text-white">68%</p>
-                  <p className="text-[11px] uppercase tracking-wide text-blue-100/70">
-                    Referral Engagement
-                  </p>
-                </div>
-                <div className="rounded-xl bg-blue-400/10 p-3 text-center">
-                  <p className="text-xl font-bold text-white">30+</p>
-                  <p className="text-[11px] uppercase tracking-wide text-blue-100/70">
-                    Countries Reached
-                  </p>
-                </div>
-              </div>
-              <p className="mt-3 text-xs font-medium uppercase tracking-wider text-cyan-100/85">
-                Top adoption markets: India, United States, China, Germany
-              </p>
-            </MotionDiv>
+        <section className="relative px-4 py-10 sm:py-12 md:px-16 lg:px-32 xl:px-44">
+          <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {heroStats.map((stat, index) => (
+              <AnimatedStat key={stat.label} stat={stat} index={index} />
+            ))}
           </div>
         </section>
 
-        <section className="relative px-4 pb-12 md:px-16 lg:px-32 xl:px-44">
+        <section className="section-spacing relative px-4 md:px-16 lg:px-32 xl:px-44">
           <div className="mx-auto max-w-5xl text-center">
-            <h2 className="tc-title-gradient text-3xl font-bold sm:text-4xl">
+            <h2 className="tc-title-gradient heading">
               Built for modern AI storytelling workflows
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-blue-100/70">
@@ -284,12 +289,12 @@ const Hero = () => {
             ))}
           </MotionDiv>
 
-          <div className="mt-16">
+          <div className="mt-16 md:mt-20">
             <Video />
           </div>
         </section>
 
-        <section className="relative px-4 pb-20 md:px-16 lg:px-32 xl:px-44">
+        <section id="pricing" className="section-spacing relative px-4 md:px-16 lg:px-32 xl:px-44">
           <div className="text-center">
             <h2 className="tc-title-gradient text-3xl font-bold sm:text-4xl">
               Simple pricing for rapid creation
@@ -297,30 +302,52 @@ const Hero = () => {
             <p className="mt-3 text-blue-100/70">
               Pick a plan and scale story generation as your usage grows.
             </p>
-            <div className="mt-8 flex flex-wrap justify-center gap-6 p-2 text-white">
-              {pricingPlans.map((plan, index) => (
-                <div
-                  key={index}
-                  className="tc-glass-panel-soft flex min-h-[260px] w-full flex-col justify-between p-7 text-left shadow-xl md:w-[320px]"
-                >
-                  <div>
-                    <h3 className="text-xl font-semibold text-blue-100">
-                      {plan.name}
-                    </h3>
-                    <p className="mt-1 text-sm text-blue-100/70">{plan.subtitle}</p>
-                    <p className="my-3 text-4xl font-extrabold text-white">
-                      {plan.price}
-                    </p>
-                    <p className="text-blue-100/85">Get {plan.credits} Credits</p>
-                  </div>
+            <div className="mx-auto mt-8 grid max-w-7xl grid-cols-1 gap-6 p-2 text-white sm:grid-cols-2 lg:grid-cols-4">
+              {pricingPlans.map((plan, index) => {
+                const isFeatured = plan.recommended;
 
-                  <Link href="/buy-credits">
-                    <Button className="tc-btn-primary mt-5 w-full bg-blue-500/80 px-6 py-5 text-sm hover:bg-blue-400">
-                      Select Plan
-                    </Button>
-                  </Link>
-                </div>
-              ))}
+                return (
+                  <div
+                    key={index}
+                    className={`tc-glass-panel-soft relative flex min-h-[260px] w-full flex-col justify-between p-7 text-left shadow-xl ${
+                      isFeatured
+                        ? "border-blue-200/70 bg-blue-600/20 shadow-[0_0_42px_rgba(37,99,235,0.24)]"
+                        : ""
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-start justify-between gap-3">
+                        <h3 className="text-xl font-semibold text-blue-100">
+                          {plan.name}
+                        </h3>
+                        {isFeatured && (
+                          <span className="rounded-full border border-blue-200/60 bg-blue-600 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+                            Most Popular
+                          </span>
+                        )}
+                      </div>
+                      <p className="mt-1 text-sm text-blue-100/70">{plan.subtitle}</p>
+                      <p className="my-3 text-4xl font-extrabold text-white">
+                        {plan.price}
+                      </p>
+                      <p className="text-blue-100/85">Get {plan.credits} Credits</p>
+                    </div>
+
+                    <Link href={plan.href}>
+                      <Button
+                        aria-label={`Select ${plan.name} plan`}
+                        className={`mt-5 w-full px-6 py-5 text-sm ${
+                          isFeatured
+                            ? "tc-btn-primary shadow-[0_0_28px_rgba(37,99,235,0.24)]"
+                            : "tc-btn-ghost"
+                        }`}
+                      >
+                        {plan.ctaLabel}
+                      </Button>
+                    </Link>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </section>

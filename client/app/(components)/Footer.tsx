@@ -1,100 +1,99 @@
 "use client";
-import Image from "next/image";
+
 import Link from "next/link";
 
 const Footer = () => {
-  const genreLinks = [
-    { label: "Fantasy", href: "/ai-fantasy-story-generator" },
-    { label: "Bedtime", href: "/ai-bedtime-story-generator" },
-    { label: "Horror", href: "/explore?genre=horror" },
-    { label: "Romantic", href: "/explore?genre=romantic" },
-    { label: "Mythology", href: "/explore?genre=mythology" },
-    { label: "Adventure", href: "/explore?genre=adventure" },
-    { label: "Sci-Fi", href: "/explore?genre=sci-fi" },
+  const year = new Date().getFullYear();
+
+  const companyLinks = [
+    { label: "About", href: "/about" },
+    { label: "Create Story", href: "/create-story" },
+    { label: "Explore Stories", href: "/explore" },
+    { label: "Contact", href: "/contact" },
   ];
 
+  const exploreLinks = [
+    { label: "Fantasy Generator", href: "/ai-fantasy-story-generator" },
+    { label: "Bedtime Generator", href: "/ai-bedtime-story-generator" },
+    { label: "Privacy Policy", href: "/privacy-policy" },
+    { label: "Terms and Conditions", href: "/terms-and-conditions" },
+  ];
+
+  const connectLinks = [
+    { label: "contact@talecrafterai.tech", href: "mailto:contact@talecrafterai.tech" },
+    { label: "Create with TaleCrafter", href: "/create-story" },
+  ];
+
+  const footerLinkClass =
+    "text-sm text-blue-100/50 transition-colors duration-200 hover:text-cyan-100";
+
   return (
-    <footer className="border-t border-blue-300/15 bg-[#010715]/95 text-blue-100/80 backdrop-blur-xl shadow-[0_-12px_30px_rgba(0,0,0,0.4)]">
-      <div className="mx-auto flex w-full max-w-screen-xl flex-col items-center justify-between gap-6 px-4 py-5 md:flex-row">
-        <a href="/" className="flex items-center gap-3">
-          <Image
-            src="/app_logo.png"
-            alt="TaleCrafter AI"
-            width={52}
-            height={52}
-            className="object-contain"
-          />
-          <span className="tc-title-gradient block text-xl font-bold sm:text-2xl">
-            TaleCrafter AI
-          </span>
-        </a>
-
-        <div className="flex flex-wrap justify-center gap-4 text-sm md:text-base">
-          <Link
-            href="/"
-            className="rounded-lg px-3 py-1 transition duration-300 hover:bg-white/10 hover:text-white"
-          >
-            Home
-          </Link>
-          <Link
-            href="/about"
-            className="rounded-lg px-3 py-1 transition duration-300 hover:bg-white/10 hover:text-white"
-          >
-            About
-          </Link>
-          <Link
-            href="/ai-fantasy-story-generator"
-            className="rounded-lg px-3 py-1 transition duration-300 hover:bg-white/10 hover:text-white"
-          >
-            Fantasy Generator
-          </Link>
-          <Link
-            href="/ai-bedtime-story-generator"
-            className="rounded-lg px-3 py-1 transition duration-300 hover:bg-white/10 hover:text-white"
-          >
-            Bedtime Generator
-          </Link>
-          <Link
-            href="/contact"
-            className="rounded-lg px-3 py-1 transition duration-300 hover:bg-white/10 hover:text-white"
-          >
-            Contact
-          </Link>
-          <Link
-            href="/privacy-policy"
-            className="rounded-lg px-3 py-1 transition duration-300 hover:bg-white/10 hover:text-white"
-          >
-            Privacy Policy
-          </Link>
-          <Link
-            href="/terms-and-conditions"
-            className="rounded-lg px-3 py-1 transition duration-300 hover:bg-white/10 hover:text-white"
-          >
-            Terms & Conditions
-          </Link>
-        </div>
-      </div>
-
-      <div className="mx-auto w-full max-w-screen-xl border-t border-blue-300/15 px-4 py-4">
-        <p className="text-center text-xs font-semibold uppercase tracking-wide text-blue-100/70 md:text-left">
-          Popular Story Genres
-        </p>
-        <div className="mt-3 flex flex-wrap justify-center gap-2 md:justify-start">
-          {genreLinks.map((genre) => (
-            <Link
-              key={genre.label}
-              href={genre.href}
-              prefetch={true}
-              className="rounded-full border border-blue-300/25 bg-blue-400/10 px-3 py-1 text-xs font-medium text-blue-100/85 transition hover:bg-blue-400/20 hover:text-white"
-            >
-              {genre.label}
+    <footer className="border-t border-blue-300/15 bg-[#020817] text-blue-100/78">
+      <div className="mx-auto w-full max-w-screen-xl px-6 py-16 sm:px-8 lg:px-10 lg:py-20">
+        <div className="grid gap-12 md:grid-cols-[1.4fr_0.8fr_1fr_1fr] lg:gap-16">
+          <div className="max-w-sm">
+            <Link href="/" className="tc-title-gradient text-3xl font-extrabold tracking-tight">
+              TaleCrafter AI
             </Link>
-          ))}
-        </div>
-      </div>
+            <p className="mt-6 text-sm leading-7 text-blue-100/50">
+              AI storybook creator for building illustrated stories, interactive paths,
+              narration-ready pages, and polished reading experiences.
+            </p>
+          </div>
 
-      <div className="border-t border-blue-300/15 py-2 text-center text-sm text-blue-100/60">
-        (c) {new Date().getFullYear()} TaleCrafter AI. All rights reserved.
+          <nav aria-label="Company links">
+            <h2 className="text-base font-bold text-white">Company</h2>
+            <ul className="mt-6 space-y-4">
+              {companyLinks.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href} className={footerLinkClass}>
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          <nav aria-label="Explore links">
+            <h2 className="text-base font-bold text-white">Explore</h2>
+            <ul className="mt-6 space-y-4">
+              {exploreLinks.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href} className={footerLinkClass}>
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          <nav aria-label="Connect links">
+            <h2 className="text-base font-bold text-white">Connect</h2>
+            <ul className="mt-6 space-y-4">
+              {connectLinks.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href} className={footerLinkClass}>
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </div>
+
+        <div className="mt-14 border-t border-blue-300/15 pt-8 md:mt-16 md:flex md:items-center md:justify-between">
+          <p className="text-sm text-blue-100/50">
+            (c) {year} TaleCrafter AI. All rights reserved.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-x-8 gap-y-3 md:mt-0">
+            <Link href="/privacy-policy" className="text-sm font-medium text-blue-100/70 transition hover:text-cyan-100">
+              Privacy Policy
+            </Link>
+            <Link href="/terms-and-conditions" className="text-sm font-medium text-blue-100/70 transition hover:text-cyan-100">
+              Terms and Conditions
+            </Link>
+          </div>
+        </div>
       </div>
     </footer>
   );

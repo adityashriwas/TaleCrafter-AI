@@ -87,7 +87,7 @@ const InteractiveStorySections = () => {
   const renderCards = (list: InteractiveStory[], mode: "draft" | "completed") => {
     if (!list.length) {
       return (
-        <p className="rounded-xl border border-blue-300/20 bg-white/[0.04] px-5 py-3 text-blue-100/70">
+        <p className="mt-4 text-blue-100/70">
           {mode === "draft" ? "No draft stories yet." : "No completed interactive stories yet."}
         </p>
       );

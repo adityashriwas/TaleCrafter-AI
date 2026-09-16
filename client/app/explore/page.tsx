@@ -213,7 +213,7 @@ const ExploreMore = () => {
           animate="show"
           variants={fadeUp}
           transition={{ duration: 0.55 }}
-          className="tc-glass-panel px-5 py-7 text-center shadow-[0_16px_45px_rgba(0,0,0,0.35)] md:px-8"
+          className="px-5 py-7 text-center md:px-8"
         >
           <h2 className="tc-title-gradient text-3xl font-extrabold sm:text-4xl md:text-5xl">
             Explore Stories
@@ -230,7 +230,7 @@ const ExploreMore = () => {
           viewport={{ once: true, amount: 0.1 }}
           variants={fadeUp}
           transition={{ delay: 0.08, duration: 0.5 }}
-          className="tc-glass-panel-soft mt-8 p-5 md:p-7"
+          className="mt-8"
         >
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {storyList?.map((item: StoryItemType) => (
@@ -251,7 +251,7 @@ const ExploreMore = () => {
 
         {!hasMoreStories && storyList.length > 0 && (
           <div className="mt-10 w-full text-center">
-            <p className="inline-flex rounded-xl border border-blue-300/20 bg-white/[0.04] px-5 py-3 text-blue-100/70">
+            <p className="text-blue-100/70">
               No more stories available right now. Check back later.
             </p>
           </div>
@@ -259,7 +259,7 @@ const ExploreMore = () => {
 
         {!loading && storyList.length === 0 && (
           <div className="mt-10 w-full text-center">
-            <p className="inline-flex rounded-xl border border-blue-300/20 bg-white/[0.04] px-5 py-3 text-blue-100/70">
+            <p className="text-blue-100/70">
               No stories found yet.
             </p>
           </div>

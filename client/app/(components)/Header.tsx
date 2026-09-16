@@ -1,146 +1,195 @@
 "use client";
 
-import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import Image from "next/image";
 import { UserButton, useUser } from "@clerk/nextjs";
+import { useState } from "react";
+import {
+  MobileNav,
+  MobileNavHeader,
+  MobileNavMenu,
+  MobileNavToggle,
+  NavBody,
+  NavItems,
+  Navbar,
+  NavbarButton,
+} from "@/components/ui/resizable-navbar";
 
-function Header() {
-  const [isOpen, setIsOpen] = useState(false);
-  const pathname = usePathname(); // Get current route
-  const { user } = useUser();
+type HeaderLogoProps = {
+  href: string;
+  onClick: () => void;
+};
+
+const HeaderLogo = ({ href, onClick }: HeaderLogoProps) => (
+  <Link
+    href={href}
+    className="relative z-20 flex items-center gap-2 rounded-full px-2 py-1"
+    onClick={onClick}
+  >
+    <Image
+      src="/app_logo.png"
+      alt="TaleCrafter AI"
+      width={42}
+      height={42}
+      className="object-contain"
+      priority
+    />
+    <span className="tc-title-gradient hidden text-xl font-bold tracking-tight sm:block">
+      TaleCrafterAI
+    </span>
+  </Link>
+);
+
+const Header = () => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+  const { isLoaded, isSignedIn, user } = useUser();
   const adminEmail = (process.env.NEXT_PUBLIC_ADMIN_EMAIL ?? "").toLowerCase();
   const currentUserEmail =
     user?.primaryEmailAddress?.emailAddress?.toLowerCase() ?? "";
   const isAdmin = adminEmail !== "" && currentUserEmail === adminEmail;
-  const toggleOpen = () => setIsOpen(!isOpen);
-  const closeNavbar = () => setIsOpen(false);
 
-  const MenuList = [
-    {
-      name: "Home",
-      path: "/",
-    },
-    {
-      name: "About",
-      path: "/about",
-    },
-    {
-      name: "Create Story",
-      path: "/create-story",
-    },
-    {
-      name: "Explore Stories",
-      path: "/explore",
-    },
-    {
-      name: "My Stories",
-      path: "/dashboard",
-    },
+  const visitorItems = [
+    { name: "Home", link: "/" },
+    { name: "About", link: "/about" },
+    { name: "Explore Stories", link: "/explore" },
+    { name: "Contact", link: "/contact" },
   ];
 
-  if (isAdmin) {
-    MenuList.push({
-      name: "Admin Panel",
-      path: "/admin",
-    });
-  }
+  const userItems = [
+    { name: "Create Story", link: "/create-story" },
+    { name: "Explore Stories", link: "/explore" },
+    { name: "My Stories", link: "/dashboard" },
+    ...(isAdmin ? [{ name: "Admin Panel", link: "/admin" }] : []),
+  ];
+
+  const isAuthenticated = isLoaded && isSignedIn;
+  const navItems = !isLoaded ? [] : isAuthenticated ? userItems : visitorItems;
+  const logoHref = isAuthenticated ? "/dashboard" : "/";
+  const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
   return (
-    <>
-      {/* Top Navbar */}
-      <nav className="sticky top-0 z-50 flex w-full items-center justify-between border-b border-blue-300/15 bg-[#010715]/95 px-3 py-1.5 backdrop-blur-xl shadow-[0_10px_35px_rgba(0,0,0,0.45)]">
-        <div className="text-xl flex items-center py-1">
-          <a href="/" className="flex items-center">
-            <Image
-              src="/app_logo.png"
-              alt="Logo"
-              width={58}
-              height={58}
-              className="object-contain"
-            />
-            <h2 className="tc-title-gradient ml-1 hidden w-full text-xl font-bold sm:block sm:text-2xl">
-              TaleCrafterAI
-            </h2>
-          </a>
-        </div>
-
-        <div className="flex items-center space-x-4">
-          {/* Hamburger Menu Button */}
-          <button
-            onClick={toggleOpen}
-            className="flex flex-col space-y-1 rounded-lg border border-blue-300/30 bg-white/5 p-2 transition hover:bg-white/10 focus:outline-none"
-            aria-label="Toggle Navigation Menu"
-          >
-            <div
-              className={`h-0.5 w-6 bg-gradient-to-r from-blue-100 to-cyan-300 transition ${
-                isOpen ? "-rotate-45 translate-x-[-6px] translate-y-[6px] " : ""
-              }`}
-            ></div>
-            <div
-              className={`h-0.5 w-6 bg-gradient-to-r from-blue-100 to-cyan-300 transition ${
-                isOpen ? "opacity-0" : ""
-              }`}
-            ></div>
-            <div
-              className={`h-0.5 w-6 bg-gradient-to-r from-blue-100 to-cyan-300 transition ${
-                isOpen ? "rotate-45 translate-x-[-6px] translate-y-[-6px]" : ""
-              }`}
-            ></div>
-          </button>
-        </div>
-      </nav>
-
-      {/* Sidebar Menu */}
-      <div
-        className={`fixed right-0 top-0 z-40 h-full w-[270px] border-l border-blue-300/20 bg-[#03122e]/70 pt-[100px] backdrop-blur-3xl transform transition-transform duration-300 ease-in-out ${
-          isOpen ? "translate-x-0" : "translate-x-full"
-        }`}
-      >
-        {MenuList.map((item, index) => (
-          <Link
-            key={index}
-            href={item.path}
-            className={`mx-3 my-1 block rounded-xl px-5 py-3 text-[19px] font-bold no-underline transition-colors duration-300 ${
-              pathname === item.path
-                ? "border border-blue-300/20 bg-blue-500/20 text-white"
-                : "tc-title-gradient w-full hover:bg-white/10"
-            }`}
-            onClick={closeNavbar}
-          >
-            {item.name}
-          </Link>
-        ))}
-
-        <div className="fixed bottom-0 flex w-full items-center justify-center gap-4 border-t border-blue-300/15 bg-[#010715]/95 p-5 backdrop-blur-xl shadow-inner">
-          {user ? (
+    <Navbar className="px-3 py-2">
+      <NavBody className="border-blue-300/15 bg-[#010715]/90">
+        <HeaderLogo href={logoHref} onClick={closeMobileMenu} />
+        <NavItems items={navItems} />
+        <div className="relative z-20 flex items-center gap-3">
+          {!isLoaded ? null : isAuthenticated ? (
             <>
+              <Link href="/create-story">
+                <NavbarButton
+                  as="button"
+                  variant="gradient"
+                  className="rounded-full bg-blue-600 px-5 text-white hover:bg-blue-500"
+                >
+                  Create
+                </NavbarButton>
+              </Link>
               <UserButton />
-              <h2 className="tc-title-gradient text-xl font-bold">{user.fullName}</h2>
             </>
           ) : (
-            <div className="flex w-full items-center justify-center gap-2">
-              <Link
-                href="/sign-in"
-                className="tc-btn-ghost rounded-lg px-4 py-2 text-sm font-semibold"
-                onClick={closeNavbar}
-              >
-                Login
+            <>
+              <Link href="/sign-in">
+                <NavbarButton
+                  as="button"
+                  variant="secondary"
+                  className="rounded-full text-blue-100/80 hover:text-white"
+                >
+                  Login
+                </NavbarButton>
               </Link>
-              <Link
-                href="/sign-up"
-                className="tc-btn-primary rounded-lg px-4 py-2 text-sm font-semibold"
-                onClick={closeNavbar}
-              >
-                Sign Up
+              <Link href="/sign-up">
+                <NavbarButton
+                  as="button"
+                  variant="gradient"
+                  className="rounded-full bg-blue-600 px-5 text-white hover:bg-blue-500"
+                >
+                  Sign Up
+                </NavbarButton>
               </Link>
-            </div>
+            </>
           )}
         </div>
-      </div>
-    </>
+      </NavBody>
+
+      <MobileNav className="border-blue-300/15 bg-[#010715]/90">
+        <MobileNavHeader>
+          <HeaderLogo href={logoHref} onClick={closeMobileMenu} />
+          <div className="flex items-center gap-3">
+            {isAuthenticated && <UserButton />}
+            <button
+              type="button"
+              aria-label="Toggle navigation menu"
+              className="rounded-full border border-blue-300/20 p-2"
+              onClick={() => setIsMobileMenuOpen((value) => !value)}
+            >
+              <MobileNavToggle
+                isOpen={isMobileMenuOpen}
+                onClick={() => setIsMobileMenuOpen((value) => !value)}
+              />
+            </button>
+          </div>
+        </MobileNavHeader>
+
+        <MobileNavMenu
+          isOpen={isMobileMenuOpen}
+          onClose={closeMobileMenu}
+          className="bg-[#03122e]/95"
+        >
+          {navItems.map((item) => (
+            <Link
+              key={item.link}
+              href={item.link}
+              onClick={closeMobileMenu}
+              className={`w-full rounded-xl px-4 py-3 text-base font-semibold transition ${
+                pathname === item.link
+                  ? "border border-blue-300/20 bg-blue-500/20 text-white"
+                  : "text-blue-100/75 hover:bg-white/10 hover:text-white"
+              }`}
+            >
+              {item.name}
+            </Link>
+          ))}
+
+          <div className="flex w-full flex-col gap-3 border-t border-blue-300/15 pt-4">
+            {!isLoaded ? null : isAuthenticated ? (
+              <Link href="/create-story" onClick={closeMobileMenu}>
+                <NavbarButton
+                  as="button"
+                  variant="gradient"
+                  className="w-full rounded-xl bg-blue-600 text-white hover:bg-blue-500"
+                >
+                  Create Story
+                </NavbarButton>
+              </Link>
+            ) : (
+              <>
+                <Link href="/sign-in" onClick={closeMobileMenu}>
+                  <NavbarButton
+                    as="button"
+                    variant="secondary"
+                    className="w-full rounded-xl border border-blue-300/20 text-blue-100"
+                  >
+                    Login
+                  </NavbarButton>
+                </Link>
+                <Link href="/sign-up" onClick={closeMobileMenu}>
+                  <NavbarButton
+                    as="button"
+                    variant="gradient"
+                    className="w-full rounded-xl bg-blue-600 text-white hover:bg-blue-500"
+                  >
+                    Sign Up
+                  </NavbarButton>
+                </Link>
+              </>
+            )}
+          </div>
+        </MobileNavMenu>
+      </MobileNav>
+    </Navbar>
   );
-}
+};
 
 export default Header;

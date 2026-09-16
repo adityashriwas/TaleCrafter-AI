@@ -14,11 +14,19 @@ const MotionDiv: any = motion.div;
 
 const plans = [
   {
+    id: "free",
+    title: "Free",
+    price: 0,
+    credits: 5,
+    recommended: false,
+    subtitle: "Included for new accounts",
+  },
+  {
     id: "basic",
     title: "Basic",
     price: 1.99,
     credits: 10,
-    highlighted: false,
+    recommended: false,
     subtitle: "Great for getting started",
   },
   {
@@ -26,7 +34,7 @@ const plans = [
     title: "Premium",
     price: 3.99,
     credits: 75,
-    highlighted: true,
+    recommended: true,
     subtitle: "Most popular for regular creators",
   },
   {
@@ -34,7 +42,7 @@ const plans = [
     title: "Ultimate",
     price: 5.99,
     credits: 150,
-    highlighted: true,
+    recommended: false,
     subtitle: "Best value for high-volume usage",
   },
 ];
@@ -62,7 +70,7 @@ function PricingOptions() {
   }, [selectedPlan]);
 
   useEffect(() => {
-    if (!shouldScrollToPayment || selectedPlan === null || selectedPrice <= 0) return;
+    if (!shouldScrollToPayment || selectedPlan === null) return;
     const timer = setTimeout(() => {
       paymentSectionRef.current?.scrollIntoView({
         behavior: "smooth",
@@ -130,6 +138,11 @@ function PricingOptions() {
       return;
     }
 
+    if (plans[selectedPlan].price <= 0) {
+      notify("Your free 5 credits are included automatically with your account.");
+      return;
+    }
+
     try {
       setCheckoutLoading(true);
       const token = await getToken();
@@ -188,23 +201,25 @@ function PricingOptions() {
           viewport={{ once: true, amount: 0.1 }}
           variants={fadeUp}
           transition={{ delay: 0.08, duration: 0.5 }}
-          className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3"
+          className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4"
         >
           {plans.map((plan, index) => (
             <div
               key={plan.id}
               className={"flex min-h-[360px] cursor-pointer flex-col justify-between rounded-2xl border p-6 text-left shadow-xl backdrop-blur-sm transition-all duration-200 " +
                 (selectedPlan === index
-                  ? "border-blue-300/50 bg-blue-500/20 shadow-[0_0_30px_rgba(59,130,246,0.2)]"
+                  ? "border-blue-200/70 bg-blue-600/20 shadow-[0_0_34px_rgba(37,99,235,0.24)]"
+                  : plan.recommended
+                  ? "border-blue-200/60 bg-blue-600/[0.14] shadow-[0_0_30px_rgba(37,99,235,0.18)] hover:-translate-y-1"
                   : "border-blue-300/20 bg-white/[0.04] hover:-translate-y-1 hover:border-blue-300/35")}
               onClick={() => setSelectedPlan(index)}
             >
               <div>
                 <div className="flex items-center justify-between">
                   <h3 className="text-xl font-bold text-white">{plan.title}</h3>
-                  {plan.highlighted && (
-                    <span className="rounded-full border border-cyan-200/40 bg-cyan-400/15 px-2.5 py-1 text-xs font-semibold text-cyan-100">
-                      Popular
+                  {plan.recommended && (
+                    <span className="rounded-full border border-blue-200/60 bg-blue-600 px-2 py-0.5 text-[10px] font-semibold text-white">
+                      Most Popular
                     </span>
                   )}
                 </div>
@@ -224,16 +239,41 @@ function PricingOptions() {
                 </ul>
               </div>
               <button
+                type="button"
+                aria-label={`Select ${plan.title} plan`}
                 className={"mt-6 w-full rounded-xl border px-4 py-2.5 text-sm font-semibold text-white transition " +
                   (selectedPlan === index
-                    ? "border-blue-200/50 bg-gradient-to-r from-blue-500 via-sky-500 to-cyan-400"
+                    ? "border-blue-200/60 bg-blue-700 hover:bg-blue-600"
+                    : plan.recommended
+                    ? "border-blue-200/50 bg-blue-600 hover:bg-blue-500"
                     : "border-blue-300/30 bg-white/10 hover:bg-white/15")}
               >
-                {selectedPlan === index ? "Selected" : "Select Plan"}
+                {selectedPlan === index
+                  ? "Selected"
+                  : plan.price <= 0
+                  ? "Included"
+                  : plan.recommended
+                  ? "Choose Premium"
+                  : "Select Plan"}
               </button>
             </div>
           ))}
         </MotionDiv>
+
+        {selectedPlan !== null && selectedPrice <= 0 && (
+          <MotionDiv
+            initial="hidden"
+            animate="show"
+            variants={fadeUp}
+            transition={{ delay: 0.1, duration: 0.45 }}
+            ref={paymentSectionRef}
+            className="tc-glass-panel mx-auto mt-8 max-w-2xl p-4"
+          >
+            <p className="text-sm text-blue-100/80">
+              The free plan includes 5 credits automatically on your account. Pick a paid plan when you need more.
+            </p>
+          </MotionDiv>
+        )}
 
         {selectedPlan !== null && selectedPrice > 0 && (
           <MotionDiv

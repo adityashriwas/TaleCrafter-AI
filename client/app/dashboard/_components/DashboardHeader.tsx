@@ -33,7 +33,7 @@ const DashboardHeader = () => {
             {userDetail?.credit ?? "-"}
           </span>
           <Link href="/buy-credits">
-            <Button className="tc-btn-primary group bg-gradient-to-r from-blue-500 via-sky-500 to-cyan-400 px-6 py-5 text-sm shadow-[0_0_26px_rgba(59,130,246,0.38)] duration-200 hover:scale-[1.03] hover:from-blue-400 hover:via-sky-400 hover:to-cyan-300">
+            <Button className="tc-btn-primary group px-6 py-5 text-sm shadow-[0_0_26px_rgba(59,130,246,0.24)] duration-200 hover:scale-[1.03]">
               <HiSparkles className="mr-2 text-base transition-transform duration-200 group-hover:rotate-12" />
               Buy Credits
             </Button>

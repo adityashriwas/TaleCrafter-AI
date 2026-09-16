@@ -19,7 +19,7 @@ const Video = () => {
   }, []);
 
   return (
-    <div className="tc-glass-panel-soft mt-10 mb-14 flex flex-col gap-4 p-2 text-center shadow-[0_20px_60px_rgba(2,12,34,0.5)] sm:p-8">
+    <div className="mb-14 flex flex-col gap-6 text-center">
       <h2 className="tc-title-gradient block w-full text-center text-2xl font-bold drop-shadow-lg sm:text-4xl">
         How to Use the App
       </h2>

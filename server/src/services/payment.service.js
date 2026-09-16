@@ -34,7 +34,7 @@ export const CREDIT_PLANS = [
     amountCents: 599,
     credits: 150,
     subtitle: 'Best value for high-volume usage',
-    highlighted: true,
+    highlighted: false,
   },
 ];
 
