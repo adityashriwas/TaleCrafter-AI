@@ -4,10 +4,17 @@ import { db, dbV2 } from '../db/index.js';
 import { StoryData } from '../db/schema.js';
 import { InteractiveStories, InteractiveStoryNodes } from '../db/schemaV2.js';
 import ApiError from '../utils/ApiError.js';
-import { buildPollinationsImageUrl, uploadImageToCloudinary } from './image.service.js';
+import {
+  buildPollinationsImageUrl,
+  uploadImageToCloudinary,
+} from './image.service.js';
 import { generateGeminiText, generateStoryJson } from './gemini.service.js';
 import { generateUniqueStorySlug } from './story.service.js';
-import { decrementUserCredits, syncUserFromClerk } from './user.service.js';
+import {
+  decrementUserCredits,
+  incrementUserCreditsByEmail,
+  syncUserFromClerk,
+} from './user.service.js';
 import {
   buildChoicePrompt,
   buildContinuationPrompt,
@@ -80,7 +87,8 @@ const listStoryNodes = async storyId => {
   return rows.map(mapStoryNode);
 };
 
-const getActiveNode = nodes => nodes.find(node => node.isActive) ?? nodes[nodes.length - 1] ?? null;
+const getActiveNode = nodes =>
+  nodes.find(node => node.isActive) ?? nodes[nodes.length - 1] ?? null;
 
 const getLinearNodes = ({ activeNode, nodes }) => {
   if (!activeNode) return [];
@@ -101,7 +109,9 @@ const getLinearNodes = ({ activeNode, nodes }) => {
 const mapGeneratedPages = async ({ pages, pageOffset, seedPrefix }) => {
   const mappedPages = await Promise.all(
     pages.map(async (page, index) => {
-      const prompt = String(page.imagePrompt || page.text || 'Story illustration');
+      const prompt = String(
+        page.imagePrompt || page.text || 'Story illustration'
+      );
       const imageUrl = buildPollinationsImageUrl(prompt, {
         seed: `${Date.now()}_${seedPrefix}_${index}_${Math.floor(Math.random() * 100000)}`,
       });
@@ -161,7 +171,9 @@ const saveCompletedToClassicStory = async ({ story, pages, finalTitle }) => {
   };
 
   if (!existing[0]) {
-    const slug = await generateUniqueStorySlug(finalTitle || story.title || 'Interactive Story');
+    const slug = await generateUniqueStorySlug(
+      finalTitle || story.title || 'Interactive Story'
+    );
     await db.insert(StoryData).values({
       storyId: story.storyId,
       slug,
@@ -180,9 +192,12 @@ const saveCompletedToClassicStory = async ({ story, pages, finalTitle }) => {
 
   let slug = String(existing[0].slug ?? '').trim();
   if (!slug) {
-    slug = await generateUniqueStorySlug(finalTitle || story.title || 'Interactive Story', {
-      excludeStoryId: story.storyId,
-    });
+    slug = await generateUniqueStorySlug(
+      finalTitle || story.title || 'Interactive Story',
+      {
+        excludeStoryId: story.storyId,
+      }
+    );
   }
 
   await db
@@ -198,104 +213,114 @@ const saveCompletedToClassicStory = async ({ story, pages, finalTitle }) => {
 };
 
 export const createInteractiveStarter = async ({ userId, payload }) => {
-  const user = await syncUserFromClerk(userId);
-
-  if (Number(user.credit ?? 0) <= 0) {
-    throw new ApiError(402, 'Insufficient credits');
-  }
-
+  const reservedUser = await decrementUserCredits(userId, 1);
   const formData = payload ?? {};
-  const story = await generateStoryJson({ formData, interactive: true });
   const storyId = randomUUID();
   const rootNodeId = randomUUID();
-  const interactiveTitle = String(story?.title ?? 'Interactive Story');
-  const slug = await generateUniqueStorySlug(interactiveTitle);
-  const chapters = Array.isArray(story?.chapters) ? story.chapters : [];
 
-  const starterPages = await Promise.all(
-    chapters.map(async (chapter, index) => {
-      const prompt = String(chapter?.imagePrompt ?? chapter?.textPrompt ?? 'Story illustration');
-      const seed = `${Date.now()}_${index}_${Math.floor(Math.random() * 100000)}`;
-      const pollinationsUrl = buildPollinationsImageUrl(prompt, { seed });
-      return {
-        pageNumber: index + 1,
-        title: String(chapter?.title ?? `Chapter ${index + 1}`),
-        text: String(chapter?.textPrompt ?? ''),
-        imagePrompt: prompt,
-        imageUrl: await persistWithFallback(pollinationsUrl),
-      };
-    })
-  );
-
-  if (starterPages.length < MIN_STARTER_PAGES) {
-    throw new ApiError(400, 'Starter story must have at least 5 pages');
-  }
-
-  const coverPromptSource = String(
-    story?.coverImagePrompt ||
-      `${story?.title ?? 'Interactive story'} cinematic book cover, ${formData?.imageStyle ?? 'illustration'}`
-  );
-  const coverTitle = String(story?.title ?? 'Interactive Story').replace(/\s+/g, '-');
-  const coverPrompt = coverPromptSource.replace(/\s+/g, '-');
-  const defaultStyleCoverPrompt = `Add-title-"${coverTitle}"-in-bold-text-for-book-cover-image,-${coverPrompt}`;
-  const coverSeed = `${Date.now()}${Math.floor(Math.random() * 100000)}`;
-  const coverImageUrl = buildPollinationsImageUrl(defaultStyleCoverPrompt, {
-    width: 410,
-    height: 630,
-    seed: coverSeed,
-  });
-  const persistedCoverImageUrl = await persistWithFallback(coverImageUrl);
-
-  let starterChoices = STARTER_FALLBACK_CHOICES;
   try {
-    const starterChoiceText = await generateGeminiText({
-      prompt: buildChoicePrompt(makePageContext(starterPages, 4)),
-      mode: 'text',
+    const story = await generateStoryJson({ formData, interactive: true });
+    const interactiveTitle = String(story?.title ?? 'Interactive Story');
+    const slug = await generateUniqueStorySlug(interactiveTitle);
+    const chapters = Array.isArray(story?.chapters) ? story.chapters : [];
+
+    const starterPages = await Promise.all(
+      chapters.map(async (chapter, index) => {
+        const prompt = String(
+          chapter?.imagePrompt ?? chapter?.textPrompt ?? 'Story illustration'
+        );
+        const seed = `${Date.now()}_${index}_${Math.floor(Math.random() * 100000)}`;
+        const pollinationsUrl = buildPollinationsImageUrl(prompt, { seed });
+        return {
+          pageNumber: index + 1,
+          title: String(chapter?.title ?? `Chapter ${index + 1}`),
+          text: String(chapter?.textPrompt ?? ''),
+          imagePrompt: prompt,
+          imageUrl: await persistWithFallback(pollinationsUrl),
+        };
+      })
+    );
+
+    if (starterPages.length < MIN_STARTER_PAGES) {
+      throw new ApiError(400, 'Starter story must have at least 5 pages');
+    }
+
+    const coverPromptSource = String(
+      story?.coverImagePrompt ||
+        `${story?.title ?? 'Interactive story'} cinematic book cover, ${formData?.imageStyle ?? 'illustration'}`
+    );
+    const coverTitle = String(story?.title ?? 'Interactive Story').replace(
+      /\s+/g,
+      '-'
+    );
+    const coverPrompt = coverPromptSource.replace(/\s+/g, '-');
+    const defaultStyleCoverPrompt = `Add-title-"${coverTitle}"-in-bold-text-for-book-cover-image,-${coverPrompt}`;
+    const coverSeed = `${Date.now()}${Math.floor(Math.random() * 100000)}`;
+    const coverImageUrl = buildPollinationsImageUrl(defaultStyleCoverPrompt, {
+      width: 410,
+      height: 630,
+      seed: coverSeed,
     });
-    const parsedChoices = parseChoices(starterChoiceText);
-    if (parsedChoices.length >= 2) starterChoices = parsedChoices;
-  } catch {
-    starterChoices = STARTER_FALLBACK_CHOICES;
+    const persistedCoverImageUrl = await persistWithFallback(coverImageUrl);
+
+    let starterChoices = STARTER_FALLBACK_CHOICES;
+    try {
+      const starterChoiceText = await generateGeminiText({
+        prompt: buildChoicePrompt(makePageContext(starterPages, 4)),
+        mode: 'text',
+      });
+      const parsedChoices = parseChoices(starterChoiceText);
+      if (parsedChoices.length >= 2) starterChoices = parsedChoices;
+    } catch {
+      starterChoices = STARTER_FALLBACK_CHOICES;
+    }
+
+    const now = new Date();
+
+    await dbV2.insert(InteractiveStories).values({
+      storyId,
+      slug,
+      userEmail: reservedUser.userEmail,
+      userName: reservedUser.userName,
+      userImage: reservedUser.userImage,
+      title: interactiveTitle,
+      storySubject: formData?.storySubject,
+      storyType: formData?.storyType,
+      ageGroup: formData?.ageGroup,
+      imageStyle: formData?.imageStyle,
+      status: 'draft',
+      rootNodeId,
+      currentNodeId: rootNodeId,
+      totalPages: starterPages.length,
+      coverImage: persistedCoverImageUrl,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    await dbV2.insert(InteractiveStoryNodes).values({
+      nodeId: rootNodeId,
+      storyId,
+      parentNodeId: null,
+      depth: 0,
+      choiceTaken: null,
+      choices: starterChoices,
+      selectedChoice: null,
+      pages: starterPages,
+      isActive: true,
+      createdAt: now,
+    });
+
+    return { storyId, user: reservedUser };
+  } catch (error) {
+    await dbV2
+      .delete(InteractiveStoryNodes)
+      .where(eq(InteractiveStoryNodes.storyId, storyId));
+    await dbV2
+      .delete(InteractiveStories)
+      .where(eq(InteractiveStories.storyId, storyId));
+    await incrementUserCreditsByEmail(reservedUser.userEmail, 1);
+    throw error;
   }
-
-  const now = new Date();
-
-  await dbV2.insert(InteractiveStories).values({
-    storyId,
-    slug,
-    userEmail: user.userEmail,
-    userName: user.userName,
-    userImage: user.userImage,
-    title: interactiveTitle,
-    storySubject: formData?.storySubject,
-    storyType: formData?.storyType,
-    ageGroup: formData?.ageGroup,
-    imageStyle: formData?.imageStyle,
-    status: 'draft',
-    rootNodeId,
-    currentNodeId: rootNodeId,
-    totalPages: starterPages.length,
-    coverImage: persistedCoverImageUrl,
-    createdAt: now,
-    updatedAt: now,
-  });
-
-  await dbV2.insert(InteractiveStoryNodes).values({
-    nodeId: rootNodeId,
-    storyId,
-    parentNodeId: null,
-    depth: 0,
-    choiceTaken: null,
-    choices: starterChoices,
-    selectedChoice: null,
-    pages: starterPages,
-    isActive: true,
-    createdAt: now,
-  });
-
-  const updatedUser = await decrementUserCredits(userId, 1);
-
-  return { storyId, user: updatedUser };
 };
 
 export const listCurrentUserInteractiveStories = async ({ userId }) => {
@@ -313,18 +338,17 @@ export const getCurrentUserInteractiveStory = async ({ userId, storyId }) => {
   return getInteractiveState(story);
 };
 
-export const deleteCurrentUserInteractiveStory = async ({ userId, storyId }) => {
+export const deleteCurrentUserInteractiveStory = async ({
+  userId,
+  storyId,
+}) => {
   const { story } = await ensureOwnedStory({ userId, storyId });
 
   await dbV2
     .delete(InteractiveStoryNodes)
     .where(eq(InteractiveStoryNodes.storyId, story.storyId));
 
-  await db
-    .delete(StoryData)
-    .where(
-      eq(StoryData.storyId, story.storyId)
-    );
+  await db.delete(StoryData).where(eq(StoryData.storyId, story.storyId));
 
   const deleted = await dbV2
     .delete(InteractiveStories)
@@ -334,17 +358,25 @@ export const deleteCurrentUserInteractiveStory = async ({ userId, storyId }) => 
   return deleted[0] ?? { storyId: story.storyId };
 };
 
-export const completeInteractiveStory = async ({ userId, storyId, selectedChoice = 'End Story' }) => {
+export const completeInteractiveStory = async ({
+  userId,
+  storyId,
+  selectedChoice = 'End Story',
+}) => {
   const { story } = await ensureOwnedStory({ userId, storyId });
   if (story.status === 'completed') {
     const completedSlug = await getCompletedStorySlug(story.storyId);
-    return { completedSlug: completedSlug || story.storyId, ...(await getInteractiveState(story)) };
+    return {
+      completedSlug: completedSlug || story.storyId,
+      ...(await getInteractiveState(story)),
+    };
   }
 
   const nodes = await listStoryNodes(story.storyId);
   const activeNode = getActiveNode(nodes);
   if (!activeNode) throw new ApiError(404, 'Active story node not found');
-  if (activeNode.selectedChoice) throw new ApiError(409, 'This branch is already locked');
+  if (activeNode.selectedChoice)
+    throw new ApiError(409, 'This branch is already locked');
 
   const linearNodes = getLinearNodes({ activeNode, nodes });
   const linearPages = linearNodes.flatMap(node => node.pages ?? []);
@@ -356,7 +388,10 @@ export const completeInteractiveStory = async ({ userId, storyId, selectedChoice
     maxPages: 5,
     finalResolution: true,
   });
-  const finalText = await generateGeminiText({ prompt: finalPrompt, mode: 'text' });
+  const finalText = await generateGeminiText({
+    prompt: finalPrompt,
+    mode: 'text',
+  });
   const resolutionPages = parsePages(finalText).slice(0, 5);
 
   if (resolutionPages.length < 3) {
@@ -390,7 +425,10 @@ export const completeInteractiveStory = async ({ userId, storyId, selectedChoice
 
   const refreshedNodes = await listStoryNodes(story.storyId);
   const finalNode = refreshedNodes.find(node => node.nodeId === finalNodeId);
-  const chain = getLinearNodes({ activeNode: finalNode, nodes: refreshedNodes });
+  const chain = getLinearNodes({
+    activeNode: finalNode,
+    nodes: refreshedNodes,
+  });
   const compiledPages = chain.flatMap(node => node.pages ?? []);
 
   await dbV2
@@ -410,23 +448,43 @@ export const completeInteractiveStory = async ({ userId, storyId, selectedChoice
     finalTitle: story.title,
   });
 
-  return { completedSlug: finalSlug, story: { ...story, status: 'completed', currentNodeId: finalNodeId, totalPages: compiledPages.length, compiledPages }, nodes: refreshedNodes };
+  return {
+    completedSlug: finalSlug,
+    story: {
+      ...story,
+      status: 'completed',
+      currentNodeId: finalNodeId,
+      totalPages: compiledPages.length,
+      compiledPages,
+    },
+    nodes: refreshedNodes,
+  };
 };
 
-export const continueInteractiveStory = async ({ userId, storyId, selectedChoice }) => {
+export const continueInteractiveStory = async ({
+  userId,
+  storyId,
+  selectedChoice,
+}) => {
   const safeChoice = String(selectedChoice ?? '').trim();
   if (!safeChoice) throw new ApiError(400, 'Selected choice is required');
 
   const { story } = await ensureOwnedStory({ userId, storyId });
-  if (story.status === 'completed') throw new ApiError(409, 'Story is already completed');
+  if (story.status === 'completed')
+    throw new ApiError(409, 'Story is already completed');
 
   const nodes = await listStoryNodes(story.storyId);
   const activeNode = getActiveNode(nodes);
   if (!activeNode) throw new ApiError(404, 'Active story node not found');
-  if (activeNode.selectedChoice) throw new ApiError(409, 'This branch is already locked');
+  if (activeNode.selectedChoice)
+    throw new ApiError(409, 'This branch is already locked');
 
   if (Number(activeNode.depth ?? 0) >= MAX_DEPTH) {
-    return completeInteractiveStory({ userId, storyId, selectedChoice: safeChoice });
+    return completeInteractiveStory({
+      userId,
+      storyId,
+      selectedChoice: safeChoice,
+    });
   }
 
   const linearNodes = getLinearNodes({ activeNode, nodes });
@@ -439,10 +497,16 @@ export const continueInteractiveStory = async ({ userId, storyId, selectedChoice
     maxPages: 6,
   });
 
-  const continuationText = await generateGeminiText({ prompt: continuationPrompt, mode: 'text' });
+  const continuationText = await generateGeminiText({
+    prompt: continuationPrompt,
+    mode: 'text',
+  });
   const payload = parseContinuationPayload(continuationText);
   const pages = payload.pages.slice(0, 6);
-  const choices = payload.choices.length >= 2 ? payload.choices.slice(0, 2) : CONTINUATION_FALLBACK_CHOICES;
+  const choices =
+    payload.choices.length >= 2
+      ? payload.choices.slice(0, 2)
+      : CONTINUATION_FALLBACK_CHOICES;
 
   if (pages.length < 3) {
     throw new ApiError(502, 'Each continuation must have minimum 3 pages');

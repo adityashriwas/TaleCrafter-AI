@@ -4,8 +4,15 @@ import { db, dbV2 } from '../db/index.js';
 import { StoryData } from '../db/schema.js';
 import { InteractiveStories, InteractiveStoryNodes } from '../db/schemaV2.js';
 import ApiError from '../utils/ApiError.js';
-import { decrementUserCredits, syncUserFromClerk } from './user.service.js';
-import { buildPollinationsImageUrl, uploadImageToCloudinary } from './image.service.js';
+import {
+  decrementUserCredits,
+  incrementUserCreditsByEmail,
+  syncUserFromClerk,
+} from './user.service.js';
+import {
+  buildPollinationsImageUrl,
+  uploadImageToCloudinary,
+} from './image.service.js';
 import { generateStoryJson } from './gemini.service.js';
 
 const MAX_BASE_SLUG_LENGTH = 70;
@@ -133,7 +140,6 @@ export const getStoryByStoryId = async storyId => {
   return result[0] ?? null;
 };
 
-
 export const listStorySitemapPage = async ({ limit, offset }) => {
   return db
     .select({ slug: StoryData.slug })
@@ -154,7 +160,12 @@ export const listStorySitemapEntries = async () => {
     .orderBy(desc(StoryData.id));
 };
 
-export const listRelatedStories = async ({ storyId, storyType, limit, offset }) => {
+export const listRelatedStories = async ({
+  storyId,
+  storyType,
+  limit,
+  offset,
+}) => {
   const safeStoryId = String(storyId ?? '').trim();
   if (!safeStoryId) throw new ApiError(400, 'Story ID is required');
 
@@ -171,7 +182,10 @@ export const listRelatedStories = async ({ storyId, storyType, limit, offset }) 
       .orderBy(orderClause)
       .limit(clampLimit(limit))
       .offset(normalizeOffset(offset)),
-    db.select({ count: sql`count(*)` }).from(StoryData).where(baseFilter),
+    db
+      .select({ count: sql`count(*)` })
+      .from(StoryData)
+      .where(baseFilter),
   ]);
 
   return {
@@ -252,47 +266,46 @@ const prepareClassicStoryImages = async ({ output, imageStyle }) => {
 };
 
 export const createClassicStory = async ({ userId, payload }) => {
-  const user = await syncUserFromClerk(userId);
+  const reservedUser = await decrementUserCredits(userId, 1);
 
-  if (Number(user.credit ?? 0) <= 0) {
-    throw new ApiError(402, 'Insufficient credits');
-  }
-
-  const storyId = randomUUID();
-  const generatedStory = await generateStoryJson({ formData: payload });
-  const prepared = await prepareClassicStoryImages({
-    output: generatedStory,
-    imageStyle: payload?.imageStyle,
-  });
-  const title = extractStoryTitle({
-    output: prepared.output,
-    storySubject: payload?.storySubject,
-  });
-  const slug = await generateUniqueStorySlug(title);
-
-  const inserted = await db
-    .insert(StoryData)
-    .values({
-      storyId,
-      slug,
-      ageGroup: payload?.ageGroup,
-      storyType: payload?.storyType,
-      storySubject: payload?.storySubject,
+  try {
+    const storyId = randomUUID();
+    const generatedStory = await generateStoryJson({ formData: payload });
+    const prepared = await prepareClassicStoryImages({
+      output: generatedStory,
       imageStyle: payload?.imageStyle,
+    });
+    const title = extractStoryTitle({
       output: prepared.output,
-      coverImage: prepared.coverImage,
-      userEmail: user.userEmail,
-      userName: user.userName,
-      userImage: user.userImage,
-    })
-    .returning({ storyId: StoryData.storyId, slug: StoryData.slug });
+      storySubject: payload?.storySubject,
+    });
+    const slug = await generateUniqueStorySlug(title);
 
-  const updatedUser = await decrementUserCredits(userId, 1);
+    const inserted = await db
+      .insert(StoryData)
+      .values({
+        storyId,
+        slug,
+        ageGroup: payload?.ageGroup,
+        storyType: payload?.storyType,
+        storySubject: payload?.storySubject,
+        imageStyle: payload?.imageStyle,
+        output: prepared.output,
+        coverImage: prepared.coverImage,
+        userEmail: reservedUser.userEmail,
+        userName: reservedUser.userName,
+        userImage: reservedUser.userImage,
+      })
+      .returning({ storyId: StoryData.storyId, slug: StoryData.slug });
 
-  return {
-    ...inserted[0],
-    user: updatedUser,
-  };
+    return {
+      ...inserted[0],
+      user: reservedUser,
+    };
+  } catch (error) {
+    await incrementUserCreditsByEmail(reservedUser.userEmail, 1);
+    throw error;
+  }
 };
 
 export const deleteCurrentUserStory = async ({ userId, storyId }) => {

@@ -10,7 +10,7 @@ import { useAuth } from "@clerk/nextjs";
 import { apiFetch } from "@/lib/api-client";
 import type { UserDetail } from "../_context/UserDetailContext";
 
-const MotionDiv: any = motion.div;
+const MotionDiv = motion.div;
 
 const plans = [
   {
@@ -212,7 +212,6 @@ function PricingOptions() {
                   : plan.recommended
                   ? "border-blue-200/60 bg-blue-600/[0.14] shadow-[0_0_30px_rgba(37,99,235,0.18)] hover:-translate-y-1"
                   : "border-blue-300/20 bg-white/[0.04] hover:-translate-y-1 hover:border-blue-300/35")}
-              onClick={() => setSelectedPlan(index)}
             >
               <div>
                 <div className="flex items-center justify-between">
@@ -241,6 +240,7 @@ function PricingOptions() {
               <button
                 type="button"
                 aria-label={`Select ${plan.title} plan`}
+                onClick={() => setSelectedPlan(index)}
                 className={"mt-6 w-full rounded-xl border px-4 py-2.5 text-sm font-semibold text-white transition " +
                   (selectedPlan === index
                     ? "border-blue-200/60 bg-blue-700 hover:bg-blue-600"

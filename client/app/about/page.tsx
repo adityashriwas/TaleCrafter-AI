@@ -2,7 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-const MotionDiv: any = motion.div;
+const MotionDiv = motion.div;
 
 const About = () => {
   const highlights = [

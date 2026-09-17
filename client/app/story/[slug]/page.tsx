@@ -23,7 +23,7 @@ export async function generateMetadata({
     };
   }
 
-  const output = (story?.output as any) ?? {};
+  const output = story.output ?? {};
   const title = String(output?.title ?? "AI Generated Story");
   const description = extractStorySummary(story);
   const storyType = String(story?.storyType ?? "").trim().toLowerCase();

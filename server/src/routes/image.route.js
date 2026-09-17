@@ -12,7 +12,17 @@ import {
 
 const router = Router();
 
-router.post('/pollinations-url', requireAuth, validate(pollinationsImageUrlSchema), createPollinationsImageUrl);
-router.post('/persist', requireAuth, validate(persistImageSchema), persistImage);
+router.post(
+  '/pollinations-url',
+  requireAuth,
+  validate(pollinationsImageUrlSchema),
+  createPollinationsImageUrl
+);
+router.post(
+  '/persist',
+  requireAuth,
+  validate(persistImageSchema),
+  persistImage
+);
 
 export default router;

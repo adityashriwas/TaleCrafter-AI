@@ -14,12 +14,8 @@ import UploadImage from "./(component)/UploadImage";
 import { motion } from "framer-motion";
 import { apiFetch } from "@/lib/api-client";
 import type { UserDetail } from "@/app/_context/UserDetailContext";
-const MotionDiv: any = motion.div;
-
-export interface feildData {
-  fieldValue: string;
-  fieldName: string;
-}
+import type { StorySelection } from "@/types/story";
+const MotionDiv = motion.div;
 
 export interface FormDataType {
   storySubject: string;
@@ -50,7 +46,7 @@ const CreateStory = () => {
   const { userDetail, setUserDetail } = useContext(UserDetailContext);
   const [storySubject, setStorySubject] = useState("");
 
-  const onHandleUserSelection = (data: feildData) => {
+  const onHandleUserSelection = (data: StorySelection) => {
     setFormData((prev) => ({
       ...prev,
       [data.fieldName]: data.fieldValue,

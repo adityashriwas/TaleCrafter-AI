@@ -1,12 +1,9 @@
 import Stripe from 'stripe';
-import { eq } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { db } from '../db/index.js';
 import { Payments } from '../db/schema.js';
 import ApiError from '../utils/ApiError.js';
-import {
-  incrementUserCreditsByEmail,
-  syncUserFromClerk,
-} from './user.service.js';
+import { syncUserFromClerk } from './user.service.js';
 
 export const CREDIT_PLANS = [
   {
@@ -53,14 +50,11 @@ const getPlan = planId => {
   return plan;
 };
 
-const getAppOrigin = origin => {
-  const safeOrigin = String(origin ?? '').trim().replace(/\/$/, '');
-  if (safeOrigin) return safeOrigin;
-
-  const configured = String(process.env.CLIENT_ORIGIN ?? process.env.SITE_URL ?? '').trim();
+const getAppOrigin = () => {
+  const configured = String(process.env.CLIENT_ORIGIN ?? '').trim();
   if (configured) return configured.replace(/\/$/, '');
-
-  return 'http://localhost:3000';
+  if (process.env.NODE_ENV !== 'production') return 'http://localhost:3000';
+  throw new ApiError(503, 'Client origin is not configured');
 };
 
 const getPaymentBySessionId = async sessionId => {
@@ -87,23 +81,38 @@ const assertSessionMatchesPlan = ({ session, payment }) => {
     throw new ApiError(400, 'Invalid checkout session type');
   }
 
-  if (session.currency !== payment.currency || session.amount_total !== payment.amountCents) {
-    throw new ApiError(400, 'Checkout session amount does not match the payment ledger');
+  if (
+    session.currency !== payment.currency ||
+    session.amount_total !== payment.amountCents
+  ) {
+    throw new ApiError(
+      400,
+      'Checkout session amount does not match the payment ledger'
+    );
   }
 
-  if (plan.amountCents !== payment.amountCents || plan.credits !== payment.credits) {
-    throw new ApiError(400, 'Payment ledger does not match the configured plan');
+  if (
+    plan.amountCents !== payment.amountCents ||
+    plan.credits !== payment.credits
+  ) {
+    throw new ApiError(
+      400,
+      'Payment ledger does not match the configured plan'
+    );
   }
 
   if (session.metadata?.userEmail !== payment.userEmail) {
-    throw new ApiError(403, 'Checkout session user does not match the payment ledger');
+    throw new ApiError(
+      403,
+      'Checkout session user does not match the payment ledger'
+    );
   }
 };
 
-export const createStripeCheckoutSession = async ({ userId, planId, origin }) => {
+export const createStripeCheckoutSession = async ({ userId, planId }) => {
   const user = await syncUserFromClerk(userId);
   const plan = getPlan(planId);
-  const appOrigin = getAppOrigin(origin);
+  const appOrigin = getAppOrigin();
   const stripe = getStripe();
 
   const session = await stripe.checkout.sessions.create({
@@ -136,21 +145,26 @@ export const createStripeCheckoutSession = async ({ userId, planId, origin }) =>
     throw new ApiError(502, 'Unable to create Stripe checkout session');
   }
 
-  await db
-    .insert(Payments)
-    .values({
-      provider: 'stripe',
-      providerSessionId: session.id,
-      userEmail: user.userEmail,
-      planId: plan.id,
-      amountCents: plan.amountCents,
-      currency: 'usd',
-      credits: plan.credits,
-      status: 'pending',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    })
-    .onConflictDoNothing({ target: Payments.providerSessionId });
+  try {
+    await db
+      .insert(Payments)
+      .values({
+        provider: 'stripe',
+        providerSessionId: session.id,
+        userEmail: user.userEmail,
+        planId: plan.id,
+        amountCents: plan.amountCents,
+        currency: 'usd',
+        credits: plan.credits,
+        status: 'pending',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .onConflictDoNothing({ target: Payments.providerSessionId });
+  } catch (error) {
+    await stripe.checkout.sessions.expire(session.id).catch(() => undefined);
+    throw error;
+  }
 
   return { url: session.url, sessionId: session.id };
 };
@@ -188,33 +202,86 @@ export const fulfillStripeCheckoutSession = async ({ session, rawEvent }) => {
     return { status: 'fulfilled', idempotent: true };
   }
 
-  if (session.status !== 'complete' || session.payment_status !== 'paid') {
-    await db
-      .update(Payments)
-      .set({
-        status: 'failed',
-        rawEvent,
-        updatedAt: new Date(),
-      })
-      .where(eq(Payments.providerSessionId, safeSessionId));
-
-    throw new ApiError(402, 'Payment has not been completed');
+  if (session.status !== 'complete') {
+    throw new ApiError(409, 'Checkout session is not complete');
   }
 
-  const updatedUser = await incrementUserCreditsByEmail(payment.userEmail, payment.credits);
+  if (session.payment_status === 'unpaid') {
+    return { status: 'pending', idempotent: true };
+  }
 
-  await db
+  const paymentIntentId = paymentIntentIdFromSession(session);
+  const rawEventJson = JSON.stringify(rawEvent ?? null);
+  const result = await db.execute(sql`
+    WITH claimed AS (
+      UPDATE payments
+      SET
+        status = 'fulfilled',
+        "providerPaymentIntentId" = ${paymentIntentId},
+        "rawEvent" = CAST(${rawEventJson} AS json),
+        "fulfilledAt" = now(),
+        "updatedAt" = now()
+      WHERE "providerSessionId" = ${safeSessionId}
+        AND status = 'pending'
+        AND EXISTS (
+          SELECT 1 FROM users WHERE users."userEmail" = payments."userEmail"
+        )
+      RETURNING "userEmail", credits
+    ),
+    credited AS (
+      UPDATE users
+      SET credit = users.credit + claimed.credits
+      FROM claimed
+      WHERE users."userEmail" = claimed."userEmail"
+      RETURNING users.id, users."userEmail", users."userName", users."userImage", users.credit
+    )
+    SELECT
+      'fulfilled' AS status,
+      credited.id,
+      credited."userEmail",
+      credited."userName",
+      credited."userImage",
+      credited.credit
+    FROM credited
+  `);
+
+  const row = result.rows?.[0];
+  if (!row) {
+    const current = await getPaymentBySessionId(safeSessionId);
+    if (current?.status === 'fulfilled') {
+      return { status: 'fulfilled', idempotent: true };
+    }
+    throw new ApiError(409, 'Payment could not be fulfilled');
+  }
+
+  return {
+    status: 'fulfilled',
+    user: {
+      id: row.id,
+      userEmail: row.userEmail,
+      userName: row.userName,
+      userImage: row.userImage,
+      credit: row.credit,
+    },
+  };
+};
+
+export const markStripeCheckoutFailed = async ({ session, rawEvent }) => {
+  const safeSessionId = String(session?.id ?? '').trim();
+  if (!safeSessionId) return { status: 'ignored' };
+
+  const updated = await db
     .update(Payments)
-    .set({
-      status: 'fulfilled',
-      providerPaymentIntentId: paymentIntentIdFromSession(session),
-      rawEvent,
-      fulfilledAt: new Date(),
-      updatedAt: new Date(),
-    })
-    .where(eq(Payments.providerSessionId, safeSessionId));
+    .set({ status: 'failed', rawEvent, updatedAt: new Date() })
+    .where(
+      and(
+        eq(Payments.providerSessionId, safeSessionId),
+        eq(Payments.status, 'pending')
+      )
+    )
+    .returning({ status: Payments.status });
 
-  return { status: 'fulfilled', user: updatedUser };
+  return updated[0] ?? { status: 'ignored' };
 };
 
 export const constructStripeWebhookEvent = ({ rawBody, signature }) => {

@@ -1,9 +1,13 @@
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
 import { clerkMiddleware } from '@clerk/express';
 import { API_PREFIX } from './constants.js';
 import ApiError from './utils/ApiError.js';
+import { attachRequestId } from './middlewares/request.middleware.js';
+import { apiRateLimit } from './middlewares/rateLimit.middleware.js';
+import { errorHandler, notFound } from './middlewares/error.middleware.js';
 import healthRouter from './routes/health.route.js';
 import userRouter from './routes/user.route.js';
 import aiRouter from './routes/ai.route.js';
@@ -16,14 +20,21 @@ import adminRouter from './routes/admin.route.js';
 
 const app = express();
 
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
+app.disable('x-powered-by');
+app.use(attachRequestId);
+app.use(helmet());
+
 const configuredOrigins = process.env.CORS_ORIGIN
-  ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim()).filter(Boolean)
+  ? process.env.CORS_ORIGIN.split(',')
+      .map(origin => origin.trim())
+      .filter(Boolean)
   : [];
 
-const devOrigins = [
-  'http://localhost:3000',
-  'http://127.0.0.1:3000',
-];
+const devOrigins = ['http://localhost:3000', 'http://127.0.0.1:3000'];
 
 const allowedOrigins = new Set([...configuredOrigins, ...devOrigins]);
 
@@ -50,6 +61,7 @@ app.post(
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true, limit: '2mb' }));
 app.use(cookieParser());
+app.use(API_PREFIX, apiRateLimit);
 
 app.use(`${API_PREFIX}/health`, healthRouter);
 
@@ -63,19 +75,7 @@ app.use(`${API_PREFIX}/interactive-stories`, interactiveStoryRouter);
 app.use(`${API_PREFIX}/payments`, paymentRouter);
 app.use(`${API_PREFIX}/admin`, adminRouter);
 
-app.use((req, _res, next) => {
-  next(new ApiError(404, `Route not found: ${req.method} ${req.originalUrl}`));
-});
-
-app.use((err, _req, res, _next) => {
-  const statusCode = err.statusCode || 500;
-
-  res.status(statusCode).json({
-    success: false,
-    statusCode,
-    message: err.message || 'Internal server error',
-    errors: err.error || [],
-  });
-});
+app.use(notFound);
+app.use(errorHandler);
 
 export default app;

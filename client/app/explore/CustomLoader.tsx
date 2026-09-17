@@ -7,11 +7,11 @@ import {
 import Image from "next/image";
 import { useEffect } from "react";
 
-function CustomLoader({ isLoading }: any) {
+function CustomLoader({ isLoading }: { isLoading: boolean }) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   useEffect(() => {
     onOpen();
-  }, []);
+  }, [onOpen]);
   return (
     <div>
       {isLoading && (

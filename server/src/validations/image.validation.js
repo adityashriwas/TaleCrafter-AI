@@ -13,7 +13,9 @@ export const pollinationsImageUrlSchema = z.object({
 });
 
 export const persistImageSchema = z.object({
-  body: z.object({ imageUrl: z.string().trim().url('A valid image URL is required') }),
+  body: z.object({
+    imageUrl: z.string().trim().url('A valid image URL is required'),
+  }),
   params: z.object({}).optional(),
   query: z.object({}).optional(),
 });

@@ -34,12 +34,16 @@ export const setAdminUserCredit = asyncHandler(async (req, res) => {
     userEmail: req.validated.params.userEmail,
     credit: req.validated.body.credit,
   });
-  return res.status(200).json(new ApiResponse(200, user, 'User credit updated'));
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, 'User credit updated'));
 });
 
 export const backfillAdminStorySlugs = asyncHandler(async (req, res) => {
   const result = await backfillStorySlugs({
     limit: req.validated.body?.limit,
   });
-  return res.status(200).json(new ApiResponse(200, result, 'Story slugs backfilled'));
+  return res
+    .status(200)
+    .json(new ApiResponse(200, result, 'Story slugs backfilled'));
 });

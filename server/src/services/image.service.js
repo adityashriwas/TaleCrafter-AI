@@ -2,6 +2,7 @@ import { v2 as cloudinary } from 'cloudinary';
 import ApiError from '../utils/ApiError.js';
 
 const POLLINATIONS_MAX_SEED = 2147483647;
+const MAX_SOURCE_IMAGE_BYTES = 15 * 1024 * 1024;
 
 const normalizeSeed = seed => {
   if (typeof seed === 'number' && Number.isFinite(seed)) {
@@ -37,7 +38,7 @@ export const buildPollinationsImageUrl = (prompt, options = {}) => {
     model: process.env.POLLINATIONS_AI_MODEL ?? 'flux',
     enhance: 'false',
     negative_prompt: 'worst quality, blurry',
-    safe: 'false',
+    safe: 'true',
     seed: String(normalizeSeed(options.seed)),
   });
 
@@ -91,8 +92,8 @@ export const uploadImageToCloudinary = async (imageUrl, options = {}) => {
 
   const safeUrl = String(imageUrl ?? '').trim();
 
-  if (!/^https?:\/\//i.test(safeUrl)) {
-    throw new ApiError(400, 'Only absolute http(s) imageUrl is supported');
+  if (!isPollinationsImageUrl(safeUrl)) {
+    throw new ApiError(400, 'Only Pollinations image URLs are supported');
   }
 
   const timestamp = String(Math.floor(Date.now() / 1000));
@@ -123,7 +124,7 @@ export const uploadImageToCloudinary = async (imageUrl, options = {}) => {
 
   const sourceResp = await fetchWithTimeout(
     safeUrl,
-    { cache: 'no-store' },
+    { cache: 'no-store', redirect: 'error' },
     options.sourceTimeoutMs ?? 70000
   );
 
@@ -136,7 +137,15 @@ export const uploadImageToCloudinary = async (imageUrl, options = {}) => {
     throw new ApiError(400, 'Source URL did not return an image');
   }
 
+  const contentLength = Number(sourceResp.headers.get('content-length') ?? 0);
+  if (contentLength > MAX_SOURCE_IMAGE_BYTES) {
+    throw new ApiError(413, 'Source image is too large');
+  }
+
   const arrayBuffer = await sourceResp.arrayBuffer();
+  if (arrayBuffer.byteLength > MAX_SOURCE_IMAGE_BYTES) {
+    throw new ApiError(413, 'Source image is too large');
+  }
   const base64 = Buffer.from(arrayBuffer).toString('base64');
   const dataUri = `data:${contentType};base64,${base64}`;
 
@@ -164,8 +173,7 @@ export const uploadImageToCloudinary = async (imageUrl, options = {}) => {
   );
 
   if (!response.ok) {
-    const errorText = await response.text();
-    throw new ApiError(502, `Cloudinary upload failed: ${errorText}`);
+    throw new ApiError(502, `Cloudinary upload failed: ${response.status}`);
   }
 
   const payload = await response.json();

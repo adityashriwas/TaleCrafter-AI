@@ -22,9 +22,25 @@ router.use(requireAdmin);
 
 router.get('/stories', getAdminStories);
 router.get('/users', getAdminUsers);
-router.post('/stories/backfill-slugs', validate(adminBackfillSlugsSchema), backfillAdminStorySlugs);
-router.delete('/stories/:storyId', validate(adminStoryIdParamSchema), removeAdminStory);
-router.delete('/users/:userEmail', validate(adminUserEmailParamSchema), removeAdminUser);
-router.patch('/users/:userEmail/credit', validate(adminUpdateUserCreditSchema), setAdminUserCredit);
+router.post(
+  '/stories/backfill-slugs',
+  validate(adminBackfillSlugsSchema),
+  backfillAdminStorySlugs
+);
+router.delete(
+  '/stories/:storyId',
+  validate(adminStoryIdParamSchema),
+  removeAdminStory
+);
+router.delete(
+  '/users/:userEmail',
+  validate(adminUserEmailParamSchema),
+  removeAdminUser
+);
+router.patch(
+  '/users/:userEmail/credit',
+  validate(adminUpdateUserCreditSchema),
+  setAdminUserCredit
+);
 
 export default router;

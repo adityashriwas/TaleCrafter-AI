@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import { IoIosArrowDropleftCircle, IoIosArrowDroprightCircle } from "react-icons/io";
@@ -65,6 +65,19 @@ type StoryNode = {
   isActive: boolean;
 };
 
+type FlipBookApi = {
+  flipPrev: () => void;
+  flipNext: () => void;
+  turnToPage?: (page: number) => void;
+  getPageCount?: () => number;
+  getCurrentPageIndex?: () => number;
+  getOrientation?: () => string;
+};
+
+type FlipBookHandle = {
+  pageFlip: () => FlipBookApi;
+};
+
 const SafeStoryImage = ({ src, alt }: { src?: string; alt: string }) => {
   const [failed, setFailed] = useState(false);
 
@@ -96,7 +109,7 @@ const InteractiveStoryPage = () => {
   const id = params?.id;
   const router = useRouter();
   const { getToken } = useAuth();
-  const bookRef = useRef<any>(null);
+  const bookRef = useRef<FlipBookHandle | null>(null);
   const bookSectionRef = useRef<HTMLDivElement | null>(null);
   const treeSectionRef = useRef<HTMLDivElement | null>(null);
 
@@ -109,12 +122,12 @@ const InteractiveStoryPage = () => {
   const [generatingNext, setGeneratingNext] = useState(false);
   const [loaderMessage, setLoaderMessage] = useState("Story is generating...");
 
-  const applyInteractiveState = (state: InteractiveStoryState) => {
+  const applyInteractiveState = useCallback((state: InteractiveStoryState) => {
     setStory(state.story);
     setNodes(state.nodes ?? []);
-  };
+  }, []);
 
-  const loadStory = async () => {
+  const loadStory = useCallback(async () => {
     if (!id) return;
 
     setLoading(true);
@@ -136,11 +149,11 @@ const InteractiveStoryPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [applyInteractiveState, getToken, id, router]);
 
   useEffect(() => {
     loadStory();
-  }, [id]);
+  }, [loadStory]);
 
   const activeNode = useMemo(() => {
     return nodes.find((node) => node.isActive) ?? nodes[nodes.length - 1] ?? null;
@@ -172,10 +185,9 @@ const InteractiveStoryPage = () => {
 
   const totalPages = linearPages.length;
 
-  const syncFlipState = () => {
+  const syncFlipState = useCallback(() => {
     const fallbackMax = Math.max(0, totalPages);
-    // @ts-ignore
-    const flipApi: any = bookRef.current?.pageFlip?.();
+    const flipApi = bookRef.current?.pageFlip?.();
 
     if (!flipApi) {
       setMaxFlipPage(fallbackMax);
@@ -192,7 +204,7 @@ const InteractiveStoryPage = () => {
     setMaxFlipPage(Math.max(0, runtimeMax));
     setIsLandscapeSpread(landscape);
     setFlipPage(Number.isFinite(current) ? Math.max(0, Math.min(current, Math.max(0, runtimeMax))) : 0);
-  };
+  }, [totalPages]);
 
   const storyEndThreshold = isLandscapeSpread
     ? Math.max(0, maxFlipPage - 1)
@@ -211,7 +223,7 @@ const InteractiveStoryPage = () => {
     }, 80);
 
     return () => clearTimeout(timer);
-  }, [story?.storyId, totalPages]);
+  }, [story?.storyId, syncFlipState]);
 
   useEffect(() => {
     if (!atEnd || story?.status === "completed") return;
@@ -289,8 +301,7 @@ const InteractiveStoryPage = () => {
       setIsLandscapeSpread(false);
 
       setTimeout(() => {
-        // @ts-ignore
-        const flipApi: any = bookRef.current?.pageFlip?.();
+        const flipApi = bookRef.current?.pageFlip?.();
         flipApi?.turnToPage?.(0);
         bookSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 180);
@@ -504,7 +515,7 @@ const InteractiveStoryPage = () => {
           </div>
 
           <div className="flex flex-col items-center">
-            {/* @ts-ignore */}
+            {/* @ts-expect-error -- react-pageflip's published props require internal defaults. */}
             <HTMLFlipBook
               key={story?.storyId}
               className="max-w-[84vw] md:max-w-[62vw] lg:max-w-[48vw]"
@@ -537,7 +548,6 @@ const InteractiveStoryPage = () => {
               disabled={!canFlipPrev}
               onClick={() => {
                 if (!canFlipPrev) return;
-                // @ts-ignore
                 bookRef.current?.pageFlip().flipPrev();
                 setTimeout(() => syncFlipState(), 90);
               }}
@@ -550,7 +560,6 @@ const InteractiveStoryPage = () => {
               disabled={!canFlipNext}
               onClick={() => {
                 if (!canFlipNext) return;
-                // @ts-ignore
                 bookRef.current?.pageFlip().flipNext();
                 setTimeout(() => syncFlipState(), 90);
               }}
@@ -618,7 +627,9 @@ const InteractiveStoryPage = () => {
                     className="absolute z-10 -translate-x-1/2 -translate-y-1/2"
                     style={{ left: `${point.x}%`, top: `${point.y}%` }}
                   >
-                    <div
+                    <button
+                      type="button"
+                      disabled={!isActiveChoiceNode}
                       className={`flex w-[180px] items-center justify-center rounded-2xl border px-3 py-3 text-center text-[12px] font-semibold leading-snug shadow-[0_8px_26px_rgba(2,8,23,0.35)] transition ${
                         node.status === "current"
                           ? "border-cyan-100 bg-cyan-500 text-white"
@@ -639,7 +650,7 @@ const InteractiveStoryPage = () => {
                       }}
                     >
                       {nodeLabel}
-                    </div>
+                    </button>
                   </div>
                 );
               })}

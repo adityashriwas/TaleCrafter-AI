@@ -5,13 +5,13 @@ import {
   createStripeCheckoutSession,
   fulfillStripeCheckoutSession,
   getStripeCheckoutStatus,
+  markStripeCheckoutFailed,
 } from '../services/payment.service.js';
 
 export const createStripeCheckout = asyncHandler(async (req, res) => {
   const checkout = await createStripeCheckoutSession({
     userId: req.auth.userId,
     planId: req.validated.body.planId,
-    origin: req.get('origin'),
   });
 
   return res
@@ -41,6 +41,11 @@ export const handleStripeWebhook = asyncHandler(async (req, res) => {
     event.type === 'checkout.session.async_payment_succeeded'
   ) {
     await fulfillStripeCheckoutSession({
+      session: event.data.object,
+      rawEvent: event,
+    });
+  } else if (event.type === 'checkout.session.async_payment_failed') {
+    await markStripeCheckoutFailed({
       session: event.data.object,
       rawEvent: event,
     });

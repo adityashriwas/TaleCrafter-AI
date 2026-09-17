@@ -3,27 +3,13 @@ import { useAuth, useUser } from "@clerk/nextjs";
 import { useCallback, useEffect, useRef, useState } from "react";
 import StoryItemCard from "./StoryItemCard";
 import { apiFetch } from "@/lib/api-client";
-
-type StoryItemType = {
-  id: string;
-  storyType: string;
-  ageGroup: string;
-  storyId: string;
-  slug?: string;
-  storySubject: string;
-  imageStyle: string;
-  coverImage: string;
-  userName: string;
-  userImage: string;
-  userEmail: string;
-  output: [] | any;
-};
+import type { StoryItem } from "@/types/story";
 
 const PAGE_SIZE = 12;
 const CACHE_PREFIX = "dashboard_stories_cache_v1_";
 
 type DashboardCache = {
-  storyList: StoryItemType[];
+  storyList: StoryItem[];
   offset: number;
   hasMoreStories: boolean;
   scrollY: number;
@@ -33,7 +19,7 @@ const UserStoryList = () => {
   const user = useUser();
   const { getToken } = useAuth();
   const userEmail = user.user?.primaryEmailAddress?.emailAddress;
-  const [storyList, setStoryList] = useState<StoryItemType[]>([]);
+  const [storyList, setStoryList] = useState<StoryItem[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [offset, setOffset] = useState(0);
   const [hasMoreStories, setHasMoreStories] = useState(true);
@@ -42,7 +28,7 @@ const UserStoryList = () => {
   const loadingRef = useRef(false);
   const offsetRef = useRef(0);
   const hasMoreRef = useRef(true);
-  const storyListRef = useRef<StoryItemType[]>([]);
+  const storyListRef = useRef<StoryItem[]>([]);
   const userEmailRef = useRef<string | undefined>(userEmail);
 
   const cacheKey = userEmail ? `${CACHE_PREFIX}${userEmail}` : null;
@@ -61,7 +47,7 @@ const UserStoryList = () => {
     } catch {
       // ignore storage failures
     }
-  }, [getToken]);
+  }, []);
 
   const getUserStory = useCallback(async (_email: string, newOffset: number) => {
     if (loadingRef.current || !hasMoreRef.current) return;
@@ -70,13 +56,13 @@ const UserStoryList = () => {
 
     try {
       const token = await getToken();
-      const result = await apiFetch<StoryItemType[]>(`/stories/me?limit=${PAGE_SIZE}&offset=${newOffset}`, { token });
+      const result = await apiFetch<StoryItem[]>(`/stories/me?limit=${PAGE_SIZE}&offset=${newOffset}`, { token });
 
       setOffset(newOffset);
       setStoryList((prev) => {
         const merged =
-          newOffset === 0 ? (result as StoryItemType[]) : [...prev, ...result];
-        const uniqueById = new Map<string, StoryItemType>();
+          newOffset === 0 ? result : [...prev, ...result];
+        const uniqueById = new Map<string, StoryItem>();
         merged.forEach((item) => uniqueById.set(item.storyId, item));
         return Array.from(uniqueById.values());
       });
@@ -213,7 +199,7 @@ const UserStoryList = () => {
             </p>
           </div>
         )}
-        {storyList?.map((item: StoryItemType) => (
+        {storyList?.map((item: StoryItem) => (
           <StoryItemCard
             key={item.storyId}
             story={item}

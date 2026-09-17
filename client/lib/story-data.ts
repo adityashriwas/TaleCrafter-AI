@@ -1,4 +1,5 @@
 import { DEFAULT_OG_IMAGE, toAbsoluteUrl } from "@/lib/seo";
+import type { StoryOutput } from "@/types/story";
 
 export type StoryRecord = {
   id: number;
@@ -9,10 +10,12 @@ export type StoryRecord = {
   ageGroup: string | null;
   imageStyle: string | null;
   coverImage: string | null;
-  output: any;
+  output: StoryOutput | null;
   userName: string | null;
   userImage: string | null;
   userEmail: string | null;
+  createdAt?: string | Date | null;
+  updatedAt?: string | Date | null;
 };
 
 const API_BASE_URL =
@@ -42,9 +45,9 @@ const cleanText = (value: string) =>
     .trim();
 
 export const extractStorySummary = (story: StoryRecord | null | undefined) => {
-  const output = story?.output as any;
+  const output = story?.output;
   const chapterText =
-    output?.chapters?.find((chapter: any) => chapter?.textPrompt)?.textPrompt ??
+    output?.chapters?.find((chapter) => chapter?.textPrompt)?.textPrompt ??
     "";
   const summary = cleanText(String(chapterText)).slice(0, 220);
 

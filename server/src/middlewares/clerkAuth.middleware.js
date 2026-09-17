@@ -1,4 +1,4 @@
-import { getAuth } from '@clerk/express';
+import { clerkClient, getAuth } from '@clerk/express';
 import ApiError from '../utils/ApiError.js';
 
 export const requireAuth = (req, _res, next) => {
@@ -12,21 +12,36 @@ export const requireAuth = (req, _res, next) => {
   return next();
 };
 
-export const requireAdmin = (req, _res, next) => {
+export const requireAdmin = async (req, _res, next) => {
   const auth = getAuth(req);
 
   if (!auth.isAuthenticated) {
     return next(new ApiError(401, 'Unauthorized'));
   }
 
-  const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
-  const userEmail = auth.sessionClaims?.email?.toLowerCase();
-  const primaryEmail = auth.sessionClaims?.primary_email_address?.toLowerCase();
+  try {
+    const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+    let userEmail = String(
+      auth.sessionClaims?.email ??
+        auth.sessionClaims?.primary_email_address ??
+        ''
+    )
+      .trim()
+      .toLowerCase();
 
-  if (!adminEmail || (userEmail !== adminEmail && primaryEmail !== adminEmail)) {
-    return next(new ApiError(403, 'Forbidden'));
+    if (!userEmail && auth.userId) {
+      const clerkUser = await clerkClient.users.getUser(auth.userId);
+      userEmail =
+        clerkUser.primaryEmailAddress?.emailAddress?.trim().toLowerCase() ?? '';
+    }
+
+    if (!adminEmail || userEmail !== adminEmail) {
+      return next(new ApiError(403, 'Forbidden'));
+    }
+
+    req.auth = auth;
+    return next();
+  } catch (error) {
+    return next(error);
   }
-
-  req.auth = auth;
-  return next();
 };

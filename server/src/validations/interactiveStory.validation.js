@@ -21,19 +21,25 @@ export const interactiveStoryIdParamSchema = z.object({
 });
 
 export const chooseInteractiveStoryPathSchema = z.object({
-  body: z.object({
-    choice: nonEmptyString('Selected choice').optional(),
-    selectedChoice: nonEmptyString('Selected choice').optional(),
-  }).refine(data => data.choice || data.selectedChoice, { message: 'Selected choice is required' }),
+  body: z
+    .object({
+      choice: nonEmptyString('Selected choice').optional(),
+      selectedChoice: nonEmptyString('Selected choice').optional(),
+    })
+    .refine(data => data.choice || data.selectedChoice, {
+      message: 'Selected choice is required',
+    }),
   params: z.object({ storyId: nonEmptyString('Interactive story ID') }),
   query: z.object({}).optional(),
 });
 
 export const completeInteractiveStoryPathSchema = z.object({
-  body: z.object({
-    choice: z.string().trim().optional(),
-    selectedChoice: z.string().trim().optional(),
-  }).optional(),
+  body: z
+    .object({
+      choice: z.string().trim().optional(),
+      selectedChoice: z.string().trim().optional(),
+    })
+    .optional(),
   params: z.object({ storyId: nonEmptyString('Interactive story ID') }),
   query: z.object({}).optional(),
 });

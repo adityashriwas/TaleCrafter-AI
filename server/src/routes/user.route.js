@@ -10,6 +10,11 @@ import { decrementCreditsSchema } from '../validations/user.validation.js';
 const router = Router();
 
 router.get('/me', requireAuth, getCurrentUser);
-router.post('/me/credits/decrement', requireAuth, validate(decrementCreditsSchema), decrementCurrentUserCredits);
+router.post(
+  '/me/credits/decrement',
+  requireAuth,
+  validate(decrementCreditsSchema),
+  decrementCurrentUserCredits
+);
 
 export default router;

@@ -4,28 +4,14 @@ import StoryItemCard from "../dashboard/_components/StoryItemCard";
 import { apiFetch } from "@/lib/api-client";
 import { motion } from "framer-motion";
 import CustomLoader from "./CustomLoader";
-const MotionDiv: any = motion.div;
-
-type StoryItemType = {
-  id: string;
-  storyType: string;
-  ageGroup: string;
-  storyId: string;
-  slug?: string;
-  storySubject: string;
-  imageStyle: string;
-  coverImage: string;
-  userName: string;
-  userImage: string;
-  userEmail: string;
-  output: [] | any;
-};
+import type { StoryItem } from "@/types/story";
+const MotionDiv = motion.div;
 
 const PAGE_SIZE = 12;
 const CACHE_KEY = "explore_stories_cache_v1";
 
 type ExploreCache = {
-  storyList: StoryItemType[];
+  storyList: StoryItem[];
   offset: number;
   hasMoreStories: boolean;
   scrollY: number;
@@ -34,7 +20,7 @@ type ExploreCache = {
 const ExploreMore = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [offset, setOffset] = useState(0);
-  const [storyList, setStoryList] = useState<StoryItemType[]>([]);
+  const [storyList, setStoryList] = useState<StoryItem[]>([]);
   const [hasMoreStories, setHasMoreStories] = useState(true);
   const [isRestored, setIsRestored] = useState(false);
   const initializedRef = useRef(false);
@@ -73,14 +59,14 @@ const ExploreMore = () => {
     setLoading(true);
 
     try {
-      const result = await apiFetch<StoryItemType[]>(`/stories?limit=${PAGE_SIZE}&offset=${newOffset}`);
+      const result = await apiFetch<StoryItem[]>(`/stories?limit=${PAGE_SIZE}&offset=${newOffset}`);
 
       setOffset(newOffset);
       setStoryList((prev) => {
         const merged =
           newOffset === 0 ? result : [...(prev || []), ...(result || [])];
-        const uniqueById = new Map<string, StoryItemType>();
-        merged.forEach((item: StoryItemType) => {
+        const uniqueById = new Map<string, StoryItem>();
+        merged.forEach((item: StoryItem) => {
           uniqueById.set(item.storyId, item);
         });
         return Array.from(uniqueById.values());
@@ -235,7 +221,7 @@ const ExploreMore = () => {
           className="mt-8"
         >
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {storyList?.map((item: StoryItemType) => (
+            {storyList?.map((item: StoryItem) => (
               <div key={item.storyId}>
                 <StoryItemCard story={item} currentUserEmail={""} />
               </div>

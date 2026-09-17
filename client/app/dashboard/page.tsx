@@ -3,7 +3,7 @@ import DashboardHeader from "./_components/DashboardHeader";
 import UserStoryList from "./_components/UserStoryList";
 import InteractiveStorySections from "./_components/InteractiveStorySections";
 import { motion } from "framer-motion";
-const MotionDiv: any = motion.div;
+const MotionDiv = motion.div;
 
 const Dashboard = () => {
   const fadeUp = {

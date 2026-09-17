@@ -7,9 +7,13 @@
   "scripts": {
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
+    "migrate": "node scripts/migrate.js",
+    "test": "node --test test/env.test.js",
+    "test:integration": "RUN_INTEGRATION_TESTS=true node --test test/payment.integration.test.js",
+    "check": "npm run lint && npm run format:check",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "format": "prettier --write",
+    "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
   "author": "Aditya Shriwas",
@@ -24,6 +28,8 @@
     "dotenv": "^17.2.3",
     "drizzle-orm": "^0.45.2",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.7.0",
+    "helmet": "^8.3.0",
     "stripe": "^22.6.2",
     "zod": "^4.6.5"
   },

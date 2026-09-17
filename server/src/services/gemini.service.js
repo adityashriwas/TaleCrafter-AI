@@ -79,7 +79,7 @@ const getModelName = () => process.env.GEMINI_MODEL ?? DEFAULT_MODEL;
 
 const createStoryChatSession = ({ apiKey, modelName }) => {
   const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: modelName ?? getModelName() });
+  const model = genAI.getGenerativeModel({ model: modelName });
 
   return model.startChat({
     generationConfig: storyGenerationConfig,
@@ -100,15 +100,13 @@ export const generateGeminiText = async ({
   }
 
   const modelName = getModelName();
+  const apiKey = process.env.GEMINI_API_KEY;
+
+  if (!apiKey) {
+    throw new ApiError(500, 'Gemini API key is not configured');
+  }
 
   if (mode === 'image-analysis') {
-    const apiKey =
-      process.env.GEMINI_API_KEY_IMAGE_ANALYSIS ?? process.env.GEMINI_API_KEY;
-
-    if (!apiKey) {
-      throw new ApiError(500, 'Gemini image analysis key is not configured');
-    }
-
     if (!imageBase64) {
       throw new ApiError(400, 'Image data is required for image analysis');
     }
@@ -128,12 +126,6 @@ export const generateGeminiText = async ({
     return result.response.text();
   }
 
-  const apiKey = process.env.GEMINI_API_KEY;
-
-  if (!apiKey) {
-    throw new ApiError(500, 'Gemini API key is not configured');
-  }
-
   if (mode === 'story-generation') {
     const storyChat = createStoryChatSession({ apiKey, modelName });
     const result = await storyChat.sendMessage(safePrompt);
@@ -150,7 +142,6 @@ export const generateGeminiText = async ({
   return result.response.text();
 };
 
-
 const DEFAULT_CREATE_STORY_PROMPT = [
   'Generate a story for {ageGroup} age group.',
   'Story type: {storyType}.',
@@ -159,8 +150,16 @@ const DEFAULT_CREATE_STORY_PROMPT = [
   'Return only strict JSON with title, coverImagePrompt, characterDescriptions, and chapters.',
 ].join('\n');
 
-export const buildStoryPrompt = ({ ageGroup, storyType, storySubject, imageStyle }) => {
-  const template = process.env.CREATE_STORY_PROMPT || process.env.NEXT_PUBLIC_CREATE_STORY_PROMPT || DEFAULT_CREATE_STORY_PROMPT;
+export const buildStoryPrompt = ({
+  ageGroup,
+  storyType,
+  storySubject,
+  imageStyle,
+}) => {
+  const template =
+    process.env.CREATE_STORY_PROMPT ||
+    process.env.NEXT_PUBLIC_CREATE_STORY_PROMPT ||
+    DEFAULT_CREATE_STORY_PROMPT;
   return template
     .replaceAll('{ageGroup}', String(ageGroup ?? ''))
     .replaceAll('{storyType}', String(storyType ?? ''))
@@ -177,7 +176,7 @@ const cleanJsonText = raw =>
 const normalizeJsonCandidate = raw =>
   String(raw ?? '')
     .replace(/[\u201C\u201D]/g, '"')
-    .replace(/[\u2018\u2019]/g, '\'')
+    .replace(/[\u2018\u2019]/g, "'")
     .replace(/,\s*([}\]])/g, '$1')
     .trim();
 
@@ -216,7 +215,10 @@ export const generateStoryJson = async ({ formData, interactive = false }) => {
   const prompt = interactive
     ? `${basePrompt}\n\nFor interactive story starter, return 6 to 8 chapters minimum in consistent JSON format. No markdown wrappers.`
     : basePrompt;
-  const outputText = await generateGeminiText({ prompt, mode: 'story-generation' });
+  const outputText = await generateGeminiText({
+    prompt,
+    mode: 'story-generation',
+  });
   let story = tryParseGeminiJson(outputText);
 
   if (!story && interactive) {

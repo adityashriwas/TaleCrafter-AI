@@ -52,14 +52,15 @@ export const Users = pgTable(
   })
 );
 
-
 export const Payments = pgTable(
   'payments',
   {
     id: serial('id').primaryKey(),
     provider: varchar('provider', { length: 40 }).notNull().default('stripe'),
     providerSessionId: varchar('providerSessionId', { length: 255 }).notNull(),
-    providerPaymentIntentId: varchar('providerPaymentIntentId', { length: 255 }),
+    providerPaymentIntentId: varchar('providerPaymentIntentId', {
+      length: 255,
+    }),
     userEmail: varchar('userEmail').notNull(),
     planId: varchar('planId', { length: 80 }).notNull(),
     amountCents: integer('amountCents').notNull(),
@@ -72,9 +73,9 @@ export const Payments = pgTable(
     updatedAt: timestamp('updatedAt').defaultNow().notNull(),
   },
   table => ({
-    providerSessionUniqueIdx: uniqueIndex('payments_provider_session_unique_idx').on(
-      table.providerSessionId
-    ),
+    providerSessionUniqueIdx: uniqueIndex(
+      'payments_provider_session_unique_idx'
+    ).on(table.providerSessionId),
     userEmailIdx: index('payments_user_email_idx').on(table.userEmail),
     statusIdx: index('payments_status_idx').on(table.status),
   })

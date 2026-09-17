@@ -7,23 +7,11 @@ import { toast } from "react-toastify";
 import { useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { apiFetch } from "@/lib/api-client";
+import type { StoryItem } from "@/types/story";
 
 type StoryItemType = {
-  story: {
-    id: string;
-    storyType: string;
-    ageGroup: string;
-    storyId: string;
-    slug?: string;
-    storySubject: string;
-    imageStyle: string;
-    coverImage: string;
-    userName: string;
-    userImage: string;
-    userEmail: string;
-    output: [] | any;
-  };
-  currentUserEmail: string; // new prop
+  story: StoryItem;
+  currentUserEmail: string;
   onDeleteSuccess?: (storyId: string) => void;
 };
 
@@ -70,7 +58,7 @@ const StoryItemCard = ({ story, currentUserEmail, onDeleteSuccess }: StoryItemTy
       toast.success("Story deleted successfully");
       removeStoryFromCachedLists(story.storyId);
       onDeleteSuccess?.(story.storyId);
-    } catch (error) {
+    } catch {
       toast.error("Failed to delete story");
     }
   };

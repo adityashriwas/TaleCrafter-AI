@@ -18,7 +18,9 @@ export const createPollinationsImageUrl = asyncHandler(async (req, res) => {
 });
 
 export const persistImage = asyncHandler(async (req, res) => {
-  const uploadResult = await uploadImageToCloudinary(req.validated.body.imageUrl);
+  const uploadResult = await uploadImageToCloudinary(
+    req.validated.body.imageUrl
+  );
 
   return res.status(200).json(
     new ApiResponse(

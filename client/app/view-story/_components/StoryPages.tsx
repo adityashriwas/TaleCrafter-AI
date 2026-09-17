@@ -2,6 +2,15 @@ import { useState, useEffect } from "react";
 import { IoPlayCircle, IoPauseCircle } from "react-icons/io5";
 import Image from "next/image";
 import { buildPollinationsImageUrl } from "@/lib/story-images";
+import type { StoryChapter } from "@/types/story";
+
+type StoryPagesProps = {
+  storyChapter: StoryChapter;
+  chapterKey: number;
+  activeNarrationKey?: number | null;
+  onStartNarration?: (chapterKey: number) => void;
+  onStopNarration?: (chapterKey: number) => void;
+};
 
 const StoryPages = ({
   storyChapter,
@@ -9,7 +18,7 @@ const StoryPages = ({
   activeNarrationKey,
   onStartNarration,
   onStopNarration,
-}: any) => {
+}: StoryPagesProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false); // Track image loading state
   const [imageError, setImageError] = useState(false);

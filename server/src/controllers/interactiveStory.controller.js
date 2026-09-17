@@ -15,14 +15,22 @@ export const createInteractiveStory = asyncHandler(async (req, res) => {
     payload: req.validated.body,
   });
 
-  return res.status(201).json(new ApiResponse(201, story, 'Interactive story created'));
+  return res
+    .status(201)
+    .json(new ApiResponse(201, story, 'Interactive story created'));
 });
 
-export const getCurrentUserInteractiveStories = asyncHandler(async (req, res) => {
-  const stories = await listCurrentUserInteractiveStories({ userId: req.auth.userId });
+export const getCurrentUserInteractiveStories = asyncHandler(
+  async (req, res) => {
+    const stories = await listCurrentUserInteractiveStories({
+      userId: req.auth.userId,
+    });
 
-  return res.status(200).json(new ApiResponse(200, stories, 'Interactive stories fetched'));
-});
+    return res
+      .status(200)
+      .json(new ApiResponse(200, stories, 'Interactive stories fetched'));
+  }
+);
 
 export const getInteractiveStory = asyncHandler(async (req, res) => {
   const story = await getCurrentUserInteractiveStory({
@@ -37,20 +45,28 @@ export const chooseInteractiveStoryPath = asyncHandler(async (req, res) => {
   const story = await continueInteractiveStory({
     userId: req.auth.userId,
     storyId: req.params.storyId,
-    selectedChoice: req.validated.body.selectedChoice ?? req.validated.body.choice,
+    selectedChoice:
+      req.validated.body.selectedChoice ?? req.validated.body.choice,
   });
 
-  return res.status(200).json(new ApiResponse(200, story, 'Interactive story continued'));
+  return res
+    .status(200)
+    .json(new ApiResponse(200, story, 'Interactive story continued'));
 });
 
 export const completeInteractiveStoryPath = asyncHandler(async (req, res) => {
   const story = await completeInteractiveStory({
     userId: req.auth.userId,
     storyId: req.params.storyId,
-    selectedChoice: req.validated.body?.selectedChoice ?? req.validated.body?.choice ?? 'End Story',
+    selectedChoice:
+      req.validated.body?.selectedChoice ??
+      req.validated.body?.choice ??
+      'End Story',
   });
 
-  return res.status(200).json(new ApiResponse(200, story, 'Interactive story completed'));
+  return res
+    .status(200)
+    .json(new ApiResponse(200, story, 'Interactive story completed'));
 });
 
 export const deleteInteractiveStory = asyncHandler(async (req, res) => {
@@ -59,5 +75,7 @@ export const deleteInteractiveStory = asyncHandler(async (req, res) => {
     storyId: req.params.storyId,
   });
 
-  return res.status(200).json(new ApiResponse(200, story, 'Interactive story deleted'));
+  return res
+    .status(200)
+    .json(new ApiResponse(200, story, 'Interactive story deleted'));
 });

@@ -20,6 +20,8 @@ client/.env
 client/.env.*
 server/.env
 server/.env.*
+!server/.env.example
+!client/.env.example
 
 # logs
 npm-debug.log*

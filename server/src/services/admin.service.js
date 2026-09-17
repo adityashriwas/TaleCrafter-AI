@@ -45,7 +45,9 @@ export const deleteAdminStory = async storyId => {
 };
 
 export const deleteAdminUser = async userEmail => {
-  const safeEmail = String(userEmail ?? '').trim().toLowerCase();
+  const safeEmail = String(userEmail ?? '')
+    .trim()
+    .toLowerCase();
   if (!safeEmail) throw new ApiError(400, 'User email is required');
 
   const deleted = await db
@@ -58,7 +60,9 @@ export const deleteAdminUser = async userEmail => {
 };
 
 export const updateAdminUserCredit = async ({ userEmail, credit }) => {
-  const safeEmail = String(userEmail ?? '').trim().toLowerCase();
+  const safeEmail = String(userEmail ?? '')
+    .trim()
+    .toLowerCase();
   const safeCredit = Number(credit);
 
   if (!safeEmail) throw new ApiError(400, 'User email is required');
@@ -99,10 +103,7 @@ export const backfillStorySlugs = async ({ limit }) => {
       excludeStoryId: story.storyId,
     });
 
-    await db
-      .update(StoryData)
-      .set({ slug })
-      .where(eq(StoryData.id, story.id));
+    await db.update(StoryData).set({ slug }).where(eq(StoryData.id, story.id));
 
     updated += 1;
   }

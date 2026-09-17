@@ -71,7 +71,6 @@ export const deleteStory = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, story, 'Story deleted'));
 });
 
-
 export const createStory = asyncHandler(async (req, res) => {
   const story = await createClassicStory({
     userId: req.auth.userId,

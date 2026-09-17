@@ -6,7 +6,7 @@ import { useUser } from "@clerk/nextjs";
 import Video from "./Video";
 import { motion } from "framer-motion";
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
-const MotionDiv: any = motion.div;
+const MotionDiv = motion.div;
 
 type StatItem = {
   value: number;

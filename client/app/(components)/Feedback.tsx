@@ -1,16 +1,16 @@
 "use client";
 
 import { toast } from "react-toastify";
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 
 const Contact = () => {
   const notify = (message: string) => toast(message);
   const [result, setResult] = useState("");
 
-  const onSubmit = async (event: any) => {
+  const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setResult("Sending....");
-    const formData = new FormData(event.target);
+    const formData = new FormData(event.currentTarget);
 
     const response = await fetch("/api/feedback", {
       method: "POST",
@@ -27,7 +27,7 @@ const Contact = () => {
 
     if (data.success) {
       setResult("Form Submitted Successfully");
-      event.target.reset();
+      event.currentTarget.reset();
     } else {
       setResult(data.message);
     }
@@ -41,7 +41,7 @@ const Contact = () => {
         <form onSubmit={onSubmit}>
           <input
             type="email"
-            id="userInput"
+            id="feedback-email"
             className="w-full mb-2 px-4 h-10 text-lg text-white bg-[#1c0f2b] border border-purple-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 transition-all"
             placeholder="Enter your email"
             required
@@ -49,7 +49,7 @@ const Contact = () => {
           />
           <input
             type="text"
-            id="userInput"
+            id="feedback-message"
             className="w-full px-4 h-10 text-lg text-white bg-[#1c0f2b] border border-purple-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 transition-all"
             placeholder="Report a bug or give feedback"
             required

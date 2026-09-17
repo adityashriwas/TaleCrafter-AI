@@ -28,9 +28,11 @@ The old implementation used PayPal buttons directly in the Next.js app. After Pa
 
 That approach was removed because it trusted browser-side state for payment completion and credit updates.
 
-## Remaining Production Hardening
+## Production Operations
 
-- Run `server/src/db/migrations/0001_payment_ledger_and_constraints.sql` in each database environment.
-- Add automated payment idempotency and webhook signature tests in the future test phase.
+- Run `npm run migrate` from `server/` in each database environment.
+- Run `npm run test:integration` against a non-production database before release.
+- Configure the permanent Stripe webhook endpoint with completed, asynchronous success, and asynchronous failure Checkout events.
+- Keep the Stripe CLI listener and its signing secret limited to local development.
 - Store Clerk user ID in the payment ledger in addition to email if/when the user schema is expanded.
 - Add an admin/support view for checking payment and fulfillment state.

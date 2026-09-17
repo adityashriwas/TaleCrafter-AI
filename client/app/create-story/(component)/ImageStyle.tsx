@@ -1,8 +1,9 @@
 import { useState } from "react";
 import Image from "next/image";
 import { OptionField } from "./StoryType";
+import type { StorySelectionProps } from "@/types/story";
 
-const ImageStyle = ({ userSelection }: any) => {
+const ImageStyle = ({ userSelection }: StorySelectionProps) => {
   const [selectedOption, setSelectedOption] = useState<string>();
 
   const onUserSelect = (item: OptionField) => {
@@ -53,12 +54,13 @@ const ImageStyle = ({ userSelection }: any) => {
 
   return (
     <div className="mt-10">
-      <label className="tc-title-gradient text-2xl sm:text-3xl lg:text-4xl block w-full font-bold">
+      <h2 className="tc-title-gradient text-2xl sm:text-3xl lg:text-4xl block w-full font-bold">
         Image Style
-      </label>
+      </h2>
       <div className="mt-5 hsb overflow-x-auto whitespace-nowrap">
         {OptionList.map((item, index) => (
-          <div
+          <button
+            type="button"
             key={index}
             className={`relative hover:grayscale-0 inline-block m-1 sm:m-3 cursor-pointer ${
               selectedOption === item.label
@@ -77,7 +79,7 @@ const ImageStyle = ({ userSelection }: any) => {
             <h2 className="tc-title-gradient text-center tracking-tighter font-semibold text-xl sm:text-2xl block w-full">
               {item.label}
             </h2>
-          </div>
+          </button>
         ))}
       </div>
     </div>

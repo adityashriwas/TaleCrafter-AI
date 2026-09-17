@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { toast } from "react-toastify";
@@ -48,7 +48,7 @@ const InteractiveStorySections = () => {
   const [stories, setStories] = useState<InteractiveStory[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const loadStories = async () => {
+  const loadStories = useCallback(async () => {
     if (!isLoaded || !userId) return;
 
     setLoading(true);
@@ -64,11 +64,11 @@ const InteractiveStorySections = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [getToken, isLoaded, userId]);
 
   useEffect(() => {
     loadStories();
-  }, [isLoaded, userId]);
+  }, [loadStories]);
 
   const draftStories = useMemo(
     () => stories.filter((story) => story.status === "draft"),

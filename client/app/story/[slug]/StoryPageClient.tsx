@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Script from "next/script";
@@ -12,10 +12,19 @@ import StoryPages from "@/app/view-story/_components/StoryPages";
 import { buildPollinationsImageUrl } from "@/lib/story-images";
 import { DEFAULT_OG_IMAGE, toAbsoluteUrl } from "@/lib/seo";
 import { apiFetch } from "@/lib/api-client";
+import type { StoryRecord } from "@/lib/story-data";
+import type { StoryChapter } from "@/types/story";
 
 type StoryPageClientProps = {
-  initialStory: any;
+  initialStory: StoryRecord;
   slug: string;
+};
+
+type FlipBookHandle = {
+  pageFlip: () => {
+    flipPrev: () => void;
+    flipNext: () => void;
+  };
 };
 
 const HTMLFlipBook = dynamic(() => import("react-pageflip"), {
@@ -54,9 +63,10 @@ function SafeStoryModeImage({ src, alt }: { src: string; alt: string }) {
   );
 }
 
-const getOutputTitle = (story: any) => String(story?.output?.title ?? "AI Generated Story");
+const getOutputTitle = (story: StoryRecord) =>
+  String(story.output?.title ?? "AI Generated Story");
 
-const getCleanChapterText = (chapter: any) => {
+const getCleanChapterText = (chapter: StoryChapter) => {
   return (
     chapter?.textPrompt
       ?.split(chapter?.imagePrompt?.substring(0, 20) || "")[0]
@@ -69,7 +79,7 @@ const getCleanChapterText = (chapter: any) => {
   );
 };
 
-const getStorySummary = (story: any) => {
+const getStorySummary = (story: StoryRecord) => {
   const firstText = String(story?.output?.chapters?.[0]?.textPrompt ?? story?.storySubject ?? "")
     .replace(/\{[^}]*\}/g, "")
     .trim();
@@ -81,7 +91,7 @@ const getStorySummary = (story: any) => {
   return `Read '${getOutputTitle(story)}', an AI generated story created with TaleCrafter AI.`;
 };
 
-const getStoryPublishedDate = (story: any) => {
+const getStoryPublishedDate = (story: StoryRecord) => {
   const rawDate = story?.createdAt ?? story?.updatedAt;
   if (!rawDate) return undefined;
 
@@ -92,14 +102,14 @@ const getStoryPublishedDate = (story: any) => {
 
 export default function StoryPageClient({ initialStory, slug }: StoryPageClientProps) {
   const RELATED_PAGE_SIZE = 10;
-  const bookRef = useRef<any>(null);
-  const [story] = useState<any>(initialStory);
+  const bookRef = useRef<FlipBookHandle | null>(null);
+  const [story] = useState<StoryRecord>(initialStory);
   const [count, setCount] = useState(0);
   const [copied, setCopied] = useState(false);
   const [downloadingPdf, setDownloadingPdf] = useState(false);
   const [contentMode, setContentMode] = useState<"flipbook" | "story">("flipbook");
   const [activeNarrationKey, setActiveNarrationKey] = useState<number | null>(null);
-  const [relatedStories, setRelatedStories] = useState<any[]>([]);
+  const [relatedStories, setRelatedStories] = useState<StoryRecord[]>([]);
   const [relatedPage, setRelatedPage] = useState(1);
   const [relatedTotalPages, setRelatedTotalPages] = useState(0);
   const [relatedLoading, setRelatedLoading] = useState(false);
@@ -114,7 +124,7 @@ export default function StoryPageClient({ initialStory, slug }: StoryPageClientP
     return `${clean} Enjoy this full AI-crafted reading experience below.`;
   }, [summary]);
 
-  const getRelatedStories = async (page: number) => {
+  const getRelatedStories = useCallback(async (page: number) => {
     if (!story?.storyId) return;
 
     setRelatedLoading(true);
@@ -128,7 +138,7 @@ export default function StoryPageClient({ initialStory, slug }: StoryPageClientP
       });
       if (storyType) params.set("storyType", storyType);
 
-      const result = await apiFetch<{ stories: any[]; totalCount: number }>(
+      const result = await apiFetch<{ stories: StoryRecord[]; totalCount: number }>(
         `/stories/${story.storyId}/related?${params.toString()}`
       );
 
@@ -143,7 +153,7 @@ export default function StoryPageClient({ initialStory, slug }: StoryPageClientP
     } finally {
       setRelatedLoading(false);
     }
-  };
+  }, [story.storyId, story.storyType]);
 
   useEffect(() => {
     setRelatedPage(1);
@@ -151,7 +161,7 @@ export default function StoryPageClient({ initialStory, slug }: StoryPageClientP
 
   useEffect(() => {
     getRelatedStories(relatedPage);
-  }, [relatedPage, story?.storyId]);
+  }, [getRelatedStories, relatedPage]);
 
   const getVisiblePageNumbers = () => {
     if (relatedTotalPages <= 1) return [];
@@ -183,7 +193,7 @@ export default function StoryPageClient({ initialStory, slug }: StoryPageClientP
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const getChapterImageUrl = (chapter: any) => {
+  const getChapterImageUrl = (chapter: StoryChapter) => {
     const persistedImage = String(chapter?.imageUrl ?? "").trim();
     if (persistedImage) return persistedImage;
 
@@ -199,10 +209,8 @@ export default function StoryPageClient({ initialStory, slug }: StoryPageClientP
 
     try {
       setDownloadingPdf(true);
-      const html2canvasModule: any = await import("html2canvas");
-      const html2canvas = html2canvasModule.default ?? html2canvasModule;
-      const jsPdfModule: any = await import("jspdf");
-      const JsPDF = jsPdfModule.jsPDF ?? jsPdfModule.default;
+      const { default: html2canvas } = await import("html2canvas");
+      const { jsPDF: JsPDF } = await import("jspdf");
       const sanitizedTitle = title.replace(/[^\w\s-]/g, "").trim() || "story";
       const pdfRoot = document.getElementById("story-pdf-export");
       if (!pdfRoot) {
@@ -332,7 +340,7 @@ export default function StoryPageClient({ initialStory, slug }: StoryPageClientP
   }, []);
 
   const structuredData = useMemo(() => {
-    const base: Record<string, any> = {
+    const base: Record<string, unknown> = {
       "@context": "https://schema.org",
       "@type": "CreativeWork",
       headline: title,
@@ -350,7 +358,7 @@ export default function StoryPageClient({ initialStory, slug }: StoryPageClientP
     }
 
     return JSON.stringify(base);
-  }, [publishedDate, slug, story?.coverImage, summary, title]);
+  }, [publishedDate, slug, story.coverImage, summary, title]);
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#020b1f] px-5 py-8 md:px-16 lg:px-28 xl:px-40">
@@ -378,7 +386,7 @@ export default function StoryPageClient({ initialStory, slug }: StoryPageClientP
         {contentMode === "flipbook" && (
           <>
             <div className="mt-8 flex flex-col items-center">
-              {/* @ts-ignore */}
+              {/* @ts-expect-error -- react-pageflip's published props require internal defaults. */}
               <HTMLFlipBook
                 className="max-w-[84vw] md:max-w-[62vw] lg:max-w-[48vw]"
                 width={330}
@@ -391,7 +399,7 @@ export default function StoryPageClient({ initialStory, slug }: StoryPageClientP
                 <div className="p-0">
                   <BookCoverPage imageUrl={story?.coverImage} />
                 </div>
-                {chapters.map((chapter: any, index: number) => (
+                {chapters.map((chapter, index) => (
                   <div key={index} className="bg-white p-4 md:p-5">
                     <StoryPages
                       storyChapter={chapter}
@@ -413,7 +421,6 @@ export default function StoryPageClient({ initialStory, slug }: StoryPageClientP
                 onClick={() => {
                   if (count <= 0) return;
                   stopNarration();
-                  // @ts-ignore
                   bookRef.current?.pageFlip().flipPrev();
                   setCount((prev) => prev - 1);
                 }}
@@ -435,7 +442,6 @@ export default function StoryPageClient({ initialStory, slug }: StoryPageClientP
                 onClick={() => {
                   if (count >= chapters.length) return;
                   stopNarration();
-                  // @ts-ignore
                   bookRef.current?.pageFlip().flipNext();
                   setCount((prev) => prev + 1);
                 }}
@@ -489,7 +495,7 @@ export default function StoryPageClient({ initialStory, slug }: StoryPageClientP
 
             {contentMode === "story" ? (
               <div className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2">
-                {chapters.map((chapter: any, index: number) => (
+                {chapters.map((chapter, index) => (
                   <article
                     key={`story-map-${index}`}
                     className="rounded-xl border border-blue-300/20 bg-[#04142e]/70 p-4"
@@ -687,7 +693,7 @@ export default function StoryPageClient({ initialStory, slug }: StoryPageClientP
               </div>
             </section>
 
-            {chapters.map((chapter: any, index: number) => (
+            {chapters.map((chapter, index) => (
               <section
                 key={`pdf-page-${index}`}
                 style={{

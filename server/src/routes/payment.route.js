@@ -5,6 +5,7 @@ import {
 } from '../controllers/payment.controller.js';
 import { requireAuth } from '../middlewares/clerkAuth.middleware.js';
 import { validate } from '../middlewares/validate.middleware.js';
+import { checkoutRateLimit } from '../middlewares/rateLimit.middleware.js';
 import {
   createStripeCheckoutSchema,
   fulfillStripeCheckoutSchema,
@@ -12,7 +13,13 @@ import {
 
 const router = Router();
 
-router.post('/stripe/checkout-session', requireAuth, validate(createStripeCheckoutSchema), createStripeCheckout);
+router.post(
+  '/stripe/checkout-session',
+  checkoutRateLimit,
+  requireAuth,
+  validate(createStripeCheckoutSchema),
+  createStripeCheckout
+);
 router.get(
   '/stripe/checkout-session/:sessionId',
   requireAuth,

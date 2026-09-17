@@ -85,10 +85,11 @@ export const syncUserFromClerk = async userId => {
   return updated[0] ?? currentUser;
 };
 
-
 export const incrementUserCreditsByEmail = async (userEmail, amount = 1) => {
   const safeAmount = Number(amount);
-  const safeEmail = String(userEmail ?? '').trim().toLowerCase();
+  const safeEmail = String(userEmail ?? '')
+    .trim()
+    .toLowerCase();
 
   if (!safeEmail) throw new ApiError(400, 'User email is required');
   if (!Number.isInteger(safeAmount) || safeAmount <= 0) {

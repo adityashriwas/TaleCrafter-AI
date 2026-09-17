@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Image from "next/image";
 
-const BookCoverPage = ({ imageUrl }: any) => {
+const BookCoverPage = ({ imageUrl }: { imageUrl?: string | null }) => {
   const [imageLoaded, setImageLoaded] = useState(false); // Track image loading
   const [hasError, setHasError] = useState(false);
 

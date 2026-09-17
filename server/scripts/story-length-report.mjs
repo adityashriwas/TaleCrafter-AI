@@ -22,7 +22,7 @@ const clean = (value = '') =>
     .replace(/\s+/g, ' ')
     .trim();
 
-const toOutput = (raw) => {
+const toOutput = raw => {
   if (!raw) return {};
   if (typeof raw === 'string') {
     try {
@@ -34,22 +34,22 @@ const toOutput = (raw) => {
   return raw;
 };
 
-const countWords = (text) => {
+const countWords = text => {
   const matches = String(text).match(/\b[\p{L}\p{N}']+\b/gu);
   return matches ? matches.length : 0;
 };
 
-const getStoryText = (output) => {
+const getStoryText = output => {
   const chapters = Array.isArray(output?.chapters) ? output.chapters : [];
   return chapters
-    .map((chapter) => clean(chapter?.textPrompt || ''))
+    .map(chapter => clean(chapter?.textPrompt || ''))
     .join(' ')
     .trim();
 };
 
 const rows = await sql('select "storyId", "slug", "output" from "storyData"');
 
-const perStory = rows.map((row) => {
+const perStory = rows.map(row => {
   const output = toOutput(row.output);
   const text = getStoryText(output);
   const words = countWords(text);
@@ -73,22 +73,28 @@ const totals = perStory.reduce(
   { words: 0, chars: 0 }
 );
 
-const withAtLeast = (n) => perStory.filter((item) => item.words >= n).length;
+const withAtLeast = n => perStory.filter(item => item.words >= n).length;
 
 const result = {
   totalStories: total,
   averageWords: total ? Math.round(totals.words / total) : 0,
   averageChars: total ? Math.round(totals.chars / total) : 0,
-  minWords: total ? Math.min(...perStory.map((s) => s.words)) : 0,
-  maxWords: total ? Math.max(...perStory.map((s) => s.words)) : 0,
+  minWords: total ? Math.min(...perStory.map(s => s.words)) : 0,
+  maxWords: total ? Math.max(...perStory.map(s => s.words)) : 0,
   atLeast500Words: withAtLeast(500),
   atLeast700Words: withAtLeast(700),
   atLeast1000Words: withAtLeast(1000),
-  pctAtLeast500: total ? Number(((withAtLeast(500) * 100) / total).toFixed(1)) : 0,
-  pctAtLeast700: total ? Number(((withAtLeast(700) * 100) / total).toFixed(1)) : 0,
-  pctAtLeast1000: total ? Number(((withAtLeast(1000) * 100) / total).toFixed(1)) : 0,
+  pctAtLeast500: total
+    ? Number(((withAtLeast(500) * 100) / total).toFixed(1))
+    : 0,
+  pctAtLeast700: total
+    ? Number(((withAtLeast(700) * 100) / total).toFixed(1))
+    : 0,
+  pctAtLeast1000: total
+    ? Number(((withAtLeast(1000) * 100) / total).toFixed(1))
+    : 0,
   lowestStories: perStory
-    .filter((item) => item.words < 500)
+    .filter(item => item.words < 500)
     .sort((a, b) => a.words - b.words)
     .slice(0, 20),
 };

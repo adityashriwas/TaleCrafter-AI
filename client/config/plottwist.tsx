@@ -6,6 +6,8 @@ export type InteractivePage = {
   imageUrl?: string;
 };
 
+type ParsedPage = Partial<InteractivePage>;
+
 const cleanJsonText = (raw: string) =>
   raw
     .replace(/```json/gi, "")
@@ -83,7 +85,7 @@ export const parsePages = (raw: string): InteractivePage[] => {
   const pages = Array.isArray(parsed?.pages) ? parsed.pages : [];
 
   return pages
-    .map((page: any, index: number) => ({
+    .map((page: ParsedPage, index: number) => ({
       pageNumber: Number(page?.pageNumber ?? index + 1),
       title: String(page?.title ?? `Page ${index + 1}`),
       text: String(page?.text ?? ""),
@@ -112,7 +114,7 @@ export const parseContinuationPayload = (raw: string): {
 
 export const createUniqueImageUrl = (prompt: string, seed: string | number) => {
   const encodedPrompt = encodeURIComponent(prompt);
-  return `https://gen.pollinations.ai/image/${encodedPrompt}?model=flux&enhance=false&negative_prompt=worst+quality%2C+blurry&safe=false&seed=${seed}`;
+  return `https://gen.pollinations.ai/image/${encodedPrompt}?model=flux&enhance=false&negative_prompt=worst+quality%2C+blurry&safe=true&seed=${seed}`;
 };
 
 export const makePageContext = (pages: InteractivePage[], maxPages = 4) => {

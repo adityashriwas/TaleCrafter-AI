@@ -18,6 +18,7 @@ const ShareButton = ({
           url: storyUrl,
         });
       } catch {
+        // The user can intentionally dismiss the native share sheet.
       }
     } else {
       navigator.clipboard.writeText(storyUrl);

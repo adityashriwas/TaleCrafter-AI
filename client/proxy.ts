@@ -1,4 +1,8 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import {
+  clerkClient,
+  clerkMiddleware,
+  createRouteMatcher,
+} from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 const ADMIN_EMAIL = (
@@ -28,7 +32,7 @@ export default clerkMiddleware(async (auth, req) => {
     }
 
     const claims = sessionClaims as Record<string, unknown> | null | undefined;
-    const email = String(
+    let email = String(
       claims?.email ??
         claims?.primary_email_address ??
         claims?.primaryEmailAddress ??
@@ -36,6 +40,13 @@ export default clerkMiddleware(async (auth, req) => {
     )
       .trim()
       .toLowerCase();
+
+    if (!email) {
+      const client = await clerkClient();
+      const clerkUser = await client.users.getUser(userId);
+      email =
+        clerkUser.primaryEmailAddress?.emailAddress?.trim().toLowerCase() ?? "";
+    }
 
     if (!ADMIN_EMAIL || email !== ADMIN_EMAIL) {
       return NextResponse.redirect(new URL("/dashboard", req.url));
