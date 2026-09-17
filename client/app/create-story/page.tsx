@@ -150,7 +150,8 @@ const CreateStory = () => {
               </h1>
               <p className="tc-title-gradient mt-3 max-w-2xl text-sm leading-relaxed md:text-base">
                 Configure your story prompt, visual style, and target audience.
-                TaleCrafter AI will generate a complete illustrated storybook with branching plot options.
+                Choose a complete Classic book or a Plot Twist story where your
+                decisions shape each new branch.
               </p>
             </div>
             <div className="inline-flex items-center rounded-xl border border-blue-300/20 bg-blue-500/10 px-4 py-3 text-blue-100/90">
@@ -236,14 +237,14 @@ const CreateStory = () => {
                   className="tc-btn-primary px-8 py-6 text-base hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-70"
                   onClick={() => GenerateStory("interactive")}
                 >
-                  Create Interactive Story
+                  Create Plot Twist Story
                 </Button>
                 <Button
                   disabled={loading}
                   className="tc-btn-primary px-8 py-6 text-base hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-70"
                   onClick={() => GenerateStory("classic")}
                 >
-                  Create Story
+                  Create Classic Story
                 </Button>
               </>
             )}

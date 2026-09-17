@@ -60,7 +60,7 @@ const InteractiveStorySections = () => {
 
       setStories(result ?? []);
     } catch {
-      toast.error("Unable to load interactive stories");
+      toast.error("Unable to load Plot Twist stories");
     } finally {
       setLoading(false);
     }
@@ -93,7 +93,9 @@ const InteractiveStorySections = () => {
     if (!list.length) {
       return (
         <p className="mt-4 text-blue-100/70">
-          {mode === "draft" ? "No draft stories yet." : "No completed interactive stories yet."}
+          {mode === "draft"
+            ? "No Plot Twist stories in progress."
+            : "No completed Plot Twist stories yet."}
         </p>
       );
     }
@@ -137,9 +139,16 @@ const InteractiveStorySections = () => {
   return (
     <div className="mt-8">
       <div className="tc-glass-panel-soft p-5 md:p-7">
-        <h3 className="tc-title-gradient text-2xl font-bold">Draft Stories</h3>
+        <h3 className="tc-title-gradient text-2xl font-bold">
+          Plot Twist Stories
+        </h3>
+        <p className="mt-1 text-sm text-blue-100/70">
+          Continue the choice-driven stories whose paths you control.
+        </p>
         {!loading && renderCards(draftStories, "draft")}
-        {loading && <p className="mt-4 text-blue-100/70">Loading drafts...</p>}
+        {loading && (
+          <p className="mt-4 text-blue-100/70">Loading Plot Twist stories...</p>
+        )}
       </div>
     </div>
   );

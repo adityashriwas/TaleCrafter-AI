@@ -491,7 +491,7 @@ const InteractiveStoryPage = () => {
       <div className="relative">
         <div className="tc-glass-panel px-5 py-6 text-center shadow-[0_16px_45px_rgba(0,0,0,0.35)] md:px-8">
           <h2 className="tc-title-gradient text-3xl font-extrabold sm:text-4xl md:text-5xl">
-            {story?.title ?? "Interactive Story"}
+            {story?.title ?? "Plot Twist Story"}
           </h2>
           <p className="mt-2 text-blue-100/70">
             Draft depth: {activeNode?.depth ?? 0}/{MAX_DEPTH} · Status: {story?.status ?? "draft"}
