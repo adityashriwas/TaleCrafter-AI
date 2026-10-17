@@ -6,197 +6,99 @@
 
 ---
 
-## Overview
+# TaleCrafter AI
 
-**TaleCrafter AI** is an innovative, full-stack web application that leverages artificial intelligence to generate personalized, interactive storybooks. Users can create professionally illustrated and narrated stories by simply specifying their preferences. The platform combines advanced AI capabilities with an engaging user interface, providing a seamless experience for creating, reading, and sharing unique stories.
+**Turn an idea into an illustrated story.**
 
-Whether you're an author exploring new ideas, a parent seeking engaging content for children, or someone looking to bring imagination to life, TaleCrafter AI transforms creative prompts into complete, illustrated storybooks with professional narration.
+TaleCrafter AI brings story writing, illustrations, branching narratives, character details, and PDF exports into one web application.
 
----
-
-## 🚀 Live Demo
-
-Experience TaleCrafter AI in action:
-
-- **Primary**: [https://www.talecrafterai.com/](https://www.talecrafterai.com/)
-
-<div align="center">
-  <img src="./public/demo.png" alt="Application Interface" width="100%">
-</div>
+[Visit TaleCrafter AI](https://www.talecrafterai.com) · [Explore Stories](https://www.talecrafterai.com/explore) · [How to Use](https://www.talecrafterai.com/how-to-use) · [Plans](https://www.talecrafterai.com/pricing)
 
 ---
 
-## ✨ Key Features
+## Why TaleCrafter?
 
-### 📖 AI-Powered Story Generation
-- **Intelligent Storytelling**: Creates complete, coherent narratives based on user input using advanced AI models
-- **Customizable Parameters**: Choose story subject, target age group, genre, and artistic style
-- **Image-to-Story**: Generate stories directly from uploaded images for enhanced creativity
+Creating an illustrated story usually means switching between writing tools, image generators, and document editors.
 
-### 🧭 Branching Plot Generation
-- **Interactive Story Paths**: Generate branching plotlines where readers choose what happens next
-- **Choice-Driven Chapters**: Build meaningful decision points that lead to different story outcomes
-- **Dynamic Continuations**: Expand each branch with consistent tone, pacing, and character context
+TaleCrafter connects those steps so creators can develop an idea, generate illustrations, and share a readable story from one place.
 
-### 🎨 Interactive Experience
-- **Animated Book Interface**: Immersive page-flip animation for authentic reading experience
-- **Dual Reading Modes**: Switch between Flipbook mode and Story mode for different reading flows
-- **Multiple Art Styles**: Professional illustration styles including Oil Painting, Watercolor, Comic, Anime, 3D, and more
-- **Age-Appropriate Content**: Tailored stories for Toddlers, Kids, Pre-teens, Teens, and Adults
+## Features
 
-### 🔊 Accessibility Features
-- **Text-to-Speech (TTS)**: Full audio narration of generated stories for immersive listening
-- **Smart Narration Control**: Starting narration on a new chapter automatically stops previous playback
-- **Responsive Design**: Optimized for mobile, tablet, and desktop experiences
+- **Classic stories:** Generate illustrated stories from a written idea.
+- **Plot Twist stories:** Shape branching narratives through choices.
+- **Image-to-story ideas:** Use an image as a starting point.
+- **Character bible:** Keep generated character details alongside the story.
+- **Scene prompts:** Access scene-by-scene material for further creative work.
+- **Flipbook reader:** Read published stories in an interactive book layout.
+- **Draft recovery:** Return to unfinished projects and continue creating.
+- **PDF export:** Download stories with an active Creator subscription.
+- **Public library:** Discover stories through genre-based exploration.
+- **Shareable pages:** Share published stories through direct links.
+- **Responsive interface:** Create and read across desktop and mobile screens.
 
-### ðŸ“„ Export & Sharing
-- **Image-First PDF Export**: Download chapter-formatted PDFs with generated visuals and text
-- **Story-Mode Download Flow**: PDF export appears in Story mode for focused reading/export UX
-- **Quick Story Sharing**: Share story links using native share or copy-to-clipboard
+## Plans
 
-### 💰 Flexible Monetization
-- **Credit-Based System**: Pay-as-you-go model for story generation
-- **Secure Payments**: Integrated PayPal for reliable transactions
-- **Transparent Pricing**: Clear credit allocation based on features used
+| Feature | Free Trial | Creator |
+| --- | --- | --- |
+| Google or GitHub sign-in | Yes | Yes |
+| Read public stories | Yes | Yes |
+| Classic story creation | Yes | Yes |
+| GitHub required for creation | Yes | No |
+| Image generation | Your connected Pollinations key | Platform-funded |
+| Branching Plot Twist stories | No | Yes |
+| Complete character bible and scene prompts | No | Yes |
+| PDF export | No | Yes |
+| Billing | No TaleCrafter subscription | Automatically renewing monthly subscription |
 
-### 👤 User Management
-- **Secure Authentication**: Enterprise-grade authentication via Clerk
-- **User Dashboard**: Track created stories, usage history, and credits
-- **Story Library**: Organize and access all generated stories in one place
+The Free Trial requires a valid Pollinations key with available balance for image generation. Free provider credits are not guaranteed.
 
-### 🎯 Discovery & Inspiration
-- **Explore Section**: Browse stories from the community
-- **Admin Dashboard**: Content management and platform oversight
+There are no per-user monthly project, image, or image-to-story quotas. Generation remains subject to provider restrictions and availability; Creator images also depend on shared platform capacity.
 
----
+See the [Plans page](https://www.talecrafterai.com/pricing) for current pricing and checkout availability.
 
-## 🛠️ Technology Stack
+## How It Works
 
-### Frontend & Framework
-- **Next.js 16** - Modern React framework with server-side rendering and API routes
-- **React 18** - UI component library
-- **TypeScript** - Type-safe JavaScript for robust development
-- **Tailwind CSS** - Utility-first styling framework
-- **NextUI** - Premium React component library for polished UI
+1. **Sign in** using an available authentication method.
+2. **Set up generation:** Free Trial users link GitHub and connect their Pollinations key; Creator users use platform-funded images.
+3. **Describe your idea** or generate an idea from an uploaded image.
+4. **Choose a genre and illustration style.**
+5. **Create a Classic or Plot Twist story**, depending on your plan.
+6. **Read, share, or export** the finished story.
 
-### Animation & Interactions
-- **Framer Motion** - Advanced animations and transitions
-- **React PageFlip** - Book page-flip animation library
+Published stories are public and may appear in search results. Avoid including confidential or sensitive information.
 
-### AI & Language Models
-- **Google Generative AI (Gemini)** - Core AI engine for story generation
-- **Gemini Vision** - Image understanding and analysis
+## Technology Stack
 
-### Backend & Database
-- **PostgreSQL** - Reliable relational database
-- **Neon** - Serverless PostgreSQL platform
-- **Drizzle ORM** - Type-safe database operations
-- **Next.js API Routes** - Serverless backend functions
+| Layer | Technology |
+| --- | --- |
+| Frontend | Next.js, React, TypeScript |
+| Styling | Tailwind CSS |
+| Backend | Node.js, Express |
+| Database | PostgreSQL on Neon |
+| Database tooling | Drizzle ORM |
+| Authentication | Neon Auth, Google, GitHub |
+| Story generation | Google Gemini |
+| Image generation | Pollinations |
+| Media storage | Cloudinary |
+| Subscription payments | Razorpay |
+| Hosting | Vercel and Render |
 
-### Authentication & Payments
-- **Clerk** - Modern authentication and user management
-- **PayPal** - Secure payment processing
+## Coming Soon
 
-### Utilities
-- **Axios** - HTTP client for API requests
-- **React Toastify** - User notifications
-- **React Icons** - Comprehensive icon library
-- **jsPDF + html2canvas** - PDF generation for story exports
+**Complete short-film generation:** Extend the workflow from illustrated stories toward video creation.
 
----
+Video generation is not included in the current subscription.
 
+## Explore the Product
 
-## 🎯 Usage Guide
-
-### Creating Your First Story
-
-1. **Sign Up / Log In**
-   - Navigate to the application and create an account or log in with your credentials
-   - Your account is secured through Clerk authentication
-
-2. **Access Story Creation**
-   - Click "Create Story" from the navigation menu
-   - Land on the story creation interface
-
-3. **Specify Story Details**
-   - **Subject**: Enter the main topic or character for your story
-   - **Age Category**: Select target audience (Toddler, Kids, Pre-teens, Teens, Adult)
-   - **Genre**: Choose from Fantasy, Science Fiction, Romance, Horror, History, Mythology, Crime Thriller, Educational, and Motivational
-   - **Art Style**: Pick your preferred visual style (Oil Painting, Watercolor, Comic, Anime, 3D, Sketch, Charcoal Drawing, Paper Cut)
-
-4. **Generate Story**
-   - Use **Create Interactive Story** to generate branching plotlines with reader choices
-   - Use **Create Story** for a classic linear story format
-   - AI will process your preferences and generate a complete narrative
-
-5. **Experience Your Story**
-   - Read in animated **Flipbook** mode for page-turn interactions
-   - Toggle to **Story** mode for chapter cards and export-ready layout
-   - Use narration controls with automatic stop when another chapter starts
-
-6. **Manage Your Stories**
-   - Access your story library from the dashboard
-   - Share stories with others using built-in sharing features
-   - Download stories as image-rich PDF files for offline reading
-
-### Credit System
-
-- **Free Trial**: New users receive starter credits to explore the platform
-- **Purchase Credits**: Buy additional credits through PayPal integration
-- **Credit Allocation**: Each story generation uses a specific number of credits based on story length and complexity
-
-### Admin Features
-
-- Access the admin dashboard for content moderation
-- Monitor platform usage and user activity
-- Manage featured stories and recommendations
+- [Create a Story](https://www.talecrafterai.com/create-story)
+- [Explore Public Stories](https://www.talecrafterai.com/explore)
+- [Read the User Guide](https://www.talecrafterai.com/how-to-use)
+- [View Plans](https://www.talecrafterai.com/pricing)
 
 ---
 
-
-## 📚 Database Schema
-
-The application uses PostgreSQL with the following main entities:
-
-- **Users**: User accounts and authentication data
-- **Stories**: Generated stories with metadata
-- **Chapters**: Story chapters and content
-- **Credits**: User credit balances and transactions
-- **Feedback**: User feedback and ratings
-
-Database migrations are managed through Drizzle ORM.
-
----
-
-## 🔐 Security & Privacy
-
-- **Secure Authentication**: Industry-standard JWT tokens via Clerk
-- **Password Security**: Encrypted password storage and transmission
-- **Data Protection**: HTTPS encryption for all data in transit
-- **Privacy Compliance**: GDPR-compliant user data handling
-
----
-
-
-## 🙋 Support & Feedback
-
-- **Report Issues**: Use the GitHub issues tracker
-- **Feature Requests**: Suggest new features via issues
-- **Questions**: Create a discussion thread
-
----
-
-## 🎉 Acknowledgments
-
-- **Google Generative AI** for powerful language models
-- **Clerk** for seamless authentication
-- **Vercel** for excellent hosting and deployment
-- **Open Source Community** for inspiring libraries and tools
-
----
-
-<div align="center">
-  
+Built independently in India for creators around the world.  
 **Made with ❤️ by the Aditya Shriwas**
 
 [Visit Website](https://www.talecrafterai.com/) • [Report Bug](https://github.com/adityashriwas/TaleCrafter-AI/issues) • [Request Feature](https://github.com/adityashriwas/TaleCrafter-AI/issues)
