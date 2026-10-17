@@ -18,8 +18,7 @@ Whether you're an author exploring new ideas, a parent seeking engaging content 
 
 Experience TaleCrafter AI in action:
 
-- **Primary**: [https://www.talecrafterai.tech/](https://www.talecrafterai.tech/)
-- **Backup**: [https://talecrafter-ai.vercel.app](https://talecrafter-ai.vercel.app/)
+- **Primary**: [https://www.talecrafterai.tech/](https://www.talecrafterai.com/)
 
 <div align="center">
   <img src="./public/demo.png" alt="Application Interface" width="100%">
@@ -200,7 +199,7 @@ Database migrations are managed through Drizzle ORM.
   
 **Made with ❤️ by the Aditya Shriwas**
 
-[Visit Website](https://www.talecrafterai.tech/) • [Report Bug](https://github.com/adityashriwas/TaleCrafter-AI/issues) • [Request Feature](https://github.com/adityashriwas/TaleCrafter-AI/issues)
+[Visit Website](https://www.talecrafterai.com/) • [Report Bug](https://github.com/adityashriwas/TaleCrafter-AI/issues) • [Request Feature](https://github.com/adityashriwas/TaleCrafter-AI/issues)
 
 </div>
 
