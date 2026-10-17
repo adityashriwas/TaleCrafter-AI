@@ -18,7 +18,7 @@ Whether you're an author exploring new ideas, a parent seeking engaging content 
 
 Experience TaleCrafter AI in action:
 
-- **Primary**: [https://www.talecrafterai.tech/](https://www.talecrafterai.com/)
+- **Primary**: [https://www.talecrafterai.com/](https://www.talecrafterai.com/)
 
 <div align="center">
   <img src="./public/demo.png" alt="Application Interface" width="100%">
